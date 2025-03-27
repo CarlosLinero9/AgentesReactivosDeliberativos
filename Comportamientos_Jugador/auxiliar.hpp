@@ -14,6 +14,9 @@ public:
   ComportamientoAuxiliar(unsigned int size = 0) : Comportamiento(size)
   {
     // Inicializar Variables de Estado Niveles 0,1,4
+    last_action = IDLE;
+    tiene_zapatillas = false;
+    giro45izq = 0;
   }
   ComportamientoAuxiliar(std::vector<std::vector<unsigned char>> mapaR, std::vector<std::vector<unsigned char>> mapaC) : Comportamiento(mapaR,mapaC)
   {
@@ -32,8 +35,14 @@ public:
   Action ComportamientoAuxiliarNivel_3(Sensores sensores);
   Action ComportamientoAuxiliarNivel_4(Sensores sensores);
 
+  int VeoCasillaInteresanteA(char i, char c, char d);
+  char ViablePorAlturaA (char casilla, int dif);
+
 private:
   // Definir Variables de Estado
+  Action last_action;
+  bool tiene_zapatillas;
+  int giro45izq;
 };
 
 #endif
