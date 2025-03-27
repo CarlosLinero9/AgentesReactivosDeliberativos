@@ -231,8 +231,33 @@ void ComportamientoRescatador::SituarSensorenMapaR(vector<vector<unsigned char>>
 
 	switch(sensores.rumbo){
 		case norte:
-		m[sensores.posF-1][sensores.posC-1] = sensores.superficie[1];
+			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[1];
+			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[2];
+			m[sensores.posF-1][sensores.posC+1] = sensores.superficie[3];
 
+			break;
+		case noreste:
+			m[sensores.posF-1][sensores.posC] = sensores.superficie[1];
+			m[sensores.posF-1][sensores.posC+1] = sensores.superficie[2];
+			m[sensores.posF][sensores.posC+1] = sensores.superficie[3];
+
+			break;
+		case este:
+			m[sensores.posF-1][sensores.posC+1] = sensores.superficie[1];
+			m[sensores.posF][sensores.posC+1] = sensores.superficie[2];
+			m[sensores.posF+1][sensores.posC+1] = sensores.superficie[3];
+
+			break;
+		case sureste:
+			break;
+		case sur:
+			break;
+		case suroeste:
+			break;
+		case oeste:
+			break;
+		case noroeste:
+			break;
 	}
 }
 
