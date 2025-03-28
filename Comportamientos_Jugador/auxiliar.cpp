@@ -155,58 +155,58 @@ void ComportamientoAuxiliar::SituarSensorenMapaA(vector<vector<unsigned char>> &
 			break;
 
 		case este:
-			m[sensores.posF-1][sensores.posC+1] = sensores.superficie[1];
-			m[sensores.posF][sensores.posC+1] = sensores.superficie[2];
-			m[sensores.posF+1][sensores.posC+1] = sensores.superficie[3];
-			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[4];
-			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[5];
-			m[sensores.posF-1][sensores.posC+1] = sensores.superficie[6];
-			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[7];
-			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[8];
-			m[sensores.posF-1][sensores.posC+1] = sensores.superficie[9];
-			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[10];
-			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[11];
-			m[sensores.posF-1][sensores.posC+1] = sensores.superficie[12];
-			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[13];
-			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[14];
-			m[sensores.posF-1][sensores.posC+1] = sensores.superficie[15];
+			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[1];
+			m[sensores.posF][sensores.posC-1] = sensores.superficie[2];
+			m[sensores.posF+1][sensores.posC-1] = sensores.superficie[3];
+			m[sensores.posF-2][sensores.posC-2] = sensores.superficie[4];
+			m[sensores.posF-1][sensores.posC-2] = sensores.superficie[5];
+			m[sensores.posF][sensores.posC-2] = sensores.superficie[6];
+			m[sensores.posF+1][sensores.posC-2] = sensores.superficie[7];
+			m[sensores.posF+2][sensores.posC-2] = sensores.superficie[8];
+			m[sensores.posF-3][sensores.posC-3] = sensores.superficie[9];
+			m[sensores.posF-2][sensores.posC-3] = sensores.superficie[10];
+			m[sensores.posF-1][sensores.posC-3] = sensores.superficie[11];
+			m[sensores.posF][sensores.posC-3] = sensores.superficie[12];
+			m[sensores.posF+1][sensores.posC-3] = sensores.superficie[13];
+			m[sensores.posF+2][sensores.posC-3] = sensores.superficie[14];
+			m[sensores.posF+3][sensores.posC-3] = sensores.superficie[15];
 
 			break;
 
 		case sureste:
-			m[sensores.posF-1][sensores.posC+1] = sensores.superficie[1];
-			m[sensores.posF][sensores.posC+1] = sensores.superficie[2];
-			m[sensores.posF+1][sensores.posC+1] = sensores.superficie[3];
-			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[4];
-			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[5];
-			m[sensores.posF-1][sensores.posC+1] = sensores.superficie[6];
-			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[7];
-			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[8];
-			m[sensores.posF-1][sensores.posC+1] = sensores.superficie[9];
-			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[10];
-			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[11];
-			m[sensores.posF-1][sensores.posC+1] = sensores.superficie[12];
-			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[13];
-			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[14];
-			m[sensores.posF-1][sensores.posC+1] = sensores.superficie[15];
+			m[sensores.posF+1][sensores.posC] = sensores.superficie[1];
+			m[sensores.posF+1][sensores.posC-1] = sensores.superficie[2];
+			m[sensores.posF][sensores.posC-1] = sensores.superficie[3];
+			m[sensores.posF+2][sensores.posC] = sensores.superficie[4];
+			m[sensores.posF+2][sensores.posC-1] = sensores.superficie[5];
+			m[sensores.posF+2][sensores.posC-2] = sensores.superficie[6];
+			m[sensores.posF+1][sensores.posC-2] = sensores.superficie[7];
+			m[sensores.posF][sensores.posC-2] = sensores.superficie[8];
+			m[sensores.posF+3][sensores.posC] = sensores.superficie[9];
+			m[sensores.posF+3][sensores.posC-1] = sensores.superficie[10];
+			m[sensores.posF+3][sensores.posC-2] = sensores.superficie[11];
+			m[sensores.posF+3][sensores.posC-3] = sensores.superficie[12];
+			m[sensores.posF+2][sensores.posC-3] = sensores.superficie[13];
+			m[sensores.posF+1][sensores.posC-3] = sensores.superficie[14];
+			m[sensores.posF][sensores.posC-3] = sensores.superficie[15];
 			break;
 
 		case sur:
-			m[sensores.posF-1][sensores.posC+1] = sensores.superficie[1];
-			m[sensores.posF][sensores.posC+1] = sensores.superficie[2];
-			m[sensores.posF+1][sensores.posC+1] = sensores.superficie[3];
-			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[4];
-			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[5];
-			m[sensores.posF-1][sensores.posC+1] = sensores.superficie[6];
-			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[7];
-			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[8];
-			m[sensores.posF-1][sensores.posC+1] = sensores.superficie[9];
-			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[10];
-			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[11];
-			m[sensores.posF-1][sensores.posC+1] = sensores.superficie[12];
-			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[13];
-			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[14];
-			m[sensores.posF-1][sensores.posC+1] = sensores.superficie[15];
+			m[sensores.posF+1][sensores.posC+1] = sensores.superficie[1];
+			m[sensores.posF+1][sensores.posC] = sensores.superficie[2];
+			m[sensores.posF+1][sensores.posC-1] = sensores.superficie[3];
+			m[sensores.posF+2][sensores.posC+2] = sensores.superficie[4];
+			m[sensores.posF+2][sensores.posC+1] = sensores.superficie[5];
+			m[sensores.posF+2][sensores.posC] = sensores.superficie[6];
+			m[sensores.posF+2][sensores.posC-1] = sensores.superficie[7];
+			m[sensores.posF+2][sensores.posC-2] = sensores.superficie[8];
+			m[sensores.posF+3][sensores.posC+3] = sensores.superficie[9];
+			m[sensores.posF+3][sensores.posC+2] = sensores.superficie[10];
+			m[sensores.posF+3][sensores.posC+1] = sensores.superficie[11];
+			m[sensores.posF+3][sensores.posC] = sensores.superficie[12];
+			m[sensores.posF+3][sensores.posC-1] = sensores.superficie[13];
+			m[sensores.posF+3][sensores.posC-2] = sensores.superficie[14];
+			m[sensores.posF+3][sensores.posC-3] = sensores.superficie[15];
 			break;
 
 		case suroeste:
@@ -231,18 +231,18 @@ void ComportamientoAuxiliar::SituarSensorenMapaA(vector<vector<unsigned char>> &
 			m[sensores.posF-1][sensores.posC+1] = sensores.superficie[1];
 			m[sensores.posF][sensores.posC+1] = sensores.superficie[2];
 			m[sensores.posF+1][sensores.posC+1] = sensores.superficie[3];
-			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[4];
-			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[5];
-			m[sensores.posF-1][sensores.posC+1] = sensores.superficie[6];
-			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[7];
-			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[8];
-			m[sensores.posF-1][sensores.posC+1] = sensores.superficie[9];
-			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[10];
-			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[11];
-			m[sensores.posF-1][sensores.posC+1] = sensores.superficie[12];
-			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[13];
-			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[14];
-			m[sensores.posF-1][sensores.posC+1] = sensores.superficie[15];
+			m[sensores.posF-2][sensores.posC+2] = sensores.superficie[4];
+			m[sensores.posF-1][sensores.posC+2] = sensores.superficie[5];
+			m[sensores.posF][sensores.posC+2] = sensores.superficie[6];
+			m[sensores.posF+1][sensores.posC+2] = sensores.superficie[7];
+			m[sensores.posF+2][sensores.posC+2] = sensores.superficie[8];
+			m[sensores.posF-3][sensores.posC+3] = sensores.superficie[9];
+			m[sensores.posF-2][sensores.posC+3] = sensores.superficie[10];
+			m[sensores.posF-1][sensores.posC+3] = sensores.superficie[11];
+			m[sensores.posF][sensores.posC+3] = sensores.superficie[12];
+			m[sensores.posF+1][sensores.posC+3] = sensores.superficie[13];
+			m[sensores.posF+2][sensores.posC+3] = sensores.superficie[14];
+			m[sensores.posF+3][sensores.posC+3] = sensores.superficie[15];
 			break;
 
 		case noroeste:
