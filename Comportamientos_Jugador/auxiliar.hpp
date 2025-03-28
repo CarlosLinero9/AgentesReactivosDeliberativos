@@ -38,6 +38,9 @@ public:
   int VeoCasillaInteresanteA(char i, char c, char d);
   char ViablePorAlturaA (char casilla, int dif);
 
+  void SituarSensorenMapaA(vector<vector<unsigned char>> &m, vector<vector<unsigned char>> &a, Sensores sensores);
+
+
 private:
   // Definir Variables de Estado
   Action last_action;
