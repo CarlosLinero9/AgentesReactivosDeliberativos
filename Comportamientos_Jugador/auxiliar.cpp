@@ -46,16 +46,20 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_0(Sensores sensores)
 	else if(giro45izq != 0){
 		accion = TURN_SR;
 		giro45izq--;
+		cout << giro45izq << endl;
 	}
 	else {
 		char i = ViablePorAlturaA(sensores.superficie[1], sensores.cota[1]-sensores.cota[0]);
 		char c = ViablePorAlturaA(sensores.superficie[2], sensores.cota[2]-sensores.cota[0]);
 		char d = ViablePorAlturaA(sensores.superficie[3], sensores.cota[3]-sensores.cota[0]);
-		bool i_libre = CasillaLibreA(sensores.agentes[1]);
-		bool c_libre = CasillaLibreA(sensores.agentes[2]);
-		bool d_libre = CasillaLibreA(sensores.agentes[3]);
 
-		int pos = VeoCasillaInteresanteA(i, c, d, i_libre, c_libre, d_libre);
+		/*Lo comento todo porque prefiero no utilozarlo ahora mismo*/
+		//bool i_libre = CasillaLibreA(sensores.agentes[1]);
+		//bool c_libre = CasillaLibreA(sensores.agentes[2]);
+		//bool d_libre = CasillaLibreA(sensores.agentes[3]);
+
+		//int pos = VeoCasillaInteresanteA(i, c, d, i_libre, c_libre, d_libre);
+		int pos = VeoCasillaInteresanteA(i, c, d);
 
 		switch (pos){
 			case 2:
