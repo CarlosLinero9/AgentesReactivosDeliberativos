@@ -36,7 +36,9 @@ public:
   Action ComportamientoAuxiliarNivel_4(Sensores sensores);
 
   int VeoCasillaInteresanteA(char i, char c, char d);
+  int VeoCasillaInteresanteA(char i, char c, char d, bool i_libre, bool c_libre, bool d_libre);
   char ViablePorAlturaA (char casilla, int dif);
+  bool CasillaLibreA(char casilla);
 
   void SituarSensorenMapaA(vector<vector<unsigned char>> &m, vector<vector<unsigned char>> &a, Sensores sensores);
 

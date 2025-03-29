@@ -37,9 +37,12 @@ public:
 
   int VeoCasillaInteresanteR(char i, char c, char d);
   int VeoCasillaInteresanteR(char i, char c, char d, bool zap);
+  int VeoCasillaInteresanteR(char i, char c, char d, bool i_libre, bool c_libre, bool d_libre, bool zap);
   char ViablePorAlturaR (char casilla, int dif, bool zap);
+  bool CasillaLibreR(char casilla);
 
   void SituarSensorenMapaR(vector<vector<unsigned char>> &m, vector<vector<unsigned char>> &a, Sensores sensores);
+  
 
 private:
   // Variables de Estado

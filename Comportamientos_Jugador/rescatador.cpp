@@ -151,9 +151,11 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_0(Sensores sensor
 		char i = ViablePorAlturaR(sensores.superficie[1], sensores.cota[1]-sensores.cota[0], tiene_zapatillas);
 		char c = ViablePorAlturaR(sensores.superficie[2], sensores.cota[2]-sensores.cota[0], tiene_zapatillas);
 		char d = ViablePorAlturaR(sensores.superficie[3], sensores.cota[3]-sensores.cota[0], tiene_zapatillas);
+		bool i_libre = CasillaLibreR(sensores.agentes[1]);
+		bool c_libre = CasillaLibreR(sensores.agentes[2]);
+		bool d_libre = CasillaLibreR(sensores.agentes[3]);
 
-
-		int pos = VeoCasillaInteresanteR(i, c, d, tiene_zapatillas);
+		int pos = VeoCasillaInteresanteR(i, c, d, i_libre, c_libre, d_libre, tiene_zapatillas);
 		switch (pos){
 			case 2:
 				accion = WALK;
@@ -216,11 +218,34 @@ int ComportamientoRescatador::VeoCasillaInteresanteR(char i, char c, char d, boo
 	else return 0;
 }
 
+/*Una primera idea para resolver puede ser esta. 
+Tengo que ir perfeccionando cosas.*/
+int ComportamientoRescatador::VeoCasillaInteresanteR(char i, char c, char d, bool i_libre, bool c_libre, 
+	bool d_libre, bool zap){
+	if (c == 'X' and c_libre) return 2;
+	else if (i == 'X' and i_libre) return 1;
+	else if (d == 'X' and d_libre) return 3;
+	else if(!zap) {
+		if(c == 'D' and c_libre) return 2;
+		else if (i == 'D' and i_libre) return 1;
+		else if (d == 'D' and d_libre) return 3;
+	}
+	if (c == 'C' and c_libre) return 2;
+	else if (i == 'C' and i_libre) return 1;
+	else if (d == 'C' and d_libre) return 3;
+	else return 0;
+}
+
 char ComportamientoRescatador::ViablePorAlturaR(char casilla, int dif, bool zap){
 	if (abs(dif)<=1 or (zap and abs(dif)<=2))
 		return casilla;
 	else 
 		return 'P';
+}
+
+bool ComportamientoRescatador::CasillaLibreR(char casilla){
+	if(casilla == '_') return true;
+	else return false;
 }
 
 void ComportamientoRescatador::SituarSensorenMapaR(vector<vector<unsigned char>> &m, vector<vector<unsigned char>> &a, Sensores sensores){
