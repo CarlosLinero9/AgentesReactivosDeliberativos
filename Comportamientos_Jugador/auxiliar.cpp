@@ -53,12 +53,12 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_0(Sensores sensores)
 		char d = ViablePorAlturaA(sensores.superficie[3], sensores.cota[3]-sensores.cota[0]);
 
 		/*Lo comento todo porque prefiero no utilizarlo ahora mismo*/
-		//bool i_libre = CasillaLibreA(sensores.agentes[1]);
-		//bool c_libre = CasillaLibreA(sensores.agentes[2]);
-		//bool d_libre = CasillaLibreA(sensores.agentes[3]);
+		bool i_libre = CasillaLibreA(sensores.agentes[1]);
+		bool c_libre = CasillaLibreA(sensores.agentes[2]);
+		bool d_libre = CasillaLibreA(sensores.agentes[3]);
 
-		//int pos = VeoCasillaInteresanteA(i, c, d, i_libre, c_libre, d_libre);
-		int pos = VeoCasillaInteresanteA(i, c, d);
+		int pos = VeoCasillaInteresanteA(i, c, d, i_libre, c_libre, d_libre);
+		//int pos = VeoCasillaInteresanteA(i, c, d);
 
 		switch (pos){
 			case 2:
