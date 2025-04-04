@@ -5,6 +5,7 @@
 #include <time.h>
 #include <thread>
 #include <list>
+#include <set>
 
 #include "comportamientos/comportamiento.hpp"
 
@@ -29,6 +30,17 @@ struct NodoA{
   bool operator==(const NodoA &nodo) const
   {
     return (estado == nodo.estado);
+  }
+
+  bool operator<(const NodoA &node) const
+  {
+    if(estado.f < node.estado.f) return true;
+    else if(estado.f == node.estado.f and estado.c < node.estado.c) return true;
+    else if(estado.f == node.estado.f and estado.c == node.estado.c and estado.brujula 
+          < node.estado.brujula) return true;
+    else if(estado.f == node.estado.f and estado.c == node.estado.c and estado.brujula
+         == node.estado.brujula and estado.zapatillas < node.estado.zapatillas) return true;
+    else return false;
   }
 };
 
@@ -80,7 +92,8 @@ public:
     const vector<vector<unsigned char>> &altura);
   bool Find(const NodoA &st,const list<NodoA> &lista);
   void AnularMatrizA(vector<vector<unsigned char>> &m);
-
+  list<Action> AnchuraAuxiliar_V2(const EstadoA &inicio, const EstadoA &final,
+    const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura);
   
 private:
   // Definir Variables de Estado

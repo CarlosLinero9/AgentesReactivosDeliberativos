@@ -470,7 +470,8 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_E(Sensores sensores){
 		inicio.zapatillas = tiene_zapatillas;
 		fin.f = sensores.destinoF;
 		fin.c = sensores.destinoC;
-		plan = AnchuraAuxiliar(inicio, fin, mapaResultado, mapaCotas);
+		//plan = AnchuraAuxiliar(inicio, fin, mapaResultado, mapaCotas);
+		plan  = AnchuraAuxiliar_V2(inicio, fin, mapaResultado, mapaCotas);
 		VisualizaPlan(inicio, plan);
 		hayPlan = plan.size() != 0;
 	}
@@ -671,4 +672,65 @@ void ComportamientoAuxiliar::AnularMatrizA(vector<vector<unsigned char>> &m){
 			m[i][j] = 0;
 		}
 	}
+}
+
+list<Action> ComportamientoAuxiliar::AnchuraAuxiliar_V2(const EstadoA &inicio, const EstadoA &final,
+	const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura){
+
+		NodoA current_node;
+		list<NodoA> frontier;
+		set<NodoA> explored;
+		list<Action> path;
+
+		current_node.estado = inicio;
+		frontier.push_back(current_node);
+		bool SolutionFound = (current_node.estado.f == final.f and current_node.estado.c == final.c);
+
+		while(!SolutionFound and !frontier.empty()){
+			frontier.pop_front();
+			explored.insert(current_node);
+
+			//Compruebbo si estoy en una casilla de las zapatillas
+			if(terreno[current_node.estado.f][current_node.estado.c] == 'D'){
+				current_node.estado.zapatillas = true;
+			}
+
+			//Genero el hijo resultante de aplicar la accion WALK
+			NodoA child_WALK = current_node;
+			child_WALK.estado = applyA(WALK, current_node.estado, terreno, altura);
+			if(child_WALK.estado.f == final.f and child_WALK.estado.c == final.c){
+				//El hijo generado es solucion
+				child_WALK.secuencia.push_back(WALK);
+				current_node = child_WALK;
+				SolutionFound = true;
+			}
+			else if(explored.find(child_WALK) == explored.end()){
+				//Se mete en la lista frontier después de añadir a secuencia la acción
+				child_WALK.secuencia.push_back(WALK);
+				frontier.push_back(child_WALK);
+			}
+
+			//Genero el hijo resultante de aplicar la accion TURN_SR
+			if(!SolutionFound){
+				NodoA child_TURN_SR = current_node;
+				child_TURN_SR.estado = applyA(TURN_SR, current_node.estado, terreno, altura);
+				if(explored.find(child_TURN_SR) == explored.end()){
+					child_TURN_SR.secuencia.push_back(TURN_SR);
+					frontier.push_back(child_TURN_SR);
+				}
+			}
+
+			//Paso a evaluar el siguiente nodo en la lista "frontier"
+			if(!SolutionFound and !frontier.empty()){
+				current_node = frontier.front();
+				while(explored.find(current_node) != explored.end() and !frontier.empty()){
+					frontier.pop_front();
+					current_node = frontier.front();
+				}
+			}
+		}
+
+		if(SolutionFound) path = current_node.secuencia;
+		
+		return path;
 }
