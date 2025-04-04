@@ -101,7 +101,7 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_4(Sensores sensores)
 
 
 ///////////
-/*Nivel 0*/
+/*Parte 0*/
 ///////////
 
 int ComportamientoAuxiliar::VeoCasillaInteresanteA(char i, char c, char d){
@@ -449,7 +449,7 @@ void ComportamientoAuxiliar::SituarSensorenMapaA(vector<vector<unsigned char>> &
 ///////////
 /*Parte 1*/
 ///////////
-list<Action> AvanzaSaltosDeCaballo(){
+list<Action> AvanzaSaltosDeCaballoA(){
 	list<Action> secuencia;
 	secuencia.push_back(WALK);
 	secuencia.push_back(WALK);
@@ -661,6 +661,7 @@ void ComportamientoAuxiliar::VisualizaPlan(const EstadoA &st, const list<Action>
 				break;
 			case TURN_SR:
 				cst.brujula = (cst.brujula + 1) % 8;
+				break;
 		}
 		it++;
 	}
