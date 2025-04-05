@@ -6,6 +6,7 @@
 #include <thread>
 #include <list>
 #include <set>
+#include <iostream>
 
 #include "comportamientos/comportamiento.hpp"
 

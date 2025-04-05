@@ -172,10 +172,10 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_0(Sensores sensor
 				accion = TURN_SR;
 				break;
 			case 0:
-				if(last_action == TURN_SR)
-					accion = TURN_L;
-				else
+				if(last_action == TURN_L)
 					accion = TURN_SR;
+				else
+					accion = TURN_L;
 				
 				break;
 		}
@@ -895,4 +895,28 @@ list<Action> ComportamientoRescatador::AnchuraRescatador_V2(const EstadoR &inici
 
 void PintaPlan(const list<Action> &plan, bool zap){
 
+	auto it = plan.begin();
+	while(it != plan.end()){
+		if(*it == WALK){
+			cout << "W ";
+		}else if(*it == RUN){
+			cout << "R ";
+		}else if(*it == TURN_SR){
+			cout << "r ";
+		}else if(*it == TURN_L){
+			cout << "L ";
+		}else if(*it == CALL_ON){
+			cout << "C ";
+		}else if(*it == CALL_OFF){
+			cout << "c ";
+		}else if(*it == IDLE){
+			cout << "I ";
+		}else{
+			cout << "-_";
+		}
+		it++;	
+	}
+	cout << "( longitud " << plan.size();
+	if(zap) cout << "[Z]";
+	cout << ")\n";
 }
