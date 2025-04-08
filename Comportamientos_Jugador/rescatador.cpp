@@ -38,108 +38,6 @@ int ComportamientoRescatador::interact(Action accion, int valor)
 ///////////
 Action ComportamientoRescatador::ComportamientoRescatadorNivel_0(Sensores sensores)
 {
-	// El comportamiento de seguir un camino hasta encontrar un puesto base.
-
-	//Primera versión
-	// Action accion;
-
-	// if(sensores.superficie[0] == 'D') tiene_zapatillas = true;
-
-	// if(sensores.superficie[0] == 'X'){
-	// 	accion = IDLE;
-	// }
-	// else if(giro45izq != 0){
-	// 	accion = TURN_SR;
-	// 	giro45izq--;
-	// }
-	// else if(sensores.superficie[2] == 'C'){
-	// 	accion = WALK;
-	// }
-	// else if(sensores.superficie[1] == 'C'){
-	// 	giro45izq = 1;
-	// 	accion = TURN_L;
-	// }
-	// else if(sensores.superficie[3] == 'C'){
-	// 	accion = TURN_SR;
-	// }
-	// else{
-	// 	accion = TURN_L;
-	// }
-
-	// last_action = accion;
-	// return accion;
-
-
-	//Segunda versión
-	// Action accion;
-
-	// if(sensores.superficie[0] == 'D') tiene_zapatillas = true;
-
-	// if(sensores.superficie[0] == 'X'){
-	// 	accion = IDLE;
-	// }
-	// else if(giro45izq != 0){
-	// 	accion = TURN_SR;
-	// 	giro45izq--;
-	// }
-	// else {
-	// 	int pos = VeoCasillaInteresanteR(sensores.superficie[1], sensores.superficie[2], sensores.superficie[3]);
-	// 	switch (pos){
-	// 		case 2:
-	// 			accion = WALK;
-	// 			break;
-	// 		case 1:
-	// 			giro45izq = 1;
-	// 			accion = TURN_L;
-	// 			break;
-	// 		case 3:
-	// 			accion = TURN_SR;
-	// 			break;
-	// 		case 0:
-	// 			accion = TURN_L;
-	// 			break;
-	// 	}
-	// }
-
-	// last_action = accion;
-	// return accion;
-
-
-	// //Tercera version
-	// Action accion;
-
-	// if(sensores.superficie[0] == 'D') tiene_zapatillas = true;
-
-	// if(sensores.superficie[0] == 'X'){
-	// 	accion = IDLE;
-	// }
-	// else if(giro45izq != 0){
-	// 	accion = TURN_SR;
-	// 	giro45izq--;
-	// }
-	// else {
-	// 	int pos = VeoCasillaInteresanteR(sensores.superficie[1], sensores.superficie[2], sensores.superficie[3], tiene_zapatillas);
-	// 	switch (pos){
-	// 		case 2:
-	// 			accion = WALK;
-	// 			break;
-	// 		case 1:
-	// 			giro45izq = 1;
-	// 			accion = TURN_L;
-	// 			break;
-	// 		case 3:
-	// 			accion = TURN_SR;
-	// 			break;
-	// 		case 0:
-	// 			accion = TURN_L;
-	// 			break;
-	// 	}
-	// }
-
-	// last_action = accion;
-	// return accion;
-
-	//Cuarta version
 	Action accion;
 	SituarSensorenMapaR(mapaResultado, mapaCotas, sensores);
 	if(sensores.superficie[0] == 'D') tiene_zapatillas = true;
@@ -152,14 +50,8 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_0(Sensores sensor
 		giro45izq--;
 	}
 	else {
-		char i = ViablePorAlturaR(sensores.superficie[1], sensores.cota[1]-sensores.cota[0], tiene_zapatillas);
-		char c = ViablePorAlturaR(sensores.superficie[2], sensores.cota[2]-sensores.cota[0], tiene_zapatillas);
-		char d = ViablePorAlturaR(sensores.superficie[3], sensores.cota[3]-sensores.cota[0], tiene_zapatillas);
-		bool i_libre = CasillaLibreR(sensores.agentes[1]);
-		bool c_libre = CasillaLibreR(sensores.agentes[2]);
-		bool d_libre = CasillaLibreR(sensores.agentes[3]);
 
-		int pos = VeoCasillaInteresanteR(i, c, d, i_libre, c_libre, d_libre, tiene_zapatillas);
+		int pos = VeoCasillaInteresanteR(sensores, tiene_zapatillas);
 		switch (pos){
 			case 2:
 				accion = WALK;
@@ -180,56 +72,90 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_0(Sensores sensor
 				break;
 		}
 	}
+	pasos++;
+
+	if(pasos == MAX_PASOS){
+		RefrescarmatrizR(frecuencia_visita);
+		pasos = 0;
+	}
 
 	last_action = accion;
 	return accion;
 }
 
-Action ComportamientoRescatador::ComportamientoRescatadorNivel_1(Sensores sensores)
-{
-}
 
-Action ComportamientoRescatador::ComportamientoRescatadorNivel_2(Sensores sensores)
-{
-}
-
-Action ComportamientoRescatador::ComportamientoRescatadorNivel_3(Sensores sensores)
-{
-}
-
-Action ComportamientoRescatador::ComportamientoRescatadorNivel_4(Sensores sensores)
-{
-}
-
-int ComportamientoRescatador::VeoCasillaInteresanteR(char i, char c, char d){
-	if (c == 'X') return 2;
-	else if (i == 'X') return 1;
-	else if (d == 'X') return 3;
-	else if (c == 'C') return 2;
-	else if (i == 'C') return 1;
-	else if (d == 'C') return 3;
-	else return 0;
-}
-
-int ComportamientoRescatador::VeoCasillaInteresanteR(char i, char c, char d, bool zap){
-	if (c == 'X') return 2;
-	else if (i == 'X') return 1;
-	else if (d == 'X') return 3;
-	else if(!zap) {
-		if(c == 'D') return 2;
-		else if (i == 'D') return 1;
-		else if (d == 'D') return 3;
-	}
-	if (c == 'C') return 2;
-	else if (i == 'C') return 1;
-	else if (d == 'C') return 3;
-	else return 0;
+bool ComportamientoRescatador::NoVisitaFrecuente(int f, int c){
+	if(frecuencia_visita[f][c] >= LIMITE_VISITAS) return false;
+	else return true;
 }
 
 /*Una primera idea para resolver puede ser esta. 
 Tengo que ir perfeccionando cosas.*/
-int ComportamientoRescatador::VeoCasillaInteresanteR(char i, char c, char d, bool i_libre, bool c_libre, 
-	bool d_libre, bool zap){
+int ComportamientoRescatador::VeoCasillaInteresanteR(Sensores &sensores, bool zap){
+
+	char i = ViablePorAlturaR(sensores.superficie[1], sensores.cota[1]-sensores.cota[0], zap);
+	char c = ViablePorAlturaR(sensores.superficie[2], sensores.cota[2]-sensores.cota[0], zap);
+	char d = ViablePorAlturaR(sensores.superficie[3], sensores.cota[3]-sensores.cota[0], zap);
+
+	bool i_libre = CasillaLibreR(sensores.agentes[1]);
+	bool c_libre = CasillaLibreR(sensores.agentes[2]);
+	bool d_libre = CasillaLibreR(sensores.agentes[3]);
+
+	bool no_visita_frecuente_i;
+	bool no_visita_frecuente_c;
+	bool no_visita_frecuente_d;
+
+	switch(sensores.rumbo){
+		case norte:
+			no_visita_frecuente_i = NoVisitaFrecuente(sensores.posF - 1, sensores.posC - 1);
+			no_visita_frecuente_c = NoVisitaFrecuente(sensores.posF - 1, sensores.posC);
+			no_visita_frecuente_d = NoVisitaFrecuente(sensores.posF - 1, sensores.posC + 1);
+		break;
+
+		case noroeste:
+			no_visita_frecuente_i = NoVisitaFrecuente(sensores.posF, sensores.posC - 1);
+			no_visita_frecuente_c = NoVisitaFrecuente(sensores.posF - 1, sensores.posC - 1);
+			no_visita_frecuente_d = NoVisitaFrecuente(sensores.posF - 1, sensores.posC);
+		break;
+
+		case oeste:
+			no_visita_frecuente_i = NoVisitaFrecuente(sensores.posF + 1, sensores.posC - 1);
+			no_visita_frecuente_c = NoVisitaFrecuente(sensores.posF, sensores.posC - 1);
+			no_visita_frecuente_d = NoVisitaFrecuente(sensores.posF - 1, sensores.posC - 1);
+		break;
+
+		case suroeste:
+			no_visita_frecuente_i = NoVisitaFrecuente(sensores.posF + 1, sensores.posC);
+			no_visita_frecuente_c = NoVisitaFrecuente(sensores.posF + 1, sensores.posC - 1);
+			no_visita_frecuente_d = NoVisitaFrecuente(sensores.posF, sensores.posC - 1);
+		break;
+
+		case sur:
+			no_visita_frecuente_i = NoVisitaFrecuente(sensores.posF + 1, sensores.posC + 1);
+			no_visita_frecuente_c = NoVisitaFrecuente(sensores.posF + 1, sensores.posC);
+			no_visita_frecuente_d = NoVisitaFrecuente(sensores.posF + 1, sensores.posC - 1);
+		break;
+
+		case sureste:
+			no_visita_frecuente_i = NoVisitaFrecuente(sensores.posF, sensores.posC + 1);
+			no_visita_frecuente_c = NoVisitaFrecuente(sensores.posF + 1, sensores.posC + 1);
+			no_visita_frecuente_d = NoVisitaFrecuente(sensores.posF + 1, sensores.posC);
+		break;
+
+		case este:
+			no_visita_frecuente_i = NoVisitaFrecuente(sensores.posF - 1, sensores.posC + 1);
+			no_visita_frecuente_c = NoVisitaFrecuente(sensores.posF, sensores.posC + 1);
+			no_visita_frecuente_d = NoVisitaFrecuente(sensores.posF + 1, sensores.posC + 1);
+		break;
+
+		case noreste:
+			no_visita_frecuente_i = NoVisitaFrecuente(sensores.posF - 1, sensores.posC);
+			no_visita_frecuente_c = NoVisitaFrecuente(sensores.posF - 1, sensores.posC + 1);
+			no_visita_frecuente_d = NoVisitaFrecuente(sensores.posF, sensores.posC + 1);
+		break;
+	}
+	
+		
 	if (c == 'X' and c_libre) return 2;
 	else if (i == 'X' and i_libre) return 1;
 	else if (d == 'X' and d_libre) return 3;
@@ -238,9 +164,9 @@ int ComportamientoRescatador::VeoCasillaInteresanteR(char i, char c, char d, boo
 		else if (i == 'D' and i_libre) return 1;
 		else if (d == 'D' and d_libre) return 3;
 	}
-	if (c == 'C' and c_libre) return 2;
-	else if (i == 'C' and i_libre) return 1;
-	else if (d == 'C' and d_libre) return 3;
+	if (c == 'C' and c_libre and no_visita_frecuente_c) return 2;
+	else if (i == 'C' and i_libre and no_visita_frecuente_i) return 1;
+	else if (d == 'C' and d_libre and no_visita_frecuente_d) return 3;
 	else return 0;
 }
 
@@ -254,6 +180,14 @@ char ComportamientoRescatador::ViablePorAlturaR(char casilla, int dif, bool zap)
 bool ComportamientoRescatador::CasillaLibreR(char casilla){
 	if(casilla == '_') return true;
 	else return false;
+}
+
+void ComportamientoRescatador::RefrescarmatrizR(vector<vector<int>> &m){
+	for(int i=0; i<m.size(); i++){
+		for(int j=0; j<m[i].size(); j++){
+			m[i][j] = 0;
+		}
+	}
 }
 
 void ComportamientoRescatador::SituarSensorenMapaR(vector<vector<unsigned char>> &m, vector<vector<unsigned char>> &a, Sensores sensores){
@@ -297,6 +231,23 @@ void ComportamientoRescatador::SituarSensorenMapaR(vector<vector<unsigned char>>
 			a[sensores.posF-3][sensores.posC+2] = sensores.cota[14];
 			a[sensores.posF-3][sensores.posC+3] = sensores.cota[15];
 
+			frecuencia_visita[sensores.posF][sensores.posC]+=4;
+			frecuencia_visita[sensores.posF-1][sensores.posC-1]++;
+			frecuencia_visita[sensores.posF-1][sensores.posC]++;
+			frecuencia_visita[sensores.posF-1][sensores.posC+1]++;
+			frecuencia_visita[sensores.posF-2][sensores.posC-2]++;
+			frecuencia_visita[sensores.posF-2][sensores.posC-1]++;
+			frecuencia_visita[sensores.posF-2][sensores.posC]++;
+			frecuencia_visita[sensores.posF-2][sensores.posC+1]++;
+			frecuencia_visita[sensores.posF-2][sensores.posC+2]++;
+			frecuencia_visita[sensores.posF-3][sensores.posC-3]++;
+			frecuencia_visita[sensores.posF-3][sensores.posC-2]++;
+			frecuencia_visita[sensores.posF-3][sensores.posC-1]++;
+			frecuencia_visita[sensores.posF-3][sensores.posC]++;
+			frecuencia_visita[sensores.posF-3][sensores.posC+1]++;
+			frecuencia_visita[sensores.posF-3][sensores.posC+2]++;
+			frecuencia_visita[sensores.posF-3][sensores.posC+3]++;
+
 			break;
 
 		case noroeste:
@@ -333,6 +284,20 @@ void ComportamientoRescatador::SituarSensorenMapaR(vector<vector<unsigned char>>
 			a[sensores.posF-3][sensores.posC-2] = sensores.cota[13];
 			a[sensores.posF-3][sensores.posC-1] = sensores.cota[14];
 			a[sensores.posF-3][sensores.posC] = sensores.cota[15];
+
+			frecuencia_visita[sensores.posF][sensores.posC]+=4;
+			frecuencia_visita[sensores.posF][sensores.posC-1]++;
+			frecuencia_visita[sensores.posF-1][sensores.posC-1]++;
+			frecuencia_visita[sensores.posF-1][sensores.posC]++;
+			frecuencia_visita[sensores.posF][sensores.posC-2]++;
+			frecuencia_visita[sensores.posF-1][sensores.posC-2]++;
+			frecuencia_visita[sensores.posF-2][sensores.posC-2]++;
+			frecuencia_visita[sensores.posF-2][sensores.posC-1]++;
+			frecuencia_visita[sensores.posF-2][sensores.posC]++;
+			frecuencia_visita[sensores.posF][sensores.posC-3]++;
+			frecuencia_visita[sensores.posF-1][sensores.posC-3]++;
+			frecuencia_visita[sensores.posF-2][sensores.posC-3]++;
+			frecuencia_visita[sensores.posF-3][sensores.posC-3]++;
 
 
 			break;
@@ -372,6 +337,23 @@ void ComportamientoRescatador::SituarSensorenMapaR(vector<vector<unsigned char>>
 			a[sensores.posF-2][sensores.posC-3] = sensores.cota[14];
 			a[sensores.posF-3][sensores.posC-3] = sensores.cota[15];
 
+			frecuencia_visita[sensores.posF][sensores.posC]+=4;
+			frecuencia_visita[sensores.posF+1][sensores.posC-1]++;
+			frecuencia_visita[sensores.posF][sensores.posC-1]++;
+			frecuencia_visita[sensores.posF-1][sensores.posC-1]++;
+			frecuencia_visita[sensores.posF+2][sensores.posC-2]++;
+			frecuencia_visita[sensores.posF+1][sensores.posC-2]++;
+			frecuencia_visita[sensores.posF][sensores.posC-2]++;
+			frecuencia_visita[sensores.posF-1][sensores.posC-2]++;
+			frecuencia_visita[sensores.posF-2][sensores.posC-2]++;
+			frecuencia_visita[sensores.posF+3][sensores.posC-3]++;
+			frecuencia_visita[sensores.posF+2][sensores.posC-3]++;
+			frecuencia_visita[sensores.posF+1][sensores.posC-3]++;
+			frecuencia_visita[sensores.posF][sensores.posC-3]++;
+			frecuencia_visita[sensores.posF-1][sensores.posC-3]++;
+			frecuencia_visita[sensores.posF-2][sensores.posC-3]++;
+			frecuencia_visita[sensores.posF-3][sensores.posC-3]++;
+
 
 			break;
 
@@ -410,6 +392,23 @@ void ComportamientoRescatador::SituarSensorenMapaR(vector<vector<unsigned char>>
 			a[sensores.posF+3][sensores.posC+1] = sensores.cota[14];
 			a[sensores.posF+3][sensores.posC] = sensores.cota[15];
 
+			frecuencia_visita[sensores.posF][sensores.posC]+=4;
+			frecuencia_visita[sensores.posF][sensores.posC+1]++;
+			frecuencia_visita[sensores.posF+1][sensores.posC+1]++;
+			frecuencia_visita[sensores.posF+1][sensores.posC]++;
+			frecuencia_visita[sensores.posF][sensores.posC+2]++;
+			frecuencia_visita[sensores.posF+1][sensores.posC+2]++;
+			frecuencia_visita[sensores.posF+2][sensores.posC+2]++;
+			frecuencia_visita[sensores.posF+2][sensores.posC+1]++;
+			frecuencia_visita[sensores.posF+2][sensores.posC]++;
+			frecuencia_visita[sensores.posF][sensores.posC+3]++;
+			frecuencia_visita[sensores.posF+1][sensores.posC+3]++;
+			frecuencia_visita[sensores.posF+2][sensores.posC+3]++;
+			frecuencia_visita[sensores.posF+3][sensores.posC+3]++;
+			frecuencia_visita[sensores.posF+3][sensores.posC+2]++;
+			frecuencia_visita[sensores.posF+3][sensores.posC+1]++;
+			frecuencia_visita[sensores.posF+3][sensores.posC]++;
+
 			break;
 
 		case sur:
@@ -446,6 +445,23 @@ void ComportamientoRescatador::SituarSensorenMapaR(vector<vector<unsigned char>>
 			a[sensores.posF+3][sensores.posC-1] = sensores.cota[13];
 			a[sensores.posF+3][sensores.posC-2] = sensores.cota[14];
 			a[sensores.posF+3][sensores.posC-3] = sensores.cota[15];
+
+			frecuencia_visita[sensores.posF][sensores.posC]+=4;
+			frecuencia_visita[sensores.posF+1][sensores.posC+1]++;
+			frecuencia_visita[sensores.posF+1][sensores.posC]++;
+			frecuencia_visita[sensores.posF+1][sensores.posC-1]++;
+			frecuencia_visita[sensores.posF+2][sensores.posC+2]++;
+			frecuencia_visita[sensores.posF+2][sensores.posC+1]++;
+			frecuencia_visita[sensores.posF+2][sensores.posC]++;
+			frecuencia_visita[sensores.posF+2][sensores.posC-1]++;
+			frecuencia_visita[sensores.posF+2][sensores.posC-2]++;
+			frecuencia_visita[sensores.posF+3][sensores.posC+3]++;
+			frecuencia_visita[sensores.posF+3][sensores.posC+2]++;
+			frecuencia_visita[sensores.posF+3][sensores.posC+1]++;
+			frecuencia_visita[sensores.posF+3][sensores.posC]++;
+			frecuencia_visita[sensores.posF+3][sensores.posC-1]++;
+			frecuencia_visita[sensores.posF+3][sensores.posC-2]++;
+			frecuencia_visita[sensores.posF+3][sensores.posC-3]++;
 
 			break;
 
@@ -484,6 +500,23 @@ void ComportamientoRescatador::SituarSensorenMapaR(vector<vector<unsigned char>>
 			a[sensores.posF+1][sensores.posC-3] = sensores.cota[14];
 			a[sensores.posF][sensores.posC-3] = sensores.cota[15];
 
+			frecuencia_visita[sensores.posF][sensores.posC]+=4;
+			frecuencia_visita[sensores.posF+1][sensores.posC]++;
+			frecuencia_visita[sensores.posF+1][sensores.posC-1]++;
+			frecuencia_visita[sensores.posF][sensores.posC-1]++;
+			frecuencia_visita[sensores.posF+2][sensores.posC]++;
+			frecuencia_visita[sensores.posF+2][sensores.posC-1]++;
+			frecuencia_visita[sensores.posF+2][sensores.posC-2]++;
+			frecuencia_visita[sensores.posF+1][sensores.posC-2]++;
+			frecuencia_visita[sensores.posF][sensores.posC-2]++;
+			frecuencia_visita[sensores.posF+3][sensores.posC]++;
+			frecuencia_visita[sensores.posF+3][sensores.posC-1]++;
+			frecuencia_visita[sensores.posF+3][sensores.posC-2]++;
+			frecuencia_visita[sensores.posF+3][sensores.posC-3]++;
+			frecuencia_visita[sensores.posF+2][sensores.posC-3]++;
+			frecuencia_visita[sensores.posF+1][sensores.posC-3]++;
+			frecuencia_visita[sensores.posF][sensores.posC-3]++;
+
 			break;
 
 		case este:
@@ -521,6 +554,23 @@ void ComportamientoRescatador::SituarSensorenMapaR(vector<vector<unsigned char>>
 			a[sensores.posF+2][sensores.posC+3] = sensores.cota[14];
 			a[sensores.posF+3][sensores.posC+3] = sensores.cota[15];
 
+			frecuencia_visita[sensores.posF][sensores.posC]+=4;
+			frecuencia_visita[sensores.posF-1][sensores.posC+1]++;
+			frecuencia_visita[sensores.posF][sensores.posC+1]++;
+			frecuencia_visita[sensores.posF+1][sensores.posC+1]++;
+			frecuencia_visita[sensores.posF-2][sensores.posC+2]++;
+			frecuencia_visita[sensores.posF-1][sensores.posC+2]++;
+			frecuencia_visita[sensores.posF][sensores.posC+2]++;
+			frecuencia_visita[sensores.posF+1][sensores.posC+2]++;
+			frecuencia_visita[sensores.posF+2][sensores.posC+2]++;
+			frecuencia_visita[sensores.posF-3][sensores.posC+3]++;
+			frecuencia_visita[sensores.posF-2][sensores.posC+3]++;
+			frecuencia_visita[sensores.posF-1][sensores.posC+3]++;
+			frecuencia_visita[sensores.posF][sensores.posC+3]++;
+			frecuencia_visita[sensores.posF+1][sensores.posC+3]++;
+			frecuencia_visita[sensores.posF+2][sensores.posC+3]++;
+			frecuencia_visita[sensores.posF+3][sensores.posC+3]++;
+
 			break;
 
 		case noreste:
@@ -557,6 +607,23 @@ void ComportamientoRescatador::SituarSensorenMapaR(vector<vector<unsigned char>>
 			a[sensores.posF-2][sensores.posC+3] = sensores.cota[13];
 			a[sensores.posF-1][sensores.posC+3] = sensores.cota[14];
 			a[sensores.posF][sensores.posC+3] = sensores.cota[15];
+
+			frecuencia_visita[sensores.posF][sensores.posC]+=4;
+			frecuencia_visita[sensores.posF-1][sensores.posC]++;
+			frecuencia_visita[sensores.posF-1][sensores.posC+1]++;
+			frecuencia_visita[sensores.posF][sensores.posC+1]++;
+			frecuencia_visita[sensores.posF-2][sensores.posC]++;
+			frecuencia_visita[sensores.posF-2][sensores.posC+1]++;
+			frecuencia_visita[sensores.posF-2][sensores.posC+2]++;
+			frecuencia_visita[sensores.posF-1][sensores.posC+2]++;
+			frecuencia_visita[sensores.posF][sensores.posC+2]++;
+			frecuencia_visita[sensores.posF-3][sensores.posC]++;
+			frecuencia_visita[sensores.posF-3][sensores.posC+1]++;
+			frecuencia_visita[sensores.posF-3][sensores.posC+2]++;
+			frecuencia_visita[sensores.posF-3][sensores.posC+3]++;
+			frecuencia_visita[sensores.posF-2][sensores.posC+3]++;
+			frecuencia_visita[sensores.posF-1][sensores.posC+3]++;
+			frecuencia_visita[sensores.posF][sensores.posC+3]++;
 
 			break;
 	}
@@ -919,4 +986,24 @@ void PintaPlan(const list<Action> &plan, bool zap){
 	cout << "( longitud " << plan.size();
 	if(zap) cout << "[Z]";
 	cout << ")\n";
+}
+
+
+
+
+
+Action ComportamientoRescatador::ComportamientoRescatadorNivel_1(Sensores sensores)
+{
+}
+
+Action ComportamientoRescatador::ComportamientoRescatadorNivel_2(Sensores sensores)
+{
+}
+
+Action ComportamientoRescatador::ComportamientoRescatadorNivel_3(Sensores sensores)
+{
+}
+
+Action ComportamientoRescatador::ComportamientoRescatadorNivel_4(Sensores sensores)
+{
 }

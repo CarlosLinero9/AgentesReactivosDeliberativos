@@ -10,6 +10,8 @@
 
 #include "comportamientos/comportamiento.hpp"
 
+const int MAX_PASOS = 100;  //Maximo de pasos antes de refrescar la matriz
+const int LIMITE_VISITAS = 40; //Limite de visitas que puede tener una casilla
 struct EstadoR{
   int f;
   int c;
@@ -54,7 +56,10 @@ public:
     last_action = IDLE;
     tiene_zapatillas = false;
     giro45izq = 0;
+    frecuencia_visita = vector<vector<int>>(mapaResultado.size(), vector<int>(mapaResultado[0].size(), 0));
+    pasos = 0;
   }
+
   ComportamientoRescatador(std::vector<std::vector<unsigned char>> mapaR, std::vector<std::vector<unsigned char>> mapaC) : Comportamiento(mapaR,mapaC)
   {
     // Inicializar Variables de Estado Niveles 2,3
@@ -75,12 +80,14 @@ public:
 
 
   /*Parte 0*/
-  int VeoCasillaInteresanteR(char i, char c, char d);
-  int VeoCasillaInteresanteR(char i, char c, char d, bool zap);
-  int VeoCasillaInteresanteR(char i, char c, char d, bool i_libre, bool c_libre, bool d_libre, bool zap);
+  bool NoVisitaFrecuente(int f, int c);
+  int VeoCasillaInteresanteR(Sensores & sensores, bool zap);
   char ViablePorAlturaR (char casilla, int dif, bool zap);
   bool CasillaLibreR(char casilla);
   void SituarSensorenMapaR(vector<vector<unsigned char>> &m, vector<vector<unsigned char>> &a, Sensores sensores);
+  void RefrescarmatrizR(vector<vector<int>> &m);
+  
+
 
   /*Parte 1*/
   Action ComportamientoRescatadorNivel_E(Sensores sensores);
@@ -103,6 +110,8 @@ private:
   Action last_action;
   bool tiene_zapatillas;
   int giro45izq;
+  vector<vector<int>> frecuencia_visita;
+  int pasos;
 
   //Variables de estado para el nivel E
   list<Action> plan;
