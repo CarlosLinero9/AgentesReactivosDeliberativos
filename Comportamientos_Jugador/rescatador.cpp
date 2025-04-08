@@ -72,6 +72,7 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_0(Sensores sensor
 				break;
 		}
 	}
+	//if(accion == WALK) //Tengo que pensarlo
 	pasos++;
 
 	if(pasos == MAX_PASOS){
@@ -231,22 +232,22 @@ void ComportamientoRescatador::SituarSensorenMapaR(vector<vector<unsigned char>>
 			a[sensores.posF-3][sensores.posC+2] = sensores.cota[14];
 			a[sensores.posF-3][sensores.posC+3] = sensores.cota[15];
 
-			frecuencia_visita[sensores.posF][sensores.posC]+=4;
-			frecuencia_visita[sensores.posF-1][sensores.posC-1]++;
-			frecuencia_visita[sensores.posF-1][sensores.posC]++;
-			frecuencia_visita[sensores.posF-1][sensores.posC+1]++;
-			frecuencia_visita[sensores.posF-2][sensores.posC-2]++;
-			frecuencia_visita[sensores.posF-2][sensores.posC-1]++;
-			frecuencia_visita[sensores.posF-2][sensores.posC]++;
-			frecuencia_visita[sensores.posF-2][sensores.posC+1]++;
-			frecuencia_visita[sensores.posF-2][sensores.posC+2]++;
-			frecuencia_visita[sensores.posF-3][sensores.posC-3]++;
-			frecuencia_visita[sensores.posF-3][sensores.posC-2]++;
-			frecuencia_visita[sensores.posF-3][sensores.posC-1]++;
-			frecuencia_visita[sensores.posF-3][sensores.posC]++;
-			frecuencia_visita[sensores.posF-3][sensores.posC+1]++;
-			frecuencia_visita[sensores.posF-3][sensores.posC+2]++;
-			frecuencia_visita[sensores.posF-3][sensores.posC+3]++;
+			frecuencia_visita[sensores.posF][sensores.posC]+=SUMA_AL_VISITAR;
+			frecuencia_visita[sensores.posF-1][sensores.posC-1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-1][sensores.posC]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-1][sensores.posC+1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-2][sensores.posC-2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-2][sensores.posC-1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-2][sensores.posC]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-2][sensores.posC+1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-2][sensores.posC+2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-3][sensores.posC-3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-3][sensores.posC-2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-3][sensores.posC-1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-3][sensores.posC]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-3][sensores.posC+1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-3][sensores.posC+2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-3][sensores.posC+3]+=SUMA_AL_VER;
 
 			break;
 
@@ -285,19 +286,22 @@ void ComportamientoRescatador::SituarSensorenMapaR(vector<vector<unsigned char>>
 			a[sensores.posF-3][sensores.posC-1] = sensores.cota[14];
 			a[sensores.posF-3][sensores.posC] = sensores.cota[15];
 
-			frecuencia_visita[sensores.posF][sensores.posC]+=4;
-			frecuencia_visita[sensores.posF][sensores.posC-1]++;
-			frecuencia_visita[sensores.posF-1][sensores.posC-1]++;
-			frecuencia_visita[sensores.posF-1][sensores.posC]++;
-			frecuencia_visita[sensores.posF][sensores.posC-2]++;
-			frecuencia_visita[sensores.posF-1][sensores.posC-2]++;
-			frecuencia_visita[sensores.posF-2][sensores.posC-2]++;
-			frecuencia_visita[sensores.posF-2][sensores.posC-1]++;
-			frecuencia_visita[sensores.posF-2][sensores.posC]++;
-			frecuencia_visita[sensores.posF][sensores.posC-3]++;
-			frecuencia_visita[sensores.posF-1][sensores.posC-3]++;
-			frecuencia_visita[sensores.posF-2][sensores.posC-3]++;
-			frecuencia_visita[sensores.posF-3][sensores.posC-3]++;
+			frecuencia_visita[sensores.posF][sensores.posC]+=SUMA_AL_VISITAR;
+			frecuencia_visita[sensores.posF][sensores.posC-1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-1][sensores.posC-1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-1][sensores.posC]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF][sensores.posC-2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-1][sensores.posC-2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-2][sensores.posC-2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-2][sensores.posC-1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-2][sensores.posC]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF][sensores.posC-3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-1][sensores.posC-3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-2][sensores.posC-3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-3][sensores.posC-3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-3][sensores.posC-2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-3][sensores.posC-1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-3][sensores.posC]+=SUMA_AL_VER;
 
 
 			break;
@@ -337,22 +341,22 @@ void ComportamientoRescatador::SituarSensorenMapaR(vector<vector<unsigned char>>
 			a[sensores.posF-2][sensores.posC-3] = sensores.cota[14];
 			a[sensores.posF-3][sensores.posC-3] = sensores.cota[15];
 
-			frecuencia_visita[sensores.posF][sensores.posC]+=4;
-			frecuencia_visita[sensores.posF+1][sensores.posC-1]++;
-			frecuencia_visita[sensores.posF][sensores.posC-1]++;
-			frecuencia_visita[sensores.posF-1][sensores.posC-1]++;
-			frecuencia_visita[sensores.posF+2][sensores.posC-2]++;
-			frecuencia_visita[sensores.posF+1][sensores.posC-2]++;
-			frecuencia_visita[sensores.posF][sensores.posC-2]++;
-			frecuencia_visita[sensores.posF-1][sensores.posC-2]++;
-			frecuencia_visita[sensores.posF-2][sensores.posC-2]++;
-			frecuencia_visita[sensores.posF+3][sensores.posC-3]++;
-			frecuencia_visita[sensores.posF+2][sensores.posC-3]++;
-			frecuencia_visita[sensores.posF+1][sensores.posC-3]++;
-			frecuencia_visita[sensores.posF][sensores.posC-3]++;
-			frecuencia_visita[sensores.posF-1][sensores.posC-3]++;
-			frecuencia_visita[sensores.posF-2][sensores.posC-3]++;
-			frecuencia_visita[sensores.posF-3][sensores.posC-3]++;
+			frecuencia_visita[sensores.posF][sensores.posC]+=SUMA_AL_VISITAR;
+			frecuencia_visita[sensores.posF+1][sensores.posC-1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF][sensores.posC-1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-1][sensores.posC-1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+2][sensores.posC-2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+1][sensores.posC-2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF][sensores.posC-2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-1][sensores.posC-2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-2][sensores.posC-2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+3][sensores.posC-3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+2][sensores.posC-3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+1][sensores.posC-3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF][sensores.posC-3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-1][sensores.posC-3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-2][sensores.posC-3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-3][sensores.posC-3]+=SUMA_AL_VER;
 
 
 			break;
@@ -392,22 +396,22 @@ void ComportamientoRescatador::SituarSensorenMapaR(vector<vector<unsigned char>>
 			a[sensores.posF+3][sensores.posC+1] = sensores.cota[14];
 			a[sensores.posF+3][sensores.posC] = sensores.cota[15];
 
-			frecuencia_visita[sensores.posF][sensores.posC]+=4;
-			frecuencia_visita[sensores.posF][sensores.posC+1]++;
-			frecuencia_visita[sensores.posF+1][sensores.posC+1]++;
-			frecuencia_visita[sensores.posF+1][sensores.posC]++;
-			frecuencia_visita[sensores.posF][sensores.posC+2]++;
-			frecuencia_visita[sensores.posF+1][sensores.posC+2]++;
-			frecuencia_visita[sensores.posF+2][sensores.posC+2]++;
-			frecuencia_visita[sensores.posF+2][sensores.posC+1]++;
-			frecuencia_visita[sensores.posF+2][sensores.posC]++;
-			frecuencia_visita[sensores.posF][sensores.posC+3]++;
-			frecuencia_visita[sensores.posF+1][sensores.posC+3]++;
-			frecuencia_visita[sensores.posF+2][sensores.posC+3]++;
-			frecuencia_visita[sensores.posF+3][sensores.posC+3]++;
-			frecuencia_visita[sensores.posF+3][sensores.posC+2]++;
-			frecuencia_visita[sensores.posF+3][sensores.posC+1]++;
-			frecuencia_visita[sensores.posF+3][sensores.posC]++;
+			frecuencia_visita[sensores.posF][sensores.posC]+=SUMA_AL_VISITAR;
+			frecuencia_visita[sensores.posF][sensores.posC+1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+1][sensores.posC+1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+1][sensores.posC]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF][sensores.posC+2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+1][sensores.posC+2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+2][sensores.posC+2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+2][sensores.posC+1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+2][sensores.posC]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF][sensores.posC+3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+1][sensores.posC+3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+2][sensores.posC+3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+3][sensores.posC+3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+3][sensores.posC+2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+3][sensores.posC+1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+3][sensores.posC]+=SUMA_AL_VER;
 
 			break;
 
@@ -446,22 +450,22 @@ void ComportamientoRescatador::SituarSensorenMapaR(vector<vector<unsigned char>>
 			a[sensores.posF+3][sensores.posC-2] = sensores.cota[14];
 			a[sensores.posF+3][sensores.posC-3] = sensores.cota[15];
 
-			frecuencia_visita[sensores.posF][sensores.posC]+=4;
-			frecuencia_visita[sensores.posF+1][sensores.posC+1]++;
-			frecuencia_visita[sensores.posF+1][sensores.posC]++;
-			frecuencia_visita[sensores.posF+1][sensores.posC-1]++;
-			frecuencia_visita[sensores.posF+2][sensores.posC+2]++;
-			frecuencia_visita[sensores.posF+2][sensores.posC+1]++;
-			frecuencia_visita[sensores.posF+2][sensores.posC]++;
-			frecuencia_visita[sensores.posF+2][sensores.posC-1]++;
-			frecuencia_visita[sensores.posF+2][sensores.posC-2]++;
-			frecuencia_visita[sensores.posF+3][sensores.posC+3]++;
-			frecuencia_visita[sensores.posF+3][sensores.posC+2]++;
-			frecuencia_visita[sensores.posF+3][sensores.posC+1]++;
-			frecuencia_visita[sensores.posF+3][sensores.posC]++;
-			frecuencia_visita[sensores.posF+3][sensores.posC-1]++;
-			frecuencia_visita[sensores.posF+3][sensores.posC-2]++;
-			frecuencia_visita[sensores.posF+3][sensores.posC-3]++;
+			frecuencia_visita[sensores.posF][sensores.posC]+=SUMA_AL_VISITAR;
+			frecuencia_visita[sensores.posF+1][sensores.posC+1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+1][sensores.posC]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+1][sensores.posC-1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+2][sensores.posC+2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+2][sensores.posC+1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+2][sensores.posC]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+2][sensores.posC-1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+2][sensores.posC-2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+3][sensores.posC+3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+3][sensores.posC+2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+3][sensores.posC+1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+3][sensores.posC]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+3][sensores.posC-1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+3][sensores.posC-2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+3][sensores.posC-3]+=SUMA_AL_VER;
 
 			break;
 
@@ -500,22 +504,22 @@ void ComportamientoRescatador::SituarSensorenMapaR(vector<vector<unsigned char>>
 			a[sensores.posF+1][sensores.posC-3] = sensores.cota[14];
 			a[sensores.posF][sensores.posC-3] = sensores.cota[15];
 
-			frecuencia_visita[sensores.posF][sensores.posC]+=4;
-			frecuencia_visita[sensores.posF+1][sensores.posC]++;
-			frecuencia_visita[sensores.posF+1][sensores.posC-1]++;
-			frecuencia_visita[sensores.posF][sensores.posC-1]++;
-			frecuencia_visita[sensores.posF+2][sensores.posC]++;
-			frecuencia_visita[sensores.posF+2][sensores.posC-1]++;
-			frecuencia_visita[sensores.posF+2][sensores.posC-2]++;
-			frecuencia_visita[sensores.posF+1][sensores.posC-2]++;
-			frecuencia_visita[sensores.posF][sensores.posC-2]++;
-			frecuencia_visita[sensores.posF+3][sensores.posC]++;
-			frecuencia_visita[sensores.posF+3][sensores.posC-1]++;
-			frecuencia_visita[sensores.posF+3][sensores.posC-2]++;
-			frecuencia_visita[sensores.posF+3][sensores.posC-3]++;
-			frecuencia_visita[sensores.posF+2][sensores.posC-3]++;
-			frecuencia_visita[sensores.posF+1][sensores.posC-3]++;
-			frecuencia_visita[sensores.posF][sensores.posC-3]++;
+			frecuencia_visita[sensores.posF][sensores.posC]+=SUMA_AL_VISITAR;
+			frecuencia_visita[sensores.posF+1][sensores.posC]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+1][sensores.posC-1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF][sensores.posC-1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+2][sensores.posC]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+2][sensores.posC-1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+2][sensores.posC-2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+1][sensores.posC-2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF][sensores.posC-2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+3][sensores.posC]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+3][sensores.posC-1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+3][sensores.posC-2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+3][sensores.posC-3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+2][sensores.posC-3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+1][sensores.posC-3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF][sensores.posC-3]+=SUMA_AL_VER;
 
 			break;
 
@@ -554,22 +558,22 @@ void ComportamientoRescatador::SituarSensorenMapaR(vector<vector<unsigned char>>
 			a[sensores.posF+2][sensores.posC+3] = sensores.cota[14];
 			a[sensores.posF+3][sensores.posC+3] = sensores.cota[15];
 
-			frecuencia_visita[sensores.posF][sensores.posC]+=4;
-			frecuencia_visita[sensores.posF-1][sensores.posC+1]++;
-			frecuencia_visita[sensores.posF][sensores.posC+1]++;
-			frecuencia_visita[sensores.posF+1][sensores.posC+1]++;
-			frecuencia_visita[sensores.posF-2][sensores.posC+2]++;
-			frecuencia_visita[sensores.posF-1][sensores.posC+2]++;
-			frecuencia_visita[sensores.posF][sensores.posC+2]++;
-			frecuencia_visita[sensores.posF+1][sensores.posC+2]++;
-			frecuencia_visita[sensores.posF+2][sensores.posC+2]++;
-			frecuencia_visita[sensores.posF-3][sensores.posC+3]++;
-			frecuencia_visita[sensores.posF-2][sensores.posC+3]++;
-			frecuencia_visita[sensores.posF-1][sensores.posC+3]++;
-			frecuencia_visita[sensores.posF][sensores.posC+3]++;
-			frecuencia_visita[sensores.posF+1][sensores.posC+3]++;
-			frecuencia_visita[sensores.posF+2][sensores.posC+3]++;
-			frecuencia_visita[sensores.posF+3][sensores.posC+3]++;
+			frecuencia_visita[sensores.posF][sensores.posC]+=SUMA_AL_VISITAR;
+			frecuencia_visita[sensores.posF-1][sensores.posC+1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF][sensores.posC+1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+1][sensores.posC+1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-2][sensores.posC+2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-1][sensores.posC+2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF][sensores.posC+2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+1][sensores.posC+2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+2][sensores.posC+2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-3][sensores.posC+3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-2][sensores.posC+3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-1][sensores.posC+3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF][sensores.posC+3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+1][sensores.posC+3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+2][sensores.posC+3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+3][sensores.posC+3]+=SUMA_AL_VER;
 
 			break;
 
@@ -608,22 +612,22 @@ void ComportamientoRescatador::SituarSensorenMapaR(vector<vector<unsigned char>>
 			a[sensores.posF-1][sensores.posC+3] = sensores.cota[14];
 			a[sensores.posF][sensores.posC+3] = sensores.cota[15];
 
-			frecuencia_visita[sensores.posF][sensores.posC]+=4;
-			frecuencia_visita[sensores.posF-1][sensores.posC]++;
-			frecuencia_visita[sensores.posF-1][sensores.posC+1]++;
-			frecuencia_visita[sensores.posF][sensores.posC+1]++;
-			frecuencia_visita[sensores.posF-2][sensores.posC]++;
-			frecuencia_visita[sensores.posF-2][sensores.posC+1]++;
-			frecuencia_visita[sensores.posF-2][sensores.posC+2]++;
-			frecuencia_visita[sensores.posF-1][sensores.posC+2]++;
-			frecuencia_visita[sensores.posF][sensores.posC+2]++;
-			frecuencia_visita[sensores.posF-3][sensores.posC]++;
-			frecuencia_visita[sensores.posF-3][sensores.posC+1]++;
-			frecuencia_visita[sensores.posF-3][sensores.posC+2]++;
-			frecuencia_visita[sensores.posF-3][sensores.posC+3]++;
-			frecuencia_visita[sensores.posF-2][sensores.posC+3]++;
-			frecuencia_visita[sensores.posF-1][sensores.posC+3]++;
-			frecuencia_visita[sensores.posF][sensores.posC+3]++;
+			frecuencia_visita[sensores.posF][sensores.posC]+=SUMA_AL_VISITAR;
+			frecuencia_visita[sensores.posF-1][sensores.posC]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-1][sensores.posC+1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF][sensores.posC+1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-2][sensores.posC]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-2][sensores.posC+1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-2][sensores.posC+2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-1][sensores.posC+2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF][sensores.posC+2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-3][sensores.posC]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-3][sensores.posC+1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-3][sensores.posC+2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-3][sensores.posC+3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-2][sensores.posC+3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-1][sensores.posC+3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF][sensores.posC+3]+=SUMA_AL_VER;
 
 			break;
 	}

@@ -10,8 +10,6 @@
 
 #include "comportamientos/comportamiento.hpp"
 
-const int MAX_PASOS = 100;  //Maximo de pasos antes de refrescar la matriz
-const int LIMITE_VISITAS = 40; //Limite de visitas que puede tener una casilla
 struct EstadoR{
   int f;
   int c;
@@ -106,6 +104,13 @@ public:
   
 
 private:
+
+  //Constantes
+  const int MAX_PASOS = (mapaResultado.size()*mapaResultado[0].size())/10;  //Maximo de pasos antes de refrescar la matriz
+  const int LIMITE_VISITAS = (mapaResultado.size()+mapaResultado[0].size())/4;  //Limite de visitas que puede tener una casilla
+  const int SUMA_AL_VISITAR = 2; //Suma que se le añade a la casilla que se va a visitar
+  const int SUMA_AL_VER = 1; //Suma que se le añade a la casilla que se ve en el cono de vision
+
   // Variables de Estado
   Action last_action;
   bool tiene_zapatillas;
