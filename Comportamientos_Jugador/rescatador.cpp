@@ -68,7 +68,7 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_0(Sensores sensor
 					accion = TURN_L;
 				else
 					accion = TURN_SR;
-				
+				//accion = TURN_L;
 				break;
 		}
 	}

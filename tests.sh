@@ -6,19 +6,18 @@
 
 # Configuraciones a probar
 tests_0=(
-    "./practica2SG ./mapas/mapa30.map 0 0 8 4 2 14 17 0"
-    "./practica2SG ./mapas/mapa30.map 0 0 17 5 0 17 17 0"
-    "./practica2SG ./mapas/mapa30.map 0 0 24 7 2 17 17 0"
-    "./practica2SG ./mapas/mapa30.map 0 0 24 10 2 17 17 0"
-    "./practica2SG ./mapas/mapa30.map 0 0 16 9 2 16 14 6"
-    "./practica2SG ./mapas/mapa75.map 0 0 63 29 6 59 68 1"
-    "./practica2SG ./mapas/pruebaCiclo.map 0 0 13 3 6 5 12 6"               # Evitar Ciclos
-    "./practica2SG ./mapas/pruebaDosUnicos_Zapas.map 0 0 24 10 2 17 17 0"   # Permitir ciclos si ha conseguido zapatillas
-    "./practica2SG ./mapas/pruebaDosUnicos_Choque.map 0 0 16 9 2 16 14 6"   # Permitir ciclos si ha habido un choque
-    "./practica2SG ./mapas/mapa75.map 0 0 63 29 6 59 68 1"
+    "./practica2 ./mapas/mapa30.map 0 0 8 4 2 14 17 0"
+    "./practica2 ./mapas/mapa30.map 0 0 17 5 0 17 17 0"
+    "./practica2 ./mapas/mapa30.map 0 0 24 7 2 17 17 0"
+    "./practica2 ./mapas/mapa30.map 0 0 24 10 2 17 17 0"
+    "./practica2 ./mapas/mapa30.map 0 0 16 9 2 16 14 6"
+    "./practica2 ./mapas/mapa75.map 0 0 63 29 6 59 68 1"
+    "./practica2 ./mapas/pruebaCiclo.map 0 0 13 3 6 5 12 6"               # Evitar Ciclos
+    "./practica2 ./mapas/pruebaDosUnicos_Zapas.map 0 0 24 10 2 17 17 0"   # Permitir ciclos si ha conseguido zapatillas
+    "./practica2 ./mapas/pruebaDosUnicos_Choque.map 0 0 16 9 2 16 14 6"   # Permitir ciclos si ha habido un choque
 )
 tests_1=(
-    "./practica2SG ./mapas/mapa30.map 0 1 6 3 0 21 15 2"
+    "./practica2 ./mapas/mapa30.map 0 1 6 3 0 21 15 2"
 )
 # A test_1, añado todos los tests_0 pero cambiando el nivel de 0 a 1
 for test in "${tests_0[@]}"; do
@@ -27,13 +26,13 @@ for test in "${tests_0[@]}"; do
 done
 
 tests_2=(
-    "./practica2SG mapas/mapa30.map 1 2 8 13 0 11 18 0 18 12 0"
+    "./practica2 mapas/mapa30.map 1 2 8 13 0 11 18 0 18 12 0"
 )
 tests_3=(
-    "./practica2SG mapas/mapa30.map 1 3 8 13 0 11 18 0 18 12 0"
+    "./practica2 mapas/mapa30.map 1 3 8 13 0 11 18 0 18 12 0"
 )
 tests_4=(
-    "./practica2SG mapas/mapa30.map 1 4 8 13 0 11 18 0 18 12 1"
+    "./practica2 mapas/mapa30.map 1 4 8 13 0 11 18 0 18 12 1"
 )
 
 
