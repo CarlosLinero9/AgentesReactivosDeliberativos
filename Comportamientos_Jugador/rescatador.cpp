@@ -64,11 +64,22 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_0(Sensores sensor
 				accion = TURN_SR;
 				break;
 			case 0:
+			
 				if(last_action == TURN_SR)
 					accion = TURN_L;
 				else
 					accion = TURN_SR;
-				//accion = TURN_L;
+
+
+				//if(last_default_action == TURN_SR)
+				//	accion = TURN_L;
+				//else
+				//	accion = TURN_SR;
+				
+				//last_default_action = accion;
+				    
+				
+				
 				break;
 		}
 	}
