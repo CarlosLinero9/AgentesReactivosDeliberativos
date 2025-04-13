@@ -17,7 +17,7 @@ Action ComportamientoRescatador::think(Sensores sensores)
 		accion = ComportamientoRescatadorNivel_2 (sensores);
 		break;
 	case 3:
-		// accion = ComportamientoRescatadorNivel_3 (sensores);
+		//accion = ComportamientoRescatadorNivel_3 (sensores);
 		accion = ComportamientoRescatadorNivel_E(sensores);
 		break;
 	case 4:
@@ -1038,7 +1038,6 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_2(Sensores sensor
 		inicio.zapatillas = tiene_zapatillas;
 		fin.f_rescatador = sensores.destinoF;
 		fin.c_rescatador = sensores.destinoC;
-		//plan = AnchuraRescatador(inicio, fin, mapaResultado, mapaCotas);
 		plan  = DijsktraR(inicio, fin, mapaResultado, mapaCotas);
 		VisualizaPlan(inicio, plan);
 		hayPlan = plan.size() != 0;
@@ -1363,6 +1362,7 @@ list<Action> ComportamientoRescatador::DijsktraR(const EstadoR_N2 &inicio, const
 				frontier.push(child_WALK);
 			}
 
+			/*Tengo que mirar el case de RUN*/
 			// if(!SolutionFound){
 			// 	NodoR_N2 child_RUN = current_node;
 			// 	child_RUN.estado = applyR(RUN, current_node.estado, terreno, altura);
@@ -1413,6 +1413,10 @@ list<Action> ComportamientoRescatador::DijsktraR(const EstadoR_N2 &inicio, const
 
 Action ComportamientoRescatador::ComportamientoRescatadorNivel_3(Sensores sensores)
 {
+	//Debería de definir algún comportamiento para apartarse y no molestar al auxiliar
+	//De todas formas, el auxiliar lo evita en su comportamiento
+	Action accion = IDLE;
+	return accion;
 }
 
 

@@ -5,6 +5,9 @@
 #include <time.h>
 #include <thread>
 #include <list>
+#include <queue>
+#include <iostream>
+#include <utility>
 #include <set>
 
 #include "comportamientos/comportamiento.hpp"
@@ -13,6 +16,7 @@
 //ESTRUCTURAS AUXILIARES NIVELES DELIBERATIVOS//////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 
+/*TUTORIAL*/
 struct EstadoA{
   int f;
   int c;
@@ -47,6 +51,63 @@ struct NodoA{
   }
 };
 
+
+/*NIVEL 3*/
+
+struct EstadoA_N3{
+  int f_rescatador;
+  int c_rescatador;
+  int brujula_rescatador;
+  int f_auxiliar;
+  int c_auxiliar;
+  int brujula_auxiliar;
+  bool zapatillas;
+
+  bool operator==(const EstadoA_N3 &st) const
+  {
+    return (f_auxiliar == st.f_auxiliar and c_auxiliar == st.c_auxiliar and
+      brujula_auxiliar == st.brujula_auxiliar and zapatillas == st.zapatillas);
+  }
+
+  bool operator<(const EstadoA_N3 &st) const
+  {
+    return (f_auxiliar < st.f_auxiliar) or (f_auxiliar==st.f_auxiliar and c_auxiliar < st.c_auxiliar) or
+      (f_auxiliar==st.f_auxiliar and c_auxiliar==st.c_auxiliar and
+      brujula_auxiliar < st.brujula_auxiliar) or (f_auxiliar==st.f_auxiliar and c_auxiliar==st.c_auxiliar and
+      brujula_auxiliar==st.brujula_auxiliar and zapatillas < st.zapatillas);
+  }
+};
+
+struct NodoA_N3{
+  EstadoA_N3 estado;
+  list<Action> secuencia;
+  int energia;
+  int energia_heuristica;
+
+  bool operator==(const NodoA_N3 &nodo) const
+  {
+    return (estado == nodo.estado);
+  }
+
+  bool operator<(const NodoA_N3 &node) const
+  {
+    return (estado<node.estado);
+  }
+
+  bool operator>(const NodoA_N3 &node) const
+  {
+    return (energia+energia_heuristica>node.energia+node.energia_heuristica);
+  }
+
+};
+
+class Compara_N3{
+  public:
+    bool operator()(const NodoA_N3 &nodo1, const NodoA_N3 &nodo2) const
+    {
+      return nodo1>nodo2;
+    }
+};
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -119,6 +180,17 @@ public:
   
   /*NIVEL 3*/
   Action ComportamientoAuxiliarNivel_3(Sensores sensores);
+  int FuncionCoste(const Action &accion, const EstadoA_N3 &st, const vector<vector<unsigned char>> &terreno,
+    const vector<vector<unsigned char>> &altura);
+  EstadoA_N3 NextCasillaAuxiliar(const EstadoA_N3 &st);
+  EstadoA_N3 applyA(Action accion, const EstadoA_N3 &st, const vector<vector<unsigned char>> &terreno,
+    const vector<vector<unsigned char>> &altura);
+  bool CasillaAccesibleAuxiliar(const EstadoA_N3 &st, 
+    const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura);
+  void VisualizaPlan(const EstadoA_N3 &st, const list<Action> &plan);
+  list<Action> AlgoritmoAE(const EstadoA_N3 &inicio, const EstadoA_N3 &final,
+    const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura);
+
 
   /*NIVEL 4*/
   Action ComportamientoAuxiliarNivel_4(Sensores sensores);
