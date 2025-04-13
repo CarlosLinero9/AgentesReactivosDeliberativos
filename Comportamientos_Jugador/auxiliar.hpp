@@ -9,6 +9,9 @@
 
 #include "comportamientos/comportamiento.hpp"
 
+////////////////////////////////////////////////////////////////////////////
+//ESTRUCTURAS AUXILIARES NIVELES DELIBERATIVOS//////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
 struct EstadoA{
   int f;
@@ -44,6 +47,12 @@ struct NodoA{
   }
 };
 
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// Definicion de la clase ComportamientoRescatador/////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
+
 class ComportamientoAuxiliar : public Comportamiento
 {
 
@@ -67,21 +76,30 @@ public:
 
   int interact(Action accion, int valor);
 
+  
+  ///////////////////////////////////////////////////////////////////////////////////////////
+  /*PARTE REACTIVA*//////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////////////////
+
+
+  /*NIVEL 0*/
   Action ComportamientoAuxiliarNivel_0(Sensores sensores);
+
+  /*NIVEL 1*/
   Action ComportamientoAuxiliarNivel_1(Sensores sensores);
-  Action ComportamientoAuxiliarNivel_2(Sensores sensores);
-  Action ComportamientoAuxiliarNivel_3(Sensores sensores);
-  Action ComportamientoAuxiliarNivel_4(Sensores sensores);
-
-
-  /*Parte 0*/
+ 
   int VeoCasillaInteresanteA(char i, char c, char d);
   int VeoCasillaInteresanteA(char i, char c, char d, bool i_libre, bool c_libre, bool d_libre);
   char ViablePorAlturaA (char casilla, int dif);
   bool CasillaLibreA(char casilla);
   void SituarSensorenMapaA(vector<vector<unsigned char>> &m, vector<vector<unsigned char>> &a, Sensores sensores);
 
-  /*Parte 1*/
+  ///////////////////////////////////////////////////////////////////////////////////////////
+  /*PARTE DELIBERATIVA*//////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////////////////
+
+
+  /*TUTORIAL*/
   Action ComportamientoAuxiliarNivel_E(Sensores sensores);
   list<Action> AnchuraAuxiliar(const EstadoA &inicio, const EstadoA &final,
     const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura);
@@ -94,6 +112,15 @@ public:
   void AnularMatrizA(vector<vector<unsigned char>> &m);
   list<Action> AnchuraAuxiliar_V2(const EstadoA &inicio, const EstadoA &final,
     const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura);
+
+  /*NIVEL 2*/
+  Action ComportamientoAuxiliarNivel_2(Sensores sensores);
+  
+  /*NIVEL 3*/
+  Action ComportamientoAuxiliarNivel_3(Sensores sensores);
+
+  /*NIVEL 4*/
+  Action ComportamientoAuxiliarNivel_4(Sensores sensores);
   
 private:
   // Definir Variables de Estado
