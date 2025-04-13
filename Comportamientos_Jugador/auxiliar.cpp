@@ -45,6 +45,7 @@ int ComportamientoAuxiliar::interact(Action accion, int valor)
 
 
 /*NIVEL 0*/
+
 Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_0(Sensores sensores)
 {
 	// El comportamiento de seguir un camino hasta encontrar un puesto base.

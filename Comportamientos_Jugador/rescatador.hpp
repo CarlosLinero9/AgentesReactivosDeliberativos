@@ -10,6 +10,10 @@
 
 #include "comportamientos/comportamiento.hpp"
 
+////////////////////////////////////////////////////////////////////////////
+//ESTRUCTURAS AUXILIARES NIVELES DELIBERATIVOS//////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+
 struct EstadoR{
   int f;
   int c;
@@ -44,6 +48,12 @@ struct NodoR{
   }
 };
 
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// Definicion de la clase ComportamientoRescatador/////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
+
 class ComportamientoRescatador : public Comportamiento
 {
 
@@ -70,24 +80,30 @@ public:
 
   int interact(Action accion, int valor);
 
+  ///////////////////////////////////////////////////////////////////////////////////////////
+  /*PARTE REACTIVA*//////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////////////////
+
+  /*NIVEL 0*/
   Action ComportamientoRescatadorNivel_0(Sensores sensores);
-  Action ComportamientoRescatadorNivel_1(Sensores sensores);
-  Action ComportamientoRescatadorNivel_2(Sensores sensores);
-  Action ComportamientoRescatadorNivel_3(Sensores sensores);
-  Action ComportamientoRescatadorNivel_4(Sensores sensores);
-
-
-  /*Parte 0*/
   bool NoVisitaFrecuente(int f, int c);
   int VeoCasillaInteresanteR(Sensores & sensores, bool zap);
   char ViablePorAlturaR (char casilla, int dif, bool zap);
   bool CasillaLibreR(char casilla);
   void SituarSensorenMapaR(vector<vector<unsigned char>> &m, vector<vector<unsigned char>> &a, Sensores sensores);
   void RefrescarmatrizR(vector<vector<int>> &m);
+
+  /*NIVEL 1*/
+  Action ComportamientoRescatadorNivel_1(Sensores sensores);
+
+
   
+  
+  ///////////////////////////////////////////////////////////////////////////////////////////
+  /*PARTE DELIBERATIVA*//////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////////////////
 
-
-  /*Parte 1*/
+  /*TUTORIAL*/
   Action ComportamientoRescatadorNivel_E(Sensores sensores);
   list<Action> AnchuraRescatador(const EstadoR &inicio, const EstadoR &final,
     const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura);
@@ -103,9 +119,27 @@ public:
   void PintaPlan(const list<Action> &plan, bool zap);
   
 
+  /*NIVEL 2*/
+  Action ComportamientoRescatadorNivel_2(Sensores sensores);
+
+  /*NIVEL 3*/
+  Action ComportamientoRescatadorNivel_3(Sensores sensores);
+
+  /*NIVEL 4*/
+  Action ComportamientoRescatadorNivel_4(Sensores sensores);
+  
+  
+
+
+  ///////////////////////////////////////////////////////////////////////////////////////////
+  /*VARIABLES*//////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////////////////
+
 private:
 
   //Constantes
+
+  /*NIVEL 0*/
   const int MAX_PASOS = (mapaResultado.size()*mapaResultado[0].size())/10;  //Maximo de pasos antes de refrescar la matriz
   const int LIMITE_VISITAS = (mapaResultado.size()+mapaResultado[0].size())/2;  //Limite de visitas que puede tener una casilla
   const int SUMA_AL_VISITAR = 3; //Suma que se le añade a la casilla que se va a visitar

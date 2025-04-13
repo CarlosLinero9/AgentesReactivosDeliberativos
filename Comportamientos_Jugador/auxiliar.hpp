@@ -50,7 +50,7 @@ struct NodoA{
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////
-// Definicion de la clase ComportamientoRescatador/////////////////////////////////////////
+// Definicion de la clase ComportamientoAuxiliar///////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 class ComportamientoAuxiliar : public Comportamiento
@@ -84,15 +84,16 @@ public:
 
   /*NIVEL 0*/
   Action ComportamientoAuxiliarNivel_0(Sensores sensores);
-
-  /*NIVEL 1*/
-  Action ComportamientoAuxiliarNivel_1(Sensores sensores);
- 
   int VeoCasillaInteresanteA(char i, char c, char d);
   int VeoCasillaInteresanteA(char i, char c, char d, bool i_libre, bool c_libre, bool d_libre);
   char ViablePorAlturaA (char casilla, int dif);
   bool CasillaLibreA(char casilla);
   void SituarSensorenMapaA(vector<vector<unsigned char>> &m, vector<vector<unsigned char>> &a, Sensores sensores);
+
+  /*NIVEL 1*/
+  Action ComportamientoAuxiliarNivel_1(Sensores sensores);
+ 
+  
 
   ///////////////////////////////////////////////////////////////////////////////////////////
   /*PARTE DELIBERATIVA*//////////////////////////////////////////////////////////////////////
@@ -122,6 +123,10 @@ public:
   /*NIVEL 4*/
   Action ComportamientoAuxiliarNivel_4(Sensores sensores);
   
+
+  ///////////////////////////////////////////////////////////////////////////////////////////
+  /*VARIABLES*//////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////////////////
 private:
   // Definir Variables de Estado
   Action last_action;
