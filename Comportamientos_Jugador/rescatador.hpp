@@ -95,13 +95,14 @@ struct NodoR_N2{
     return (energia>node.energia);
   }
 
-  class Compara_N2{
-    public:
-      bool operator()(const NodoR_N2 &nodo1, const NodoR_N2 &nodo2) const
-      {
-        return nodo1>nodo2;
-      }
-  };
+};
+
+class Compara_N2{
+  public:
+    bool operator()(const NodoR_N2 &nodo1, const NodoR_N2 &nodo2) const
+    {
+      return nodo1>nodo2;
+    }
 };
 
 
@@ -182,7 +183,7 @@ public:
 
   /*NIVEL 2*/
   Action ComportamientoRescatadorNivel_2(Sensores sensores);
-  list<Action> DijsktraR(const EstadoR &inicio, const EstadoR &final,
+  list<Action> DijsktraR(const EstadoR_N2 &inicio, const EstadoR_N2 &final,
     const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura);
   int FuncionCoste(const Action &accion, const EstadoR_N2 &st, const vector<vector<unsigned char>> &terreno,
     const vector<vector<unsigned char>> &altura);
@@ -190,6 +191,8 @@ public:
   EstadoR_N2 applyR(Action accion, const EstadoR_N2 &st, const vector<vector<unsigned char>> &terreno,
     const vector<vector<unsigned char>> &altura);
   bool CasillaAccesibleRescatador(const EstadoR_N2 &st, const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura);
+  void VisualizaPlan(const EstadoR_N2 &st, const list<Action> &plan);
+
 
   /*NIVEL 3*/
   Action ComportamientoRescatadorNivel_3(Sensores sensores);

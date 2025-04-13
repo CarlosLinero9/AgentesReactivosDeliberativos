@@ -848,32 +848,32 @@ void ComportamientoRescatador::VisualizaPlan(const EstadoR &st, const list<Actio
 			case RUN:
 				switch(cst.brujula){
 					case 0:
-						cst.f--;
+						cst.f-=2;
 						break;
 					case 1:
-						cst.f--;
-						cst.c++;
+						cst.f-=2;
+						cst.c+=2;
 						break;
 					case 2:
-						cst.c++;
+						cst.c+=2;
 						break;
 					case 3:
-						cst.f++;
-						cst.c++;
+						cst.f+=2;
+						cst.c+=2;
 						break;
 					case 4:
-						cst.f++;
+						cst.f+=2;
 						break;
 					case 5:
-						cst.f++;
-						cst.c--;
+						cst.f+=2;
+						cst.c-=2;
 						break;
 					case 6:
-						cst.c--;
+						cst.c-=2;
 						break;
 					case 7:
-						cst.f--;
-						cst.c--;
+						cst.f-=2;
+						cst.c-=2;
 						break;
 				}
 				mapaConPlan[cst.f][cst.c] = 3;
@@ -1031,13 +1031,13 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_2(Sensores sensor
 	Action accion = IDLE;
 	if(!hayPlan){
 		//Invocar al método de busqueda
-		EstadoR inicio, fin;
-		inicio.f = sensores.posF;
-		inicio.c = sensores.posC;
-		inicio.brujula = sensores.rumbo;
+		EstadoR_N2 inicio, fin;
+		inicio.f_rescatador = sensores.posF;
+		inicio.c_rescatador = sensores.posC;
+		inicio.brujula_rescatador = sensores.rumbo;
 		inicio.zapatillas = tiene_zapatillas;
-		fin.f = sensores.destinoF;
-		fin.c = sensores.destinoC;
+		fin.f_rescatador = sensores.destinoF;
+		fin.c_rescatador = sensores.destinoC;
 		//plan = AnchuraRescatador(inicio, fin, mapaResultado, mapaCotas);
 		plan  = DijsktraR(inicio, fin, mapaResultado, mapaCotas);
 		VisualizaPlan(inicio, plan);
@@ -1174,7 +1174,6 @@ EstadoR_N2 ComportamientoRescatador::NextCasillaRescatador(const EstadoR_N2 &st)
 EstadoR_N2 ComportamientoRescatador::applyR(Action accion, const EstadoR_N2 &st, const vector<vector<unsigned char>> &terreno,
     const vector<vector<unsigned char>> &altura){
 			EstadoR_N2 next = st;
-			EstadoR_N2 aux;
 
 			switch(accion){
 				case WALK: {
@@ -1234,10 +1233,180 @@ bool ComportamientoRescatador::CasillaAccesibleRescatador(const EstadoR_N2 &st, 
 		return check1 and check2 and check3 and !check4;
 }
 
+void ComportamientoRescatador::VisualizaPlan(const EstadoR_N2 &st, const list<Action> &plan){
+	AnularMatrizR(mapaConPlan);
+	EstadoR_N2 cst = st;
 
-list<Action> ComportamientoRescatador::DijsktraR(const EstadoR &inicio, const EstadoR &final,
+	auto it = plan.begin();
+	while(it != plan.end()){
+		switch(*it){
+			case RUN:
+				switch(cst.brujula_rescatador){
+					case 0:
+						cst.f_rescatador-=2;
+						break;
+					case 1:
+						cst.f_rescatador-=2;
+						cst.c_rescatador+=2;
+						break;
+					case 2:
+						cst.c_rescatador+=2;
+						break;
+					case 3:
+						cst.f_rescatador+=2;
+						cst.c_rescatador+=2;
+						break;
+					case 4:
+						cst.f_rescatador+=2;
+						break;
+					case 5:
+						cst.f_rescatador+=2;
+						cst.c_rescatador-=2;
+						break;
+					case 6:
+						cst.c_rescatador-=2;
+						break;
+					case 7:
+						cst.f_rescatador-=2;
+						cst.c_rescatador-=2;
+						break;
+				}
+				mapaConPlan[cst.f_rescatador][cst.c_rescatador] = 3;
+				break;
+
+			case WALK:
+				switch(cst.brujula_rescatador){
+					case 0:
+						cst.f_rescatador--;
+						break;
+					case 1:
+						cst.f_rescatador--;
+						cst.c_rescatador++;
+						break;
+					case 2:
+						cst.c_rescatador++;
+						break;
+					case 3:
+						cst.f_rescatador++;
+						cst.c_rescatador++;
+						break;
+					case 4:
+						cst.f_rescatador++;
+						break;
+					case 5:
+						cst.f_rescatador++;
+						cst.c_rescatador--;
+						break;
+					case 6:
+						cst.c_rescatador--;
+						break;
+					case 7:
+						cst.f_rescatador--;
+						cst.c_rescatador--;
+						break;
+				}
+				mapaConPlan[cst.f_rescatador][cst.c_rescatador] = 1;
+				break;
+
+			case TURN_SR:
+				cst.brujula_rescatador = (cst.brujula_rescatador + 1) % 8;
+				break;
+
+			case TURN_L:
+				cst.brujula_rescatador = (cst.brujula_rescatador + 6) % 8;
+				break;
+		}
+		it++;
+	}
+}
+
+
+list<Action> ComportamientoRescatador::DijsktraR(const EstadoR_N2 &inicio, const EstadoR_N2 &final,
     const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura){
 
+		NodoR_N2 current_node;
+		priority_queue<NodoR_N2, vector<NodoR_N2>, Compara_N2> frontier;
+		set<EstadoR_N2> explored;
+		list<Action> path;
+
+		current_node.estado = inicio;
+		current_node.energia = 0;
+		frontier.push(current_node);
+		bool SolutionFound = (current_node.estado.f_rescatador == final.f_rescatador
+			and current_node.estado.c_rescatador == final.c_rescatador);
+
+		while(!SolutionFound and !frontier.empty()){
+			frontier.pop();
+			explored.insert(current_node.estado);
+
+			//Compruebbo si estoy en una casilla de las zapatillas
+			if(terreno[current_node.estado.f_rescatador][current_node.estado.c_rescatador] == 'D'){
+				current_node.estado.zapatillas = true;
+			}
+
+			if(current_node.estado.f_rescatador == final.f_rescatador and current_node.estado.c_rescatador == final.c_rescatador){
+				SolutionFound = true;
+			}
+
+			//Genero el hijo resultante de aplicar la accion WALK
+			NodoR_N2 child_WALK = current_node;
+			child_WALK.estado = applyR(WALK, current_node.estado, terreno, altura);
+			child_WALK.secuencia.push_back(WALK);
+			child_WALK.energia += FuncionCoste(WALK, current_node.estado, terreno, altura);
+			if(child_WALK.estado.f_rescatador == final.f_rescatador and child_WALK.estado.c_rescatador == final.c_rescatador){
+				//El hijo generado es solucion
+				current_node = child_WALK;
+				SolutionFound = true;
+			}
+			else if(explored.find(child_WALK.estado) == explored.end()){
+				//Se mete en la lista frontier después de añadir a secuencia la acción
+				frontier.push(child_WALK);
+			}
+
+			// if(!SolutionFound){
+			// 	NodoR_N2 child_RUN = current_node;
+			// 	child_RUN.estado = applyR(RUN, current_node.estado, terreno, altura);
+			// 	child_RUN.secuencia.push_back(RUN);
+			// 	child_RUN.energia += FuncionCoste(RUN, current_node.estado, terreno, altura);
+			// 	if(explored.find(child_RUN.estado) == explored.end()){
+			// 		frontier.push(child_RUN);
+			// 	}
+			// }
+
+			//Genero el hijo resultante de aplicar la accion TURN_SR
+			if(!SolutionFound){
+				NodoR_N2 child_TURN_SR = current_node;
+				child_TURN_SR.estado = applyR(TURN_SR, current_node.estado, terreno, altura);
+				child_TURN_SR.secuencia.push_back(TURN_SR);
+				child_TURN_SR.energia += FuncionCoste(TURN_SR, current_node.estado, terreno, altura);
+				if(explored.find(child_TURN_SR.estado) == explored.end()){
+					frontier.push(child_TURN_SR);
+				}
+
+				NodoR_N2 child_TURN_L = current_node;
+				child_TURN_L.estado = applyR(TURN_L, current_node.estado, terreno, altura);
+				child_TURN_L.secuencia.push_back(TURN_L);
+				child_TURN_L.energia += FuncionCoste(TURN_L, current_node.estado, terreno, altura);
+				if(explored.find(child_TURN_L.estado) == explored.end()){
+					frontier.push(child_TURN_L);
+				}
+			}
+
+			//Paso a evaluar el siguiente nodo en la lista "frontier"
+			if(!SolutionFound and !frontier.empty()){
+				current_node = frontier.top();
+				while(explored.find(current_node.estado) != explored.end() and !frontier.empty()){
+					frontier.pop();
+
+					if(!frontier.empty())
+						current_node = frontier.top();
+				}
+			}
+		}
+
+		if(SolutionFound) path = current_node.secuencia;
+		
+		return path;
 	}
 
 /*NIVEL 3*/
