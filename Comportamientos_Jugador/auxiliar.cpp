@@ -803,6 +803,9 @@ int ComportamientoAuxiliar::FuncionCoste(const Action &accion, const EstadoA_N3 
 				case 'S':
 					coste = 2 + dif_altura;
 					break;
+				case 'B':
+					coste = 20 + dif_altura * 5;			
+					break;
 				default:
 					coste = 1;
 					break;
@@ -817,6 +820,9 @@ int ComportamientoAuxiliar::FuncionCoste(const Action &accion, const EstadoA_N3 
 					coste = 16;
 					break;
 				case 'T':
+					coste = 3;
+					break;
+				case 'B':
 					coste = 3;
 					break;
 				default:

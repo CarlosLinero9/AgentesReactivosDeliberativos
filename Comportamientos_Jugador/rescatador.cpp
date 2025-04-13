@@ -1070,6 +1070,9 @@ int ComportamientoRescatador::FuncionCoste(const Action &accion, const EstadoR_N
 				case 'S':
 					coste = 2 + dif_altura;
 					break;
+				case 'B':
+					coste = 20 + dif_altura * 5;
+					break;
 				default:
 					coste = 1;
 					break;
@@ -1092,6 +1095,9 @@ int ComportamientoRescatador::FuncionCoste(const Action &accion, const EstadoR_N
 				case 'S':
 					coste = 3 + dif_altura * 2;
 					break;
+				case 'B':
+					coste = 35 + dif_altura * 5;
+					break;
 				default:
 					coste = 1;
 					break;
@@ -1107,6 +1113,9 @@ int ComportamientoRescatador::FuncionCoste(const Action &accion, const EstadoR_N
 				case 'T':
 					coste = 3;
 					break;
+				case 'B':
+					coste = 3;
+					break;
 				default:
 					coste = 1;
 					break;
@@ -1120,6 +1129,9 @@ int ComportamientoRescatador::FuncionCoste(const Action &accion, const EstadoR_N
 					coste = 30;
 					break;
 				case 'T':
+					coste = 5;
+					break;
+				case 'B':
 					coste = 5;
 					break;
 				default:
