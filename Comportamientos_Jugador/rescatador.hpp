@@ -6,6 +6,7 @@
 #include <thread>
 #include <list>
 #include <set>
+#include <queue>
 #include <iostream>
 
 #include "comportamientos/comportamiento.hpp"
@@ -14,6 +15,7 @@
 //ESTRUCTURAS AUXILIARES NIVELES DELIBERATIVOS//////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 
+/*TUTORIAL*/
 struct EstadoR{
   int f;
   int c;
@@ -47,6 +49,65 @@ struct NodoR{
     else return false;
   }
 };
+
+/*NIVEL 2*/
+struct EstadoR_N2{
+  int f_rescatador;
+  int c_rescatador;
+  int brujula_rescatador;
+  int f_auxiliar;
+  int c_auxiliar;
+  int brujula_auxiliar;
+  bool zapatillas;
+
+  bool operator==(const EstadoR_N2 &st) const
+  {
+    return (f_rescatador == st.f_rescatador and c_rescatador == st.c_rescatador and
+      brujula_rescatador == st.brujula_rescatador and zapatillas == st.zapatillas);
+  }
+
+  bool operator<(const EstadoR_N2 &st) const
+  {
+    return (f_rescatador < st.f_rescatador) or (f_rescatador==st.f_rescatador and c_rescatador < st.c_rescatador) or
+      (f_rescatador==st.f_rescatador and c_rescatador==st.c_rescatador and
+      brujula_rescatador < st.brujula_rescatador) or (f_rescatador==st.f_rescatador and c_rescatador==st.c_rescatador and
+      brujula_rescatador==st.brujula_rescatador and zapatillas < st.zapatillas);
+  }
+};
+
+struct NodoR_N2{
+  EstadoR_N2 estado;
+  list<Action> secuencia;
+  int energia;
+
+  bool operator==(const NodoR_N2 &nodo) const
+  {
+    return (estado == nodo.estado);
+  }
+
+  bool operator<(const NodoR_N2 &node) const
+  {
+    return (estado<node.estado);
+  }
+
+  bool operator>(const NodoR_N2 &node) const
+  {
+    return (energia>node.energia);
+  }
+
+  class Compara_N2{
+    public:
+      bool operator()(const NodoR_N2 &nodo1, const NodoR_N2 &nodo2) const
+      {
+        return nodo1>nodo2;
+      }
+  };
+};
+
+
+/*NIVEL 3*/
+
+/*NIVEL 4*/
 
 
 
@@ -121,6 +182,14 @@ public:
 
   /*NIVEL 2*/
   Action ComportamientoRescatadorNivel_2(Sensores sensores);
+  list<Action> DijsktraR(const EstadoR &inicio, const EstadoR &final,
+    const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura);
+  int FuncionCoste(const Action &accion, const EstadoR_N2 &st, const vector<vector<unsigned char>> &terreno,
+    const vector<vector<unsigned char>> &altura);
+  EstadoR_N2 NextCasillaRescatador(const EstadoR_N2 &st);
+  EstadoR_N2 applyR(Action accion, const EstadoR_N2 &st, const vector<vector<unsigned char>> &terreno,
+    const vector<vector<unsigned char>> &altura);
+  bool CasillaAccesibleRescatador(const EstadoR_N2 &st, const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura);
 
   /*NIVEL 3*/
   Action ComportamientoRescatadorNivel_3(Sensores sensores);

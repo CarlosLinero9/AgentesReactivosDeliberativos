@@ -743,6 +743,9 @@ list<Action> ComportamientoAuxiliar::AnchuraAuxiliar_V2(const EstadoA &inicio, c
 
 /*NIVEL 2*/
 Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_2(Sensores sensores){
+	//Debería de definir algún comportamiento para apartarse y no molestar al rescatador
+	Action accion = IDLE;
+	return accion;
 }
 
 /*NIVEL 3*/

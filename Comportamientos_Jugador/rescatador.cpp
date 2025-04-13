@@ -14,7 +14,7 @@ Action ComportamientoRescatador::think(Sensores sensores)
 		// accion = ComportamientoRescatadorNivel_1 (sensores);
 		break;
 	case 2:
-		// accion = ComportamientoRescatadorNivel_2 (sensores);
+		accion = ComportamientoRescatadorNivel_2 (sensores);
 		break;
 	case 3:
 		// accion = ComportamientoRescatadorNivel_3 (sensores);
@@ -1028,7 +1028,217 @@ void PintaPlan(const list<Action> &plan, bool zap){
 
 Action ComportamientoRescatador::ComportamientoRescatadorNivel_2(Sensores sensores)
 {
+	Action accion = IDLE;
+	if(!hayPlan){
+		//Invocar al método de busqueda
+		EstadoR inicio, fin;
+		inicio.f = sensores.posF;
+		inicio.c = sensores.posC;
+		inicio.brujula = sensores.rumbo;
+		inicio.zapatillas = tiene_zapatillas;
+		fin.f = sensores.destinoF;
+		fin.c = sensores.destinoC;
+		//plan = AnchuraRescatador(inicio, fin, mapaResultado, mapaCotas);
+		plan  = DijsktraR(inicio, fin, mapaResultado, mapaCotas);
+		VisualizaPlan(inicio, plan);
+		hayPlan = plan.size() != 0;
+	}
+	if(hayPlan and plan.size()>0){
+		accion = plan.front();
+		plan.pop_front();
+	}
+	if(plan.size()==0){
+		hayPlan=false;
+	}
+	return accion;
 }
+
+int ComportamientoRescatador::FuncionCoste(const Action &accion, const EstadoR_N2 &st, const vector<vector<unsigned char>> &terreno,
+	const vector<vector<unsigned char>> &altura){
+	int coste = 0;
+
+	switch(accion){
+		case WALK: {
+			EstadoR_N2 siguiente = NextCasillaRescatador(st);
+			int dif_altura = (altura[siguiente.f_rescatador][siguiente.c_rescatador] - altura[st.f_rescatador][st.c_rescatador]);
+			switch(terreno[st.f_rescatador][st.c_rescatador]){
+				case 'A':
+					coste = 100 + dif_altura * 10;
+					break;
+				case 'T':
+					coste = 20 + dif_altura * 5;
+					break;
+				case 'S':
+					coste = 2 + dif_altura;
+					break;
+				default:
+					coste = 1;
+					break;
+			}
+			break;
+		}
+	
+		case RUN: {
+			EstadoR_N2 siguiente_1 = NextCasillaRescatador(st);
+			EstadoR_N2 siguiente_2 = NextCasillaRescatador(siguiente_1);
+	
+			int dif_altura = (altura[siguiente_2.f_rescatador][siguiente_2.c_rescatador] - altura[st.f_rescatador][st.c_rescatador]);
+			switch(terreno[st.f_rescatador][st.c_rescatador]){
+				case 'A':
+					coste = 150 + dif_altura * 15;
+					break;
+				case 'T':
+					coste = 35 + dif_altura * 5;
+					break;
+				case 'S':
+					coste = 3 + dif_altura * 2;
+					break;
+				default:
+					coste = 1;
+					break;
+			}
+			break;
+		}
+	
+		case TURN_SR: {
+			switch(terreno[st.f_rescatador][st.c_rescatador]){
+				case 'A':
+					coste = 16;
+					break;
+				case 'T':
+					coste = 3;
+					break;
+				default:
+					coste = 1;
+					break;
+			}
+			break;
+		}
+				
+		case TURN_L: {
+			switch(terreno[st.f_rescatador][st.c_rescatador]){
+				case 'A':
+					coste = 30;
+					break;
+				case 'T':
+					coste = 5;
+					break;
+				default:
+					coste = 1;
+					break;
+			}
+			break;
+		}
+	}
+	
+
+	return coste;
+}
+
+EstadoR_N2 ComportamientoRescatador::NextCasillaRescatador(const EstadoR_N2 &st){
+	EstadoR_N2 siguiente = st;
+	
+	switch(st.brujula_rescatador){
+		case norte:
+			siguiente.f_rescatador = st.f_rescatador - 1;
+			break;
+		case noreste:
+			siguiente.f_rescatador = st.f_rescatador - 1;
+			siguiente.c_rescatador = st.c_rescatador + 1;
+			break;
+		case este:
+			siguiente.c_rescatador = st.c_rescatador + 1;
+			break;
+		case sureste:
+			siguiente.f_rescatador = st.f_rescatador + 1;
+			siguiente.c_rescatador = st.c_rescatador + 1;
+			break;
+		case sur:
+			siguiente.f_rescatador = st.f_rescatador + 1;
+			break;
+		case suroeste:
+			siguiente.f_rescatador = st.f_rescatador + 1;
+			siguiente.c_rescatador = st.c_rescatador - 1;
+			break;
+		case oeste:
+			siguiente.c_rescatador = st.c_rescatador - 1;
+			break;
+		case noroeste:
+			siguiente.f_rescatador = st.f_rescatador - 1;
+			siguiente.c_rescatador = st.c_rescatador - 1;
+			break;
+	}
+	return siguiente;
+}
+
+EstadoR_N2 ComportamientoRescatador::applyR(Action accion, const EstadoR_N2 &st, const vector<vector<unsigned char>> &terreno,
+    const vector<vector<unsigned char>> &altura){
+			EstadoR_N2 next = st;
+			EstadoR_N2 aux;
+
+			switch(accion){
+				case WALK: {
+					if(CasillaAccesibleRescatador(st, terreno, altura)){
+						next = NextCasillaRescatador(st);
+					}
+					break;
+				}
+			
+				case RUN: {
+					EstadoR_N2 siguiente_1 = NextCasillaRescatador(st);
+					EstadoR_N2 siguiente_2 = NextCasillaRescatador(siguiente_1);
+					if(CasillaAccesibleRescatador(siguiente_1, terreno, altura) &&
+					   CasillaAccesibleRescatador(siguiente_2, terreno, altura)){
+						next = siguiente_2;
+					}
+					break;
+				}
+			
+				case TURN_SR: {
+					next.brujula_rescatador = (next.brujula_rescatador + 1) % 8;
+					break;
+				}
+			
+				case TURN_L: {
+					next.brujula_rescatador = (next.brujula_rescatador + 6) % 8;
+					break;
+				}
+			}
+			
+
+			if(terreno[next.f_rescatador][next.c_rescatador] == 'D'){
+				next.zapatillas = true;
+			}
+			else{
+				next.zapatillas = st.zapatillas;
+			}
+		
+			return next;
+	}
+
+bool ComportamientoRescatador::CasillaAccesibleRescatador(const EstadoR_N2 &st, const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura){
+		EstadoR_N2 next = NextCasillaRescatador(st);
+		bool check1 = false;
+		bool check2 = false;
+		bool check3 = false;
+		bool check4 = false;
+
+		EstadoR_N2 aux;
+		aux = NextCasillaRescatador(st);
+
+		check1 = terreno[next.f_rescatador][next.c_rescatador] != 'P' and terreno[next.f_rescatador][next.c_rescatador] != 'M';
+		check2 = terreno[next.f_rescatador][next.c_rescatador] != 'B' or (terreno[next.f_rescatador][next.c_rescatador] == 'B' and st.zapatillas);
+		check3 = abs(altura[next.f_rescatador][next.c_rescatador] - altura[st.f_rescatador][st.c_rescatador]) <= 1;
+		check4 = aux.f_rescatador == st.f_auxiliar and aux.c_rescatador == st.c_auxiliar;
+
+		return check1 and check2 and check3 and !check4;
+}
+
+
+list<Action> ComportamientoRescatador::DijsktraR(const EstadoR &inicio, const EstadoR &final,
+    const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura){
+
+	}
 
 /*NIVEL 3*/
 
