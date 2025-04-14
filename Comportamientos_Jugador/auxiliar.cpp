@@ -95,12 +95,6 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_0(Sensores sensores)
 	return accion;
 }
 
-
-/*NIVEL 1*/
-Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_1(Sensores sensores)
-{
-}
-
 int ComportamientoAuxiliar::VeoCasillaInteresanteA(char i, char c, char d){
 	if (c == 'X') return 2;
 	else if (i == 'X') return 1;
@@ -440,6 +434,11 @@ void ComportamientoAuxiliar::SituarSensorenMapaA(vector<vector<unsigned char>> &
 
 			break;
 	}
+}
+
+/*NIVEL 1*/
+Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_1(Sensores sensores)
+{
 }
 
 
