@@ -8,6 +8,7 @@
 #include <queue>
 #include <iostream>
 #include <utility>
+#include <algorithm>
 #include <set>
 
 #include "comportamientos/comportamiento.hpp"
@@ -123,7 +124,9 @@ public:
     // Inicializar Variables de Estado Niveles 0,1,4
     last_action = IDLE;
     tiene_zapatillas = false;
+    accion_defecto = false;
     giro45izq = 0;
+    frecuencia_visita = vector<vector<int>>(mapaResultado.size(), vector<int>(mapaResultado[0].size(), 0));
   }
   ComportamientoAuxiliar(std::vector<std::vector<unsigned char>> mapaR, std::vector<std::vector<unsigned char>> mapaC) : Comportamiento(mapaR,mapaC)
   {
@@ -145,11 +148,11 @@ public:
 
   /*NIVEL 0*/
   Action ComportamientoAuxiliarNivel_0(Sensores sensores);
-  int VeoCasillaInteresanteA(char i, char c, char d);
-  int VeoCasillaInteresanteA(char i, char c, char d, bool i_libre, bool c_libre, bool d_libre);
-  char ViablePorAlturaA (char casilla, int dif);
+  int VeoCasillaInteresanteA(Sensores &sensores, bool zap);
+  char ViablePorAlturaA (char casilla, int dif, bool zap);
   bool CasillaLibreA(char casilla);
   void SituarSensorenMapaA(vector<vector<unsigned char>> &m, vector<vector<unsigned char>> &a, Sensores sensores);
+  int DetectarCasillaInteresanteA(Sensores &sensores, bool zap);
 
   /*NIVEL 1*/
   Action ComportamientoAuxiliarNivel_1(Sensores sensores);
@@ -201,9 +204,15 @@ public:
   ///////////////////////////////////////////////////////////////////////////////////////////
 private:
   // Definir Variables de Estado
+
+  bool accion_defecto;
   Action last_action;
   bool tiene_zapatillas;
   int giro45izq;
+  const int SUMA_AL_VISITAR = 3; //Suma que se le añade a la casilla que se va a visitar
+  const int SUMA_AL_VER = 1; //Suma que se le añade a la casilla que se ve en el cono de vision
+  vector<vector<int>> frecuencia_visita;
+
 
   //Variables de estado para el nivel E
   list<Action> plan;

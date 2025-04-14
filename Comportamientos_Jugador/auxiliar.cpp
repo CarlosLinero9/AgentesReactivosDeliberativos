@@ -18,8 +18,8 @@ Action ComportamientoAuxiliar::think(Sensores sensores)
 		accion = ComportamientoAuxiliarNivel_2 (sensores);
 		break;
 	case 3:
-		//accion = ComportamientoAuxiliarNivel_3 (sensores);
-		accion = ComportamientoAuxiliarNivel_E(sensores);
+		accion = ComportamientoAuxiliarNivel_3 (sensores);
+		//accion = ComportamientoAuxiliarNivel_E(sensores);
 		break;
 	case 4:
 		// accion = ComportamientoAuxiliarNivel_4 (sensores);
@@ -61,17 +61,8 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_0(Sensores sensores)
 		giro45izq--;
 	}
 	else {
-		char i = ViablePorAlturaA(sensores.superficie[1], sensores.cota[1]-sensores.cota[0]);
-		char c = ViablePorAlturaA(sensores.superficie[2], sensores.cota[2]-sensores.cota[0]);
-		char d = ViablePorAlturaA(sensores.superficie[3], sensores.cota[3]-sensores.cota[0]);
 
-		/*Lo comento todo porque prefiero no utilizarlo ahora mismo*/
-		bool i_libre = CasillaLibreA(sensores.agentes[1]);
-		bool c_libre = CasillaLibreA(sensores.agentes[2]);
-		bool d_libre = CasillaLibreA(sensores.agentes[3]);
-
-		int pos = VeoCasillaInteresanteA(i, c, d, i_libre, c_libre, d_libre);
-		//int pos = VeoCasillaInteresanteA(i, c, d);
+		int pos = VeoCasillaInteresanteA(sensores, tiene_zapatillas);
 
 		switch (pos){
 			case 2:
@@ -85,8 +76,14 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_0(Sensores sensores)
 				accion = TURN_SR;
 				break;
 			case 0:
-				giro45izq = 5;
+			if(accion_defecto){
 				accion = TURN_SR;
+			}else{
+				accion_defecto = true;
+				giro45izq = 6;
+				accion = TURN_SR;
+			}
+				
 				break;
 		}
 	}
@@ -95,34 +92,184 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_0(Sensores sensores)
 	return accion;
 }
 
-int ComportamientoAuxiliar::VeoCasillaInteresanteA(char i, char c, char d){
-	if (c == 'X') return 2;
-	else if (i == 'X') return 1;
-	else if (d == 'X') return 3;
-	else if (c == 'C') return 2;
-	else if (i == 'C') return 1;
-	else if (d == 'C') return 3;
-	else return 0;
-}
-
-char ComportamientoAuxiliar::ViablePorAlturaA(char casilla, int dif){
-	if (abs(dif)<=1)
-		return casilla;
-	else 
-		return 'P';
+int ComportamientoAuxiliar::DetectarCasillaInteresanteA(Sensores &sensores, bool zap) {
+    for (int i = 0; i < sensores.superficie.size(); ++i) {
+        char casilla = sensores.superficie[i];
+        if ((casilla == 'D' and !zap) or casilla == 'X') {
+            return i; // Retorna el índice de la casilla interesante
+		}    
+    }
+    return -1; // No se encontró ninguna casilla interesante
 }
 
 /*Una primera idea para resolver puede ser esta. 
 Tengo que ir perfeccionando cosas.*/
-int ComportamientoAuxiliar::VeoCasillaInteresanteA(char i, char c, char d, bool i_libre, bool c_libre, 
-	bool d_libre){
+int ComportamientoAuxiliar::VeoCasillaInteresanteA(Sensores &sensores, bool zap){
+
+	char i = ViablePorAlturaA(sensores.superficie[1], sensores.cota[1]-sensores.cota[0], zap);
+	char c = ViablePorAlturaA(sensores.superficie[2], sensores.cota[2]-sensores.cota[0], zap);
+	char d = ViablePorAlturaA(sensores.superficie[3], sensores.cota[3]-sensores.cota[0], zap);
+
+	bool i_libre = CasillaLibreA(sensores.agentes[1]);
+	bool c_libre = CasillaLibreA(sensores.agentes[2]);
+	bool d_libre = CasillaLibreA(sensores.agentes[3]);
+	/*Primero me aseguro de que se observa alguna casilla interesante*/
+	int indice_interes = DetectarCasillaInteresanteA(sensores, zap);
+
+	if(indice_interes != -1 and CasillaLibreA(sensores.agentes[indice_interes])){
+		switch(indice_interes){
+			case 1:
+			case 4:
+			case 9:
+				if(((i == 'X') or (i == 'C') or (i == 'D')) and i_libre) return 1;
+				break;
+
+			case 3:
+			case 8:
+			case 15:
+				if(((d == 'X') or (d == 'C') or (d == 'D')) and d_libre) return 3;
+				break;
+
+			case 2:
+			case 5:
+			case 6:
+			case 7:
+			case 10:
+			case 11:
+			case 12:
+			case 13:	
+			case 14:
+				if(((c == 'X') or (c == 'C') or (c == 'D')) and c_libre) return 2;
+				break;
+		}
+	}
+
+	
+
+	int frecuencia_i=0;
+	int frecuencia_c=0;
+	int frecuencia_d=0;	
+
+	vector<int> frecuencia_casillas;
+
+	switch(sensores.rumbo){
+		case norte:
+			
+			frecuencia_i = frecuencia_visita[sensores.posF - 1][sensores.posC - 1];
+			frecuencia_c = frecuencia_visita[sensores.posF - 1][sensores.posC];
+			frecuencia_d = frecuencia_visita[sensores.posF - 1][sensores.posC + 1];
+			// no_visita_frecuente_i = NoVisitaFrecuente(frecuencia_i);
+			// no_visita_frecuente_c = NoVisitaFrecuente(frecuencia_c);
+			// no_visita_frecuente_d = NoVisitaFrecuente(frecuencia_d);
+			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d};
+			break;
+
+		case noroeste:
+			
+			frecuencia_i = frecuencia_visita[sensores.posF][sensores.posC - 1];
+			frecuencia_c = frecuencia_visita[sensores.posF - 1][sensores.posC - 1];
+			frecuencia_d = frecuencia_visita[sensores.posF - 1][sensores.posC];
+			// no_visita_frecuente_i = NoVisitaFrecuente(frecuencia_i);
+			// no_visita_frecuente_c = NoVisitaFrecuente(frecuencia_c);
+			// no_visita_frecuente_d = NoVisitaFrecuente(frecuencia_d);
+			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d};
+			break;
+
+		case oeste:
+			
+			frecuencia_i = frecuencia_visita[sensores.posF + 1][sensores.posC - 1];
+			frecuencia_c = frecuencia_visita[sensores.posF][sensores.posC - 1];
+			frecuencia_d = frecuencia_visita[sensores.posF - 1][sensores.posC - 1];
+			// no_visita_frecuente_i = NoVisitaFrecuente(frecuencia_i);
+			// no_visita_frecuente_c = NoVisitaFrecuente(frecuencia_c);
+			// no_visita_frecuente_d = NoVisitaFrecuente(frecuencia_d);
+			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d};
+			break;
+
+		case suroeste:
+			
+			frecuencia_i = frecuencia_visita[sensores.posF + 1][sensores.posC];
+			frecuencia_c = frecuencia_visita[sensores.posF + 1][sensores.posC - 1];
+			frecuencia_d = frecuencia_visita[sensores.posF][sensores.posC - 1];
+			// no_visita_frecuente_i = NoVisitaFrecuente(frecuencia_i);
+			// no_visita_frecuente_c = NoVisitaFrecuente(frecuencia_c);
+			// no_visita_frecuente_d = NoVisitaFrecuente(frecuencia_d);
+			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d};
+			break;
+
+		case sur:
+			
+			frecuencia_i = frecuencia_visita[sensores.posF + 1][sensores.posC + 1];
+			frecuencia_c = frecuencia_visita[sensores.posF + 1][sensores.posC];
+			frecuencia_d = frecuencia_visita[sensores.posF + 1][sensores.posC - 1];
+			// no_visita_frecuente_i = NoVisitaFrecuente(frecuencia_i);
+			// no_visita_frecuente_c = NoVisitaFrecuente(frecuencia_c);
+			// no_visita_frecuente_d = NoVisitaFrecuente(frecuencia_d);
+			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d};
+			break;
+
+		case sureste:
+			
+			frecuencia_i = frecuencia_visita[sensores.posF][sensores.posC + 1];
+			frecuencia_c = frecuencia_visita[sensores.posF + 1][sensores.posC + 1];
+			frecuencia_d = frecuencia_visita[sensores.posF + 1][sensores.posC];
+			// no_visita_frecuente_i = NoVisitaFrecuente(frecuencia_i);
+			// no_visita_frecuente_c = NoVisitaFrecuente(frecuencia_c);
+			// no_visita_frecuente_d = NoVisitaFrecuente(frecuencia_d);
+			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d};
+			break;
+
+		case este:
+			
+			frecuencia_i = frecuencia_visita[sensores.posF - 1][sensores.posC + 1];
+			frecuencia_c = frecuencia_visita[sensores.posF][sensores.posC + 1];
+			frecuencia_d = frecuencia_visita[sensores.posF + 1][sensores.posC + 1];
+			// no_visita_frecuente_i = NoVisitaFrecuente(frecuencia_i);
+			// no_visita_frecuente_c = NoVisitaFrecuente(frecuencia_c);
+			// no_visita_frecuente_d = NoVisitaFrecuente(frecuencia_d);
+			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d};
+			break;
+
+		case noreste:
+			
+			frecuencia_i = frecuencia_visita[sensores.posF - 1][sensores.posC];
+			frecuencia_c = frecuencia_visita[sensores.posF - 1][sensores.posC + 1];
+			frecuencia_d = frecuencia_visita[sensores.posF][sensores.posC + 1];
+			// no_visita_frecuente_i = NoVisitaFrecuente(frecuencia_i);
+			// no_visita_frecuente_c = NoVisitaFrecuente(frecuencia_c);
+			// no_visita_frecuente_d = NoVisitaFrecuente(frecuencia_d);
+			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d};
+			break;
+	}
+
+	std::sort(frecuencia_casillas.begin(), frecuencia_casillas.end());  // Ordena de menor a mayor
+
+		
 	if (c == 'X' and c_libre) return 2;
 	else if (i == 'X' and i_libre) return 1;
 	else if (d == 'X' and d_libre) return 3;
-	else if (c == 'C' and c_libre) return 2;
-	else if (i == 'C' and i_libre) return 1;
-	else if (d == 'C' and d_libre) return 3;
-	else return 0;
+	else if(!zap) {
+		if(c == 'D' and c_libre) return 2;
+		else if (i == 'D' and i_libre) return 1;
+		else if (d == 'D' and d_libre) return 3;
+	}
+
+	for (int freq : frecuencia_casillas) {
+		if (freq == frecuencia_i && i_libre && i == 'C') return 1;
+		else if (freq == frecuencia_c && c_libre && c == 'C') return 2;
+		else if (freq == frecuencia_d && d_libre && d == 'C') return 3;
+	}
+
+	return 0;
+	
+}
+
+
+char ComportamientoAuxiliar::ViablePorAlturaA(char casilla, int dif, bool zap){
+	if (abs(dif)<=1 or (zap and abs(dif)<=2))
+		return casilla;
+	else 
+		return 'P';
 }
 
 bool ComportamientoAuxiliar::CasillaLibreA(char casilla){
