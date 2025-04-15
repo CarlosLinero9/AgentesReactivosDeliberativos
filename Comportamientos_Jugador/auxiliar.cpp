@@ -255,8 +255,8 @@ int ComportamientoAuxiliar::VeoCasillaInteresanteA(Sensores &sensores, bool zap)
 	}
 
 	for (int freq : frecuencia_casillas) {
-		if (freq == frecuencia_i && i_libre && i == 'C') return 1;
-		else if (freq == frecuencia_c && c_libre && c == 'C') return 2;
+		if (freq == frecuencia_c && c_libre && c == 'C') return 2;
+		else if (freq == frecuencia_i && i_libre && i == 'C') return 1;
 		else if (freq == frecuencia_d && d_libre && d == 'C') return 3;
 	}
 
