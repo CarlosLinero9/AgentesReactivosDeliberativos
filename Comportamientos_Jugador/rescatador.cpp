@@ -119,7 +119,7 @@ int ComportamientoRescatador::VeoCasillaInteresanteR(Sensores &sensores, bool za
 	/*Primero me aseguro de que se observa alguna casilla interesante*/
 	int indice_interes = DetectarCasillaInteresanteR(sensores, zap);
 
-	if(indice_interes != -1 and CasillaLibreR(sensores.agentes[indice_interes])){
+	if(indice_interes != -1){
 		switch(indice_interes){
 			case 1:
 			case 4:
@@ -831,7 +831,7 @@ int ComportamientoRescatador::VeoCasillaInteresanteR_N1(Sensores &sensores, bool
 	if(!zap){
 		int indice_interes = DetectarCasillaZapatillasR(sensores, zap);
 
-		if(indice_interes != -1 and CasillaLibreR(sensores.agentes[indice_interes])){
+		if(indice_interes != -1){
 			switch(indice_interes){
 				case 1:
 				case 4:

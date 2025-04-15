@@ -156,6 +156,7 @@ public:
   bool CasillaLibreA(char casilla);
   void SituarSensorenMapaA(vector<vector<unsigned char>> &m, vector<vector<unsigned char>> &a, Sensores sensores);
   int DetectarCasillaInteresanteA(Sensores &sensores, bool zap);
+  bool NoVisitaFrecuente(int frecuencia);
 
   /*NIVEL 1*/
   Action ComportamientoAuxiliarNivel_1(Sensores sensores);

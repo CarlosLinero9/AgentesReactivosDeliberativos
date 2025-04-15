@@ -67,13 +67,16 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_0(Sensores sensores)
 		switch (pos){
 			case 2:
 				accion = WALK;
+				cout << "Avanzo" << endl;
 				break;
 			case 1:
 				giro45izq = 6;
 				accion = TURN_SR;
+				cout << "Izqda" << endl;
 				break;
 			case 3:
 				accion = TURN_SR;
+				cout << "Der" << endl;
 				break;
 			case 0:
 				if(accion_defecto){
@@ -83,7 +86,7 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_0(Sensores sensores)
 					giro45izq = 6;
 					accion = TURN_SR;
 				}
-				
+				cout << "Defecto" << endl;
 				break;
 		}
 	}
@@ -102,6 +105,12 @@ int ComportamientoAuxiliar::DetectarCasillaInteresanteA(Sensores &sensores, bool
     return -1; // No se encontró ninguna casilla interesante
 }
 
+bool ComportamientoAuxiliar::NoVisitaFrecuente(int frecuencia){
+	// if(frecuencia <= 20) return true;
+	// else return false;
+	return true;
+}
+
 /*Una primera idea para resolver puede ser esta. 
 Tengo que ir perfeccionando cosas.*/
 int ComportamientoAuxiliar::VeoCasillaInteresanteA(Sensores &sensores, bool zap){
@@ -115,8 +124,9 @@ int ComportamientoAuxiliar::VeoCasillaInteresanteA(Sensores &sensores, bool zap)
 	bool d_libre = CasillaLibreA(sensores.agentes[3]);
 	/*Primero me aseguro de que se observa alguna casilla interesante*/
 	int indice_interes = DetectarCasillaInteresanteA(sensores, zap);
-
-	if(indice_interes != -1 and CasillaLibreA(sensores.agentes[indice_interes])){
+	
+	if(indice_interes != -1){
+		cout << "indice_interes: " << indice_interes << endl;
 		switch(indice_interes){
 			case 1:
 			case 4:
@@ -144,6 +154,9 @@ int ComportamientoAuxiliar::VeoCasillaInteresanteA(Sensores &sensores, bool zap)
 		}
 	}
 
+	bool no_visita_frecuente_i = false;
+	bool no_visita_frecuente_c = false;
+	bool no_visita_frecuente_d = false;
 	
 
 	int frecuencia_i=0;
@@ -158,9 +171,9 @@ int ComportamientoAuxiliar::VeoCasillaInteresanteA(Sensores &sensores, bool zap)
 			frecuencia_i = frecuencia_visita[sensores.posF - 1][sensores.posC - 1];
 			frecuencia_c = frecuencia_visita[sensores.posF - 1][sensores.posC];
 			frecuencia_d = frecuencia_visita[sensores.posF - 1][sensores.posC + 1];
-			// no_visita_frecuente_i = NoVisitaFrecuente(frecuencia_i);
-			// no_visita_frecuente_c = NoVisitaFrecuente(frecuencia_c);
-			// no_visita_frecuente_d = NoVisitaFrecuente(frecuencia_d);
+			no_visita_frecuente_i = NoVisitaFrecuente(frecuencia_i);
+			no_visita_frecuente_c = NoVisitaFrecuente(frecuencia_c);
+			no_visita_frecuente_d = NoVisitaFrecuente(frecuencia_d);
 			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d};
 			break;
 
@@ -169,9 +182,9 @@ int ComportamientoAuxiliar::VeoCasillaInteresanteA(Sensores &sensores, bool zap)
 			frecuencia_i = frecuencia_visita[sensores.posF][sensores.posC - 1];
 			frecuencia_c = frecuencia_visita[sensores.posF - 1][sensores.posC - 1];
 			frecuencia_d = frecuencia_visita[sensores.posF - 1][sensores.posC];
-			// no_visita_frecuente_i = NoVisitaFrecuente(frecuencia_i);
-			// no_visita_frecuente_c = NoVisitaFrecuente(frecuencia_c);
-			// no_visita_frecuente_d = NoVisitaFrecuente(frecuencia_d);
+			no_visita_frecuente_i = NoVisitaFrecuente(frecuencia_i);
+			no_visita_frecuente_c = NoVisitaFrecuente(frecuencia_c);
+			no_visita_frecuente_d = NoVisitaFrecuente(frecuencia_d);
 			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d};
 			break;
 
@@ -180,9 +193,9 @@ int ComportamientoAuxiliar::VeoCasillaInteresanteA(Sensores &sensores, bool zap)
 			frecuencia_i = frecuencia_visita[sensores.posF + 1][sensores.posC - 1];
 			frecuencia_c = frecuencia_visita[sensores.posF][sensores.posC - 1];
 			frecuencia_d = frecuencia_visita[sensores.posF - 1][sensores.posC - 1];
-			// no_visita_frecuente_i = NoVisitaFrecuente(frecuencia_i);
-			// no_visita_frecuente_c = NoVisitaFrecuente(frecuencia_c);
-			// no_visita_frecuente_d = NoVisitaFrecuente(frecuencia_d);
+			no_visita_frecuente_i = NoVisitaFrecuente(frecuencia_i);
+			no_visita_frecuente_c = NoVisitaFrecuente(frecuencia_c);
+			no_visita_frecuente_d = NoVisitaFrecuente(frecuencia_d);
 			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d};
 			break;
 
@@ -191,9 +204,9 @@ int ComportamientoAuxiliar::VeoCasillaInteresanteA(Sensores &sensores, bool zap)
 			frecuencia_i = frecuencia_visita[sensores.posF + 1][sensores.posC];
 			frecuencia_c = frecuencia_visita[sensores.posF + 1][sensores.posC - 1];
 			frecuencia_d = frecuencia_visita[sensores.posF][sensores.posC - 1];
-			// no_visita_frecuente_i = NoVisitaFrecuente(frecuencia_i);
-			// no_visita_frecuente_c = NoVisitaFrecuente(frecuencia_c);
-			// no_visita_frecuente_d = NoVisitaFrecuente(frecuencia_d);
+			no_visita_frecuente_i = NoVisitaFrecuente(frecuencia_i);
+			no_visita_frecuente_c = NoVisitaFrecuente(frecuencia_c);
+			no_visita_frecuente_d = NoVisitaFrecuente(frecuencia_d);
 			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d};
 			break;
 
@@ -202,9 +215,9 @@ int ComportamientoAuxiliar::VeoCasillaInteresanteA(Sensores &sensores, bool zap)
 			frecuencia_i = frecuencia_visita[sensores.posF + 1][sensores.posC + 1];
 			frecuencia_c = frecuencia_visita[sensores.posF + 1][sensores.posC];
 			frecuencia_d = frecuencia_visita[sensores.posF + 1][sensores.posC - 1];
-			// no_visita_frecuente_i = NoVisitaFrecuente(frecuencia_i);
-			// no_visita_frecuente_c = NoVisitaFrecuente(frecuencia_c);
-			// no_visita_frecuente_d = NoVisitaFrecuente(frecuencia_d);
+			no_visita_frecuente_i = NoVisitaFrecuente(frecuencia_i);
+			no_visita_frecuente_c = NoVisitaFrecuente(frecuencia_c);
+			no_visita_frecuente_d = NoVisitaFrecuente(frecuencia_d);
 			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d};
 			break;
 
@@ -213,9 +226,9 @@ int ComportamientoAuxiliar::VeoCasillaInteresanteA(Sensores &sensores, bool zap)
 			frecuencia_i = frecuencia_visita[sensores.posF][sensores.posC + 1];
 			frecuencia_c = frecuencia_visita[sensores.posF + 1][sensores.posC + 1];
 			frecuencia_d = frecuencia_visita[sensores.posF + 1][sensores.posC];
-			// no_visita_frecuente_i = NoVisitaFrecuente(frecuencia_i);
-			// no_visita_frecuente_c = NoVisitaFrecuente(frecuencia_c);
-			// no_visita_frecuente_d = NoVisitaFrecuente(frecuencia_d);
+			no_visita_frecuente_i = NoVisitaFrecuente(frecuencia_i);
+			no_visita_frecuente_c = NoVisitaFrecuente(frecuencia_c);
+			no_visita_frecuente_d = NoVisitaFrecuente(frecuencia_d);
 			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d};
 			break;
 
@@ -224,9 +237,9 @@ int ComportamientoAuxiliar::VeoCasillaInteresanteA(Sensores &sensores, bool zap)
 			frecuencia_i = frecuencia_visita[sensores.posF - 1][sensores.posC + 1];
 			frecuencia_c = frecuencia_visita[sensores.posF][sensores.posC + 1];
 			frecuencia_d = frecuencia_visita[sensores.posF + 1][sensores.posC + 1];
-			// no_visita_frecuente_i = NoVisitaFrecuente(frecuencia_i);
-			// no_visita_frecuente_c = NoVisitaFrecuente(frecuencia_c);
-			// no_visita_frecuente_d = NoVisitaFrecuente(frecuencia_d);
+			no_visita_frecuente_i = NoVisitaFrecuente(frecuencia_i);
+			no_visita_frecuente_c = NoVisitaFrecuente(frecuencia_c);
+			no_visita_frecuente_d = NoVisitaFrecuente(frecuencia_d);
 			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d};
 			break;
 
@@ -235,9 +248,9 @@ int ComportamientoAuxiliar::VeoCasillaInteresanteA(Sensores &sensores, bool zap)
 			frecuencia_i = frecuencia_visita[sensores.posF - 1][sensores.posC];
 			frecuencia_c = frecuencia_visita[sensores.posF - 1][sensores.posC + 1];
 			frecuencia_d = frecuencia_visita[sensores.posF][sensores.posC + 1];
-			// no_visita_frecuente_i = NoVisitaFrecuente(frecuencia_i);
-			// no_visita_frecuente_c = NoVisitaFrecuente(frecuencia_c);
-			// no_visita_frecuente_d = NoVisitaFrecuente(frecuencia_d);
+			no_visita_frecuente_i = NoVisitaFrecuente(frecuencia_i);
+			no_visita_frecuente_c = NoVisitaFrecuente(frecuencia_c);
+			no_visita_frecuente_d = NoVisitaFrecuente(frecuencia_d);
 			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d};
 			break;
 	}
@@ -255,9 +268,9 @@ int ComportamientoAuxiliar::VeoCasillaInteresanteA(Sensores &sensores, bool zap)
 	}
 
 	for (int freq : frecuencia_casillas) {
-		if (freq == frecuencia_c && c_libre && c == 'C') return 2;
-		else if (freq == frecuencia_i && i_libre && i == 'C') return 1;
-		else if (freq == frecuencia_d && d_libre && d == 'C') return 3;
+		if (freq == frecuencia_c && c_libre && c == 'C' && no_visita_frecuente_c) return 2;
+		else if (freq == frecuencia_i && i_libre && i == 'C' && no_visita_frecuente_i) return 1;
+		else if (freq == frecuencia_d && d_libre && d == 'C' && no_visita_frecuente_d) return 3;
 	}
 
 	return 0;
@@ -318,6 +331,23 @@ void ComportamientoAuxiliar::SituarSensorenMapaA(vector<vector<unsigned char>> &
 			a[sensores.posF-3][sensores.posC+2] = sensores.cota[14];
 			a[sensores.posF-3][sensores.posC+3] = sensores.cota[15];
 
+			frecuencia_visita[sensores.posF][sensores.posC]+=SUMA_AL_VISITAR;
+			frecuencia_visita[sensores.posF-1][sensores.posC-1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-1][sensores.posC]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-1][sensores.posC+1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-2][sensores.posC-2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-2][sensores.posC-1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-2][sensores.posC]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-2][sensores.posC+1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-2][sensores.posC+2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-3][sensores.posC-3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-3][sensores.posC-2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-3][sensores.posC-1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-3][sensores.posC]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-3][sensores.posC+1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-3][sensores.posC+2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-3][sensores.posC+3]+=SUMA_AL_VER;
+
 			break;
 
 		case noroeste:
@@ -354,6 +384,23 @@ void ComportamientoAuxiliar::SituarSensorenMapaA(vector<vector<unsigned char>> &
 			a[sensores.posF-3][sensores.posC-2] = sensores.cota[13];
 			a[sensores.posF-3][sensores.posC-1] = sensores.cota[14];
 			a[sensores.posF-3][sensores.posC] = sensores.cota[15];
+
+			frecuencia_visita[sensores.posF][sensores.posC]+=SUMA_AL_VISITAR;
+			frecuencia_visita[sensores.posF][sensores.posC-1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-1][sensores.posC-1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-1][sensores.posC]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF][sensores.posC-2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-1][sensores.posC-2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-2][sensores.posC-2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-2][sensores.posC-1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-2][sensores.posC]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF][sensores.posC-3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-1][sensores.posC-3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-2][sensores.posC-3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-3][sensores.posC-3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-3][sensores.posC-2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-3][sensores.posC-1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-3][sensores.posC]+=SUMA_AL_VER;
 
 
 			break;
@@ -393,6 +440,23 @@ void ComportamientoAuxiliar::SituarSensorenMapaA(vector<vector<unsigned char>> &
 			a[sensores.posF-2][sensores.posC-3] = sensores.cota[14];
 			a[sensores.posF-3][sensores.posC-3] = sensores.cota[15];
 
+			frecuencia_visita[sensores.posF][sensores.posC]+=SUMA_AL_VISITAR;
+			frecuencia_visita[sensores.posF+1][sensores.posC-1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF][sensores.posC-1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-1][sensores.posC-1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+2][sensores.posC-2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+1][sensores.posC-2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF][sensores.posC-2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-1][sensores.posC-2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-2][sensores.posC-2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+3][sensores.posC-3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+2][sensores.posC-3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+1][sensores.posC-3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF][sensores.posC-3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-1][sensores.posC-3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-2][sensores.posC-3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-3][sensores.posC-3]+=SUMA_AL_VER;
+
 
 			break;
 
@@ -431,6 +495,23 @@ void ComportamientoAuxiliar::SituarSensorenMapaA(vector<vector<unsigned char>> &
 			a[sensores.posF+3][sensores.posC+1] = sensores.cota[14];
 			a[sensores.posF+3][sensores.posC] = sensores.cota[15];
 
+			frecuencia_visita[sensores.posF][sensores.posC]+=SUMA_AL_VISITAR;
+			frecuencia_visita[sensores.posF][sensores.posC+1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+1][sensores.posC+1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+1][sensores.posC]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF][sensores.posC+2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+1][sensores.posC+2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+2][sensores.posC+2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+2][sensores.posC+1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+2][sensores.posC]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF][sensores.posC+3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+1][sensores.posC+3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+2][sensores.posC+3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+3][sensores.posC+3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+3][sensores.posC+2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+3][sensores.posC+1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+3][sensores.posC]+=SUMA_AL_VER;
+
 			break;
 
 		case sur:
@@ -467,6 +548,23 @@ void ComportamientoAuxiliar::SituarSensorenMapaA(vector<vector<unsigned char>> &
 			a[sensores.posF+3][sensores.posC-1] = sensores.cota[13];
 			a[sensores.posF+3][sensores.posC-2] = sensores.cota[14];
 			a[sensores.posF+3][sensores.posC-3] = sensores.cota[15];
+
+			frecuencia_visita[sensores.posF][sensores.posC]+=SUMA_AL_VISITAR;
+			frecuencia_visita[sensores.posF+1][sensores.posC+1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+1][sensores.posC]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+1][sensores.posC-1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+2][sensores.posC+2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+2][sensores.posC+1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+2][sensores.posC]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+2][sensores.posC-1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+2][sensores.posC-2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+3][sensores.posC+3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+3][sensores.posC+2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+3][sensores.posC+1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+3][sensores.posC]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+3][sensores.posC-1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+3][sensores.posC-2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+3][sensores.posC-3]+=SUMA_AL_VER;
 
 			break;
 
@@ -505,6 +603,23 @@ void ComportamientoAuxiliar::SituarSensorenMapaA(vector<vector<unsigned char>> &
 			a[sensores.posF+1][sensores.posC-3] = sensores.cota[14];
 			a[sensores.posF][sensores.posC-3] = sensores.cota[15];
 
+			frecuencia_visita[sensores.posF][sensores.posC]+=SUMA_AL_VISITAR;
+			frecuencia_visita[sensores.posF+1][sensores.posC]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+1][sensores.posC-1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF][sensores.posC-1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+2][sensores.posC]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+2][sensores.posC-1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+2][sensores.posC-2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+1][sensores.posC-2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF][sensores.posC-2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+3][sensores.posC]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+3][sensores.posC-1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+3][sensores.posC-2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+3][sensores.posC-3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+2][sensores.posC-3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+1][sensores.posC-3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF][sensores.posC-3]+=SUMA_AL_VER;
+
 			break;
 
 		case este:
@@ -541,6 +656,23 @@ void ComportamientoAuxiliar::SituarSensorenMapaA(vector<vector<unsigned char>> &
 			a[sensores.posF+1][sensores.posC+3] = sensores.cota[13];
 			a[sensores.posF+2][sensores.posC+3] = sensores.cota[14];
 			a[sensores.posF+3][sensores.posC+3] = sensores.cota[15];
+
+			frecuencia_visita[sensores.posF][sensores.posC]+=SUMA_AL_VISITAR;
+			frecuencia_visita[sensores.posF-1][sensores.posC+1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF][sensores.posC+1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+1][sensores.posC+1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-2][sensores.posC+2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-1][sensores.posC+2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF][sensores.posC+2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+1][sensores.posC+2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+2][sensores.posC+2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-3][sensores.posC+3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-2][sensores.posC+3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-1][sensores.posC+3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF][sensores.posC+3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+1][sensores.posC+3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+2][sensores.posC+3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF+3][sensores.posC+3]+=SUMA_AL_VER;
 
 			break;
 
@@ -579,10 +711,26 @@ void ComportamientoAuxiliar::SituarSensorenMapaA(vector<vector<unsigned char>> &
 			a[sensores.posF-1][sensores.posC+3] = sensores.cota[14];
 			a[sensores.posF][sensores.posC+3] = sensores.cota[15];
 
+			frecuencia_visita[sensores.posF][sensores.posC]+=SUMA_AL_VISITAR;
+			frecuencia_visita[sensores.posF-1][sensores.posC]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-1][sensores.posC+1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF][sensores.posC+1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-2][sensores.posC]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-2][sensores.posC+1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-2][sensores.posC+2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-1][sensores.posC+2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF][sensores.posC+2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-3][sensores.posC]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-3][sensores.posC+1]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-3][sensores.posC+2]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-3][sensores.posC+3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-2][sensores.posC+3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF-1][sensores.posC+3]+=SUMA_AL_VER;
+			frecuencia_visita[sensores.posF][sensores.posC+3]+=SUMA_AL_VER;
+
 			break;
 	}
 }
-
 
 /*NIVEL 1*/
 
@@ -707,7 +855,7 @@ int ComportamientoAuxiliar::VeoCasillaInteresanteA_N1(Sensores &sensores, bool z
 	if(!zap){
 		int indice_interes = DetectarCasillaZapatillasA(sensores, zap);
 
-		if(indice_interes != -1 and CasillaLibreA(sensores.agentes[indice_interes])){
+		if(indice_interes != -1){
 			switch(indice_interes){
 				case 1:
 				case 4:
