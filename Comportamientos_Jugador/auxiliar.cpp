@@ -12,7 +12,7 @@ Action ComportamientoAuxiliar::think(Sensores sensores)
 		accion = ComportamientoAuxiliarNivel_0 (sensores);
 		break;
 	case 1:
-		// accion = ComportamientoAuxiliarNivel_1 (sensores);
+		accion = ComportamientoAuxiliarNivel_1 (sensores);
 		break;
 	case 2:
 		accion = ComportamientoAuxiliarNivel_2 (sensores);
@@ -76,13 +76,13 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_0(Sensores sensores)
 				accion = TURN_SR;
 				break;
 			case 0:
-			if(accion_defecto){
-				accion = TURN_SR;
-			}else{
-				accion_defecto = true;
-				giro45izq = 6;
-				accion = TURN_SR;
-			}
+				if(accion_defecto){
+					accion = TURN_SR;
+				}else{
+					accion_defecto = true;
+					giro45izq = 6;
+					accion = TURN_SR;
+				}
 				
 				break;
 		}
@@ -266,7 +266,7 @@ int ComportamientoAuxiliar::VeoCasillaInteresanteA(Sensores &sensores, bool zap)
 
 
 char ComportamientoAuxiliar::ViablePorAlturaA(char casilla, int dif, bool zap){
-	if (abs(dif)<=1 or (zap and abs(dif)<=2))
+	if (abs(dif)<=1)
 		return casilla;
 	else 
 		return 'P';
@@ -583,11 +583,272 @@ void ComportamientoAuxiliar::SituarSensorenMapaA(vector<vector<unsigned char>> &
 	}
 }
 
+
 /*NIVEL 1*/
+
 Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_1(Sensores sensores)
 {
+	Action accion;
+	SituarSensorenMapaA(mapaResultado, mapaCotas, sensores);
+	if(sensores.superficie[0] == 'D') tiene_zapatillas = true;
+
+	if(giro45izq != 0){
+		accion = TURN_SR;
+		giro45izq--;
+	}
+	else {
+
+		if(pasos == MAX_PASOS){
+			objetivo.first = -1;
+			objetivo.second = -1;
+
+			int distancia = 5000;
+
+			for(int i = 0; i < mapaResultado.size() -3; i++){
+				for(int j = 0; j < mapaResultado[i].size()-3; j++){
+					int dist = abs(i - sensores.posF) + abs(j - sensores.posC);
+					if(mapaResultado[i][j] == '?' and dist < distancia){
+			
+						distancia = dist;
+						objetivo.first = i;
+						objetivo.second = j;
+						
+					}
+				}
+			}
+			if(objetivo.first != -1 and objetivo.second != -1){
+				GuardarFrecuenciasA();
+				CalcularObjetivoA();
+
+				if(sensores.posF == objetivo.first and sensores.posC == objetivo.second){
+					objetivo.first = -1;
+					objetivo.second = -1;
+					RecuperarFrecuenciasA();
+				}
+			}
+			pasos = 0;
+		}
+
+		int pos = VeoCasillaInteresanteA_N1(sensores, tiene_zapatillas);
+		switch (pos){
+			case 2:
+				accion = WALK;
+				break;
+			case 1:
+				giro45izq = 6;
+				accion = TURN_SR;
+				break;
+			case 3:
+				accion = TURN_SR;
+				break;
+			case 0:
+				if(accion_defecto){
+					accion = TURN_SR;
+				}else{
+					accion_defecto = true;
+					giro45izq = 6;
+					accion = TURN_SR;
+				}
+				
+				break;
+		}
+	}
+
+	
+	pasos++;
+	last_action = accion;
+	return accion;
 }
 
+void ComportamientoAuxiliar::GuardarFrecuenciasA(){
+	for(int i = 0; i < frecuencia_visita.size(); i++){
+		for(int j = 0; j < frecuencia_visita[i].size(); j++){
+			frecuencia_visita_aux[i][j] = frecuencia_visita[i][j];
+		}
+	}
+}
+
+void ComportamientoAuxiliar::RecuperarFrecuenciasA(){
+	for(int i = 0; i < frecuencia_visita_aux.size(); i++){
+		for(int j = 0; j < frecuencia_visita_aux[i].size(); j++){
+			frecuencia_visita[i][j] = frecuencia_visita_aux[i][j];
+		}
+	}
+}
+
+int ComportamientoAuxiliar::DetectarCasillaZapatillasA(Sensores &sensores, bool zap) {
+    for (int i = 0; i < sensores.superficie.size(); ++i) {
+        char casilla = sensores.superficie[i];
+        if (casilla == 'D' and !zap) {
+            return i; // Retorna el índice de la casilla interesante
+		}    
+    }
+    return -1; // No se encontró ninguna casilla interesante
+}
+
+bool ComportamientoAuxiliar::EsTransitableA(char casilla){
+	
+	if(casilla == 'X' or casilla == 'C' or casilla == 'D'
+		or casilla == 'S') return true;
+	else return false;
+	
+}
+
+int ComportamientoAuxiliar::VeoCasillaInteresanteA_N1(Sensores &sensores, bool zap){
+
+	char i = ViablePorAlturaA(sensores.superficie[1], sensores.cota[1]-sensores.cota[0], zap);
+	char c = ViablePorAlturaA(sensores.superficie[2], sensores.cota[2]-sensores.cota[0], zap);
+	char d = ViablePorAlturaA(sensores.superficie[3], sensores.cota[3]-sensores.cota[0], zap);
+
+	bool i_libre = CasillaLibreA(sensores.agentes[1]);
+	bool c_libre = CasillaLibreA(sensores.agentes[2]);
+	bool d_libre = CasillaLibreA(sensores.agentes[3]);
+	//cout << "i: " << i << " c: " << c << " d: " << d << endl;
+	if(!zap){
+		int indice_interes = DetectarCasillaZapatillasA(sensores, zap);
+
+		if(indice_interes != -1 and CasillaLibreA(sensores.agentes[indice_interes])){
+			switch(indice_interes){
+				case 1:
+				case 4:
+				case 9:
+					//Aquí debería de meter algo de si es transitable o no
+					if(EsTransitableA(sensores.superficie[1]) and i_libre and i != 'P') return 1;
+					break;
+
+				case 3:
+				case 8:
+				case 15:
+					if(EsTransitableA(sensores.superficie[3]) and d_libre and d != 'P') return 3;
+					break;
+
+				case 2:
+				case 5:
+				case 6:
+				case 7:
+				case 10:
+				case 11:
+				case 12:
+				case 13:	
+				case 14:
+					if(EsTransitableA(sensores.superficie[2]) and c_libre and c != 'P') return 2;
+					break;
+			}
+		}
+	}
+
+	int frecuencia_i=0;
+	int frecuencia_c=0;
+	int frecuencia_d=0;	
+
+	vector<int> frecuencia_casillas;
+
+	//Debería jugar tmb con los consumos para menearme lo maximo posible.
+	//Lo ideal será establecer una jerarquía en funcion del gasto al moverme
+	//y así ir a las que gasten menos.
+
+	switch(sensores.rumbo){
+		case norte:
+			
+			frecuencia_i = frecuencia_visita[sensores.posF - 1][sensores.posC - 1];
+			frecuencia_c = frecuencia_visita[sensores.posF - 1][sensores.posC];
+			frecuencia_d = frecuencia_visita[sensores.posF - 1][sensores.posC + 1];
+			
+			break;
+
+		case noroeste:
+			
+			frecuencia_i = frecuencia_visita[sensores.posF][sensores.posC - 1];
+			frecuencia_c = frecuencia_visita[sensores.posF - 1][sensores.posC - 1];
+			frecuencia_d = frecuencia_visita[sensores.posF - 1][sensores.posC];
+			
+			break;
+
+		case oeste:
+			
+			frecuencia_i = frecuencia_visita[sensores.posF + 1][sensores.posC - 1];
+			frecuencia_c = frecuencia_visita[sensores.posF][sensores.posC - 1];
+			frecuencia_d = frecuencia_visita[sensores.posF - 1][sensores.posC - 1];
+			
+			break;
+
+		case suroeste:
+			
+			frecuencia_i = frecuencia_visita[sensores.posF + 1][sensores.posC];
+			frecuencia_c = frecuencia_visita[sensores.posF + 1][sensores.posC - 1];
+			frecuencia_d = frecuencia_visita[sensores.posF][sensores.posC - 1];
+			
+			break;
+
+		case sur:
+			
+			frecuencia_i = frecuencia_visita[sensores.posF + 1][sensores.posC + 1];
+			frecuencia_c = frecuencia_visita[sensores.posF + 1][sensores.posC];
+			frecuencia_d = frecuencia_visita[sensores.posF + 1][sensores.posC - 1];
+			
+			break;
+
+		case sureste:
+			
+			frecuencia_i = frecuencia_visita[sensores.posF][sensores.posC + 1];
+			frecuencia_c = frecuencia_visita[sensores.posF + 1][sensores.posC + 1];
+			frecuencia_d = frecuencia_visita[sensores.posF + 1][sensores.posC];
+			
+			break;
+
+		case este:
+			
+			frecuencia_i = frecuencia_visita[sensores.posF - 1][sensores.posC + 1];
+			frecuencia_c = frecuencia_visita[sensores.posF][sensores.posC + 1];
+			frecuencia_d = frecuencia_visita[sensores.posF + 1][sensores.posC + 1];
+			
+			break;
+
+		case noreste:
+			
+			frecuencia_i = frecuencia_visita[sensores.posF - 1][sensores.posC];
+			frecuencia_c = frecuencia_visita[sensores.posF - 1][sensores.posC + 1];
+			frecuencia_d = frecuencia_visita[sensores.posF][sensores.posC + 1];
+			
+			
+			break;
+	}
+	frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d};
+
+	std::sort(frecuencia_casillas.begin(), frecuencia_casillas.end());  // Ordena de menor a mayor
+
+		
+	if(!zap) {
+		if(c == 'D' and c_libre) return 2;
+		else if (i == 'D' and i_libre) return 1;
+		else if (d == 'D' and d_libre) return 3;
+	}
+
+	for (int freq : frecuencia_casillas) {
+		if (freq == frecuencia_c && c_libre and EsTransitableA(sensores.superficie[2]) and c!='P') return 2;
+		else if (freq == frecuencia_i && i_libre and EsTransitableA(sensores.superficie[1]) and i!='P') return 1;
+		else if (freq == frecuencia_d && d_libre and EsTransitableA(sensores.superficie[3]) and d!='P') return 3;
+	}
+
+	return 0;
+	
+}
+
+void ComportamientoAuxiliar::CalcularObjetivoA(){
+	
+	// Si se encuentra un objetivo, recalcular las frecuencias
+    if (objetivo.first != -1) {
+        for (int i = 0; i < frecuencia_visita.size(); i++) {
+            for (int j = 0; j < frecuencia_visita[0].size(); j++) {
+                if (i == objetivo.first && j == objetivo.second) {
+                    frecuencia_visita[i][j] = 0; // El objetivo tiene prioridad máxima
+                } else {
+                    frecuencia_visita[i][j] = abs(i - objetivo.first) + abs(j - objetivo.second);
+                }
+            }
+        }
+    }
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////

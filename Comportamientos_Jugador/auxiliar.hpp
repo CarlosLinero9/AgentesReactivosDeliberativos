@@ -127,6 +127,9 @@ public:
     accion_defecto = false;
     giro45izq = 0;
     frecuencia_visita = vector<vector<int>>(mapaResultado.size(), vector<int>(mapaResultado[0].size(), 0));
+    frecuencia_visita_aux = vector<vector<int>>(mapaResultado.size(), vector<int>(mapaResultado[0].size(), 0));
+    pasos = 0;
+    objetivo = {-1, -1};
   }
   ComportamientoAuxiliar(std::vector<std::vector<unsigned char>> mapaR, std::vector<std::vector<unsigned char>> mapaC) : Comportamiento(mapaR,mapaC)
   {
@@ -156,7 +159,12 @@ public:
 
   /*NIVEL 1*/
   Action ComportamientoAuxiliarNivel_1(Sensores sensores);
- 
+  int DetectarCasillaZapatillasA(Sensores &sensores, bool zap);
+  int VeoCasillaInteresanteA_N1(Sensores & sensores, bool zap);
+  bool EsTransitableA(char casilla);
+  void CalcularObjetivoA();
+  void GuardarFrecuenciasA();
+  void RecuperarFrecuenciasA();
   
 
   ///////////////////////////////////////////////////////////////////////////////////////////
@@ -205,16 +213,24 @@ public:
 private:
   // Definir Variables de Estado
 
+  /*NIVELES 0, 1 y 4*/
+  //Constantes
+  const int MAX_PASOS = 125;  //Maximo de pasos antes de refrescar la matriz
+  const int SUMA_AL_VISITAR = 3; //Suma que se le añade a la casilla que se va a visitar
+  const int SUMA_AL_VER = 1; //Suma que se le añade a la casilla que se ve en el cono de vision
+
+  // Variables de Estado
   bool accion_defecto;
   Action last_action;
   bool tiene_zapatillas;
   int giro45izq;
-  const int SUMA_AL_VISITAR = 3; //Suma que se le añade a la casilla que se va a visitar
-  const int SUMA_AL_VER = 1; //Suma que se le añade a la casilla que se ve en el cono de vision
   vector<vector<int>> frecuencia_visita;
+  vector<vector<int>> frecuencia_visita_aux;
+  int pasos;
+  pair<int,int> objetivo;
 
-
-  //Variables de estado para el nivel E
+  /*NIVELES 2 Y 3*/
+  //Variables de estado
   list<Action> plan;
   bool hayPlan;
 };

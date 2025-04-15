@@ -129,7 +129,9 @@ public:
     giro45izq = 0;
     accion_defecto = false;
     frecuencia_visita = vector<vector<int>>(mapaResultado.size(), vector<int>(mapaResultado[0].size(), 0));
-    //pasos = 0;
+    frecuencia_visita_aux = vector<vector<int>>(mapaResultado.size(), vector<int>(mapaResultado[0].size(), 0));
+    pasos = 0;
+    objetivo = {-1, -1};
   }
 
   ComportamientoRescatador(std::vector<std::vector<unsigned char>> mapaR, std::vector<std::vector<unsigned char>> mapaC) : Comportamiento(mapaR,mapaC)
@@ -161,8 +163,12 @@ public:
 
   /*NIVEL 1*/
   Action ComportamientoRescatadorNivel_1(Sensores sensores);
-
-
+  int DetectarCasillaZapatillasR(Sensores &sensores, bool zap);
+  int VeoCasillaInteresanteR_N1(Sensores & sensores, bool zap);
+  bool EsTransitableR(char casilla);
+  void CalcularObjetivoR();
+  void GuardarFrecuenciasR();
+  void RecuperarFrecuenciasR();
   
   
   ///////////////////////////////////////////////////////////////////////////////////////////
@@ -215,9 +221,8 @@ private:
 
   //Constantes
 
-  /*NIVEL 0*/
-  // const int MAX_PASOS = (mapaResultado.size()*mapaResultado[0].size())/10;  //Maximo de pasos antes de refrescar la matriz
-  // const int LIMITE_VISITAS = (mapaResultado.size()+mapaResultado[0].size())/2;  //Limite de visitas que puede tener una casilla
+  /*NIVEL 0, 1 y 4*/
+  const int MAX_PASOS = 75;  //Maximo de pasos antes de refrescar la matriz
   const int SUMA_AL_VISITAR = 3; //Suma que se le añade a la casilla que se va a visitar
   const int SUMA_AL_VER = 1; //Suma que se le añade a la casilla que se ve en el cono de vision
 
@@ -227,10 +232,12 @@ private:
   bool tiene_zapatillas;
   int giro45izq;
   vector<vector<int>> frecuencia_visita;
-  //int pasos;
-  //Action last_default_action;
+  vector<vector<int>> frecuencia_visita_aux;
+  int pasos;
+  pair<int,int> objetivo;
 
-  //Variables de estado para el nivel E
+  /*NIVELES 2 Y 3*/
+  //Variables de estado
   list<Action> plan;
   bool hayPlan;
 };
