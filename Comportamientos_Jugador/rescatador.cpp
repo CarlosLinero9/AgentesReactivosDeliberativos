@@ -812,6 +812,30 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_1(Sensores sensor
 	}
 	else {
 
+		if(sensores.posF == objetivo.first and sensores.posC == objetivo.second){
+			objetivo.first = -1;
+			objetivo.second = -1;
+			RecuperarFrecuenciasR();
+
+			int distancia = 5000;
+
+			for(int i = 0; i < mapaResultado.size() -3; i++){
+				for(int j = 0; j < mapaResultado[i].size()-3; j++){
+					int dist = abs(i - sensores.posF) + abs(j - sensores.posC);
+					if(mapaResultado[i][j] == '?' and dist < distancia){
+			
+						distancia = dist;
+						objetivo.first = i;
+						objetivo.second = j;
+						
+					}
+				}
+			}
+
+			GuardarFrecuenciasR();
+			CalcularObjetivoR();
+		}
+
 		if(pasos == MAX_PASOS){
 			objetivo.first = -1;
 			objetivo.second = -1;
