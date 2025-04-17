@@ -56,26 +56,25 @@ struct NodoA{
 /*NIVEL 3*/
 
 struct EstadoA_N3{
-  int f_rescatador;
-  int c_rescatador;
-  int brujula_rescatador;
-  int f_auxiliar;
-  int c_auxiliar;
-  int brujula_auxiliar;
-  bool zapatillas;
+  ubicacion auxiliar;
+  ubicacion rescatador;
+  bool zapatillas_auxiliar;
+  bool zapatillas_rescatador;
 
   bool operator==(const EstadoA_N3 &st) const
   {
-    return (f_auxiliar == st.f_auxiliar and c_auxiliar == st.c_auxiliar and
-      brujula_auxiliar == st.brujula_auxiliar and zapatillas == st.zapatillas);
+    return (auxiliar == st.auxiliar and rescatador == st.rescatador and
+      zapatillas_auxiliar == st.zapatillas_auxiliar and zapatillas_rescatador == st.zapatillas_rescatador);
   }
 
   bool operator<(const EstadoA_N3 &st) const
   {
-    return (f_auxiliar < st.f_auxiliar) or (f_auxiliar==st.f_auxiliar and c_auxiliar < st.c_auxiliar) or
-      (f_auxiliar==st.f_auxiliar and c_auxiliar==st.c_auxiliar and
-      brujula_auxiliar < st.brujula_auxiliar) or (f_auxiliar==st.f_auxiliar and c_auxiliar==st.c_auxiliar and
-      brujula_auxiliar==st.brujula_auxiliar and zapatillas < st.zapatillas);
+    return (auxiliar.f < st.auxiliar.f) or ((auxiliar.f == st.auxiliar.f) and (auxiliar.c < st.auxiliar.c)) or
+    ((auxiliar.f == st.auxiliar.f) and (auxiliar.c == st.auxiliar.c) and (auxiliar.brujula < st.auxiliar.brujula)) or
+    ((auxiliar == st.auxiliar) and (rescatador.f < st.rescatador.f)) or ((auxiliar == st.auxiliar) and (rescatador.f == st.rescatador.f) and (rescatador.c < st.rescatador.c))
+    or ((auxiliar == st.auxiliar) and (rescatador.f == st.rescatador.f) and (rescatador.c == st.rescatador.c) and (rescatador.brujula < st.rescatador.brujula)) or
+    ((auxiliar == st.auxiliar) and (rescatador == st.rescatador) and (zapatillas_auxiliar < st.zapatillas_auxiliar)) or 
+    ((auxiliar == st.auxiliar) and (rescatador == st.rescatador) and (zapatillas_auxiliar == st.zapatillas_auxiliar) and (zapatillas_rescatador < st.zapatillas_rescatador));
   }
 };
 
@@ -92,21 +91,20 @@ struct NodoA_N3{
 
   bool operator<(const NodoA_N3 &node) const
   {
-    return (estado<node.estado);
+    return (estado < node.estado);
   }
 
   bool operator>(const NodoA_N3 &node) const
   {
-    return (energia+energia_heuristica>node.energia+node.energia_heuristica);
+    return ((node.energia + node.energia_heuristica) < (energia + energia_heuristica));
   }
-
 };
 
 class Compara_N3{
   public:
     bool operator()(const NodoA_N3 &nodo1, const NodoA_N3 &nodo2) const
     {
-      return nodo1>nodo2;
+      return (nodo1>nodo2);
     }
 };
 
@@ -130,6 +128,8 @@ public:
     frecuencia_visita_aux = vector<vector<int>>(mapaResultado.size(), vector<int>(mapaResultado[0].size(), 0));
     pasos = 0;
     objetivo = {-1, -1};
+    cola = false;
+    cola_acciones = queue<int>();
   }
   ComportamientoAuxiliar(std::vector<std::vector<unsigned char>> mapaR, std::vector<std::vector<unsigned char>> mapaC) : Comportamiento(mapaR,mapaC)
   {
@@ -192,7 +192,7 @@ public:
   
   /*NIVEL 3*/
   Action ComportamientoAuxiliarNivel_3(Sensores sensores);
-  int FuncionCoste(const Action &accion, const EstadoA_N3 &st, const vector<vector<unsigned char>> &terreno,
+  int FuncionCoste_A(const Action &accion, const EstadoA_N3 &st, const vector<vector<unsigned char>> &terreno,
     const vector<vector<unsigned char>> &altura);
   EstadoA_N3 NextCasillaAuxiliar(const EstadoA_N3 &st);
   EstadoA_N3 applyA(Action accion, const EstadoA_N3 &st, const vector<vector<unsigned char>> &terreno,
@@ -202,6 +202,7 @@ public:
   void VisualizaPlan(const EstadoA_N3 &st, const list<Action> &plan);
   list<Action> AlgoritmoAE(const EstadoA_N3 &inicio, const EstadoA_N3 &final,
     const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura);
+  int Heuristica(const ubicacion &a, const ubicacion &b);
 
 
   /*NIVEL 4*/
@@ -222,6 +223,8 @@ private:
 
   // Variables de Estado
   bool accion_defecto;
+  queue<int> cola_acciones;
+  bool cola;
   Action last_action;
   bool tiene_zapatillas;
   int giro45izq;

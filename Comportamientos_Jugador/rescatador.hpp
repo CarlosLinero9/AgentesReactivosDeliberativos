@@ -132,6 +132,8 @@ public:
     frecuencia_visita_aux = vector<vector<int>>(mapaResultado.size(), vector<int>(mapaResultado[0].size(), 0));
     pasos = 0;
     objetivo = {-1, -1};
+    cola_acciones = queue<int>();
+    cola = false;
   }
 
   ComportamientoRescatador(std::vector<std::vector<unsigned char>> mapaR, std::vector<std::vector<unsigned char>> mapaC) : Comportamiento(mapaR,mapaC)
@@ -223,11 +225,13 @@ private:
 
   /*NIVEL 0, 1 y 4*/
   const int MAX_PASOS = 75;  //Maximo de pasos antes de refrescar la matriz
-  const int SUMA_AL_VISITAR = 3; //Suma que se le añade a la casilla que se va a visitar
+  const int SUMA_AL_VISITAR = 4; //Suma que se le añade a la casilla que se va a visitar
   const int SUMA_AL_VER = 1; //Suma que se le añade a la casilla que se ve en el cono de vision
 
   // Variables de Estado
   bool accion_defecto;
+  queue<int> cola_acciones;
+  bool cola;
   Action last_action;
   bool tiene_zapatillas;
   int giro45izq;

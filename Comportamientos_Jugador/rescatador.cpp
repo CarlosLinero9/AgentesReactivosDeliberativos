@@ -98,7 +98,7 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_0(Sensores sensor
 int ComportamientoRescatador::DetectarCasillaInteresanteR(Sensores &sensores, bool zap) {
     for (int i = 0; i < sensores.superficie.size(); ++i) {
         char casilla = sensores.superficie[i];
-        if ((casilla == 'D' and !zap) or casilla == 'X') {
+        if (((casilla == 'D' and !zap) or casilla == 'X') and CasillaLibreR(sensores.agentes[i])) {
             return i; // Retorna el índice de la casilla interesante
 		}    
     }
@@ -108,7 +108,6 @@ int ComportamientoRescatador::DetectarCasillaInteresanteR(Sensores &sensores, bo
 /*Una primera idea para resolver puede ser esta. 
 Tengo que ir perfeccionando cosas.*/
 int ComportamientoRescatador::VeoCasillaInteresanteR(Sensores &sensores, bool zap){
-
 	char i = ViablePorAlturaR(sensores.superficie[1], sensores.cota[1]-sensores.cota[0], zap);
 	char c = ViablePorAlturaR(sensores.superficie[2], sensores.cota[2]-sensores.cota[0], zap);
 	char d = ViablePorAlturaR(sensores.superficie[3], sensores.cota[3]-sensores.cota[0], zap);
@@ -120,30 +119,124 @@ int ComportamientoRescatador::VeoCasillaInteresanteR(Sensores &sensores, bool za
 	int indice_interes = DetectarCasillaInteresanteR(sensores, zap);
 
 	if(indice_interes != -1){
+		cola = true;
 		switch(indice_interes){
 			case 1:
-			case 4:
-			case 9:
-				if(((i == 'X') or (i == 'C') or (i == 'D')) and i_libre) return 1;
+				cola_acciones.push(1);
+				cola_acciones.push(3);
+				cola_acciones.push(2);
 				break;
-
-			case 3:
-			case 8:
-			case 15:
-				if(((d == 'X') or (d == 'C') or (d == 'D')) and d_libre) return 3;
-				break;
-
 			case 2:
-			case 5:
-			case 6:
-			case 7:
-			case 10:
-			case 11:
-			case 12:
-			case 13:	
-			case 14:
-				if(((c == 'X') or (c == 'C') or (c == 'D')) and c_libre) return 2;
+				cola_acciones.push(2);
 				break;
+			case 3:
+				cola_acciones.push(3);
+				cola_acciones.push(2);
+				break;
+			case 4:
+				cola_acciones.push(1);
+				cola_acciones.push(3);
+				cola_acciones.push(2);
+				cola_acciones.push(2);
+				break;
+			case 5:
+				cola_acciones.push(2);
+				cola_acciones.push(1);
+				cola_acciones.push(3);
+				cola_acciones.push(2);
+				break;
+			case 6:
+				cola_acciones.push(2);
+				cola_acciones.push(2);
+				break;
+			case 7:
+				cola_acciones.push(2);
+				cola_acciones.push(3);
+				cola_acciones.push(2);
+				break;
+			case 8:
+				cola_acciones.push(3);
+				cola_acciones.push(2);
+				cola_acciones.push(2);
+				break;
+			case 9:
+				cola_acciones.push(1);
+				cola_acciones.push(3);
+				cola_acciones.push(2);
+				cola_acciones.push(2);
+				cola_acciones.push(2);
+				break;
+			case 10:
+				cola_acciones.push(2);
+				cola_acciones.push(1);
+				cola_acciones.push(3);
+				cola_acciones.push(2);
+				cola_acciones.push(2);
+				break;
+			case 11:
+				cola_acciones.push(2);
+				cola_acciones.push(2);
+				cola_acciones.push(1);
+				cola_acciones.push(3);
+				cola_acciones.push(2);
+				break;
+			case 12:
+				cola_acciones.push(2);
+				cola_acciones.push(2);
+				cola_acciones.push(2);
+				break;
+			case 13:
+				cola_acciones.push(2);
+				cola_acciones.push(2);
+				cola_acciones.push(3);
+				cola_acciones.push(2);
+				break;
+			case 14:
+				cola_acciones.push(2);
+				cola_acciones.push(3);
+				cola_acciones.push(2);
+				cola_acciones.push(2);
+				break;
+			case 15:
+				cola_acciones.push(3);
+				cola_acciones.push(2);
+				cola_acciones.push(2);
+				cola_acciones.push(2);
+				break;
+		}
+	}
+
+	if(cola){
+		if(!cola_acciones.empty()){
+			int accion = cola_acciones.front();
+			cola_acciones.pop();
+
+			switch (accion) {
+				case 1: // TURN_SL
+					if (i_libre and (i == 'C' or i == 'D' or i == 'X')) {
+						return accion;
+					}
+					break;
+				case 2: // WALK
+					if (c_libre and (c == 'C' or c == 'D' or c == 'X')) {
+						return accion;
+					}
+					break;
+				case 3: // TURN_SR
+					if (d_libre and (d == 'C' or d == 'D' or d == 'X')) {
+						return accion;
+					}
+					break;
+				default:
+					cola = false;
+					cola_acciones = queue<int>();
+					return 0; // No se encontró ninguna acción válida
+					break;
+			}
+		}
+		else{
+			cola = false;
+			return 0;
 		}
 	}
 
@@ -242,9 +335,9 @@ int ComportamientoRescatador::VeoCasillaInteresanteR(Sensores &sensores, bool za
 	}
 
 	for (int freq : frecuencia_casillas) {
-		if (freq == frecuencia_c && c_libre && c == 'C') return 2;
-		else if (freq == frecuencia_i && i_libre && i == 'C') return 1;
-		else if (freq == frecuencia_d && d_libre && d == 'C') return 3;
+		if (freq == frecuencia_c and c_libre and (c == 'C' or c == 'D')) return 2;
+		else if (freq == frecuencia_i and i_libre and (i == 'C' or i == 'D')) return 1;
+		else if (freq == frecuencia_d and d_libre and (d == 'C' or d == 'D')) return 3;
 	}
 
 	return 0;
