@@ -239,10 +239,11 @@ int ComportamientoAuxiliar::VeoCasillaInteresanteA(Sensores &sensores, bool zap)
 					return 0; // No se encontró ninguna acción válida
 					break;
 			}
+			cola = false;
+			cola_acciones = queue<int>();
 		}
 		else{
 			cola = false;
-			return 0;
 		}
 	}
 
