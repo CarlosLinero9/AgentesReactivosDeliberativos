@@ -230,11 +230,13 @@ int ComportamientoRescatador::VeoCasillaInteresanteR(Sensores &sensores, bool za
 				default:
 					cola = false;
 					cola_acciones = queue<int>();
-+					break;
+					return 0; // No se encontró ninguna acción válida
+					break;
 			}
 		}
 		else{
 			cola = false;
+			return 0;
 		}
 	}
 
