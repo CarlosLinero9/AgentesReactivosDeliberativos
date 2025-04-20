@@ -53,26 +53,24 @@ struct NodoR{
 
 /*NIVEL 2*/
 struct EstadoR_N2{
-  int f_rescatador;
-  int c_rescatador;
-  int brujula_rescatador;
-  int f_auxiliar;
-  int c_auxiliar;
-  int brujula_auxiliar;
+  int f;
+  int c;
+  int brujula;
   bool zapatillas;
 
   bool operator==(const EstadoR_N2 &st) const
   {
-    return (f_rescatador == st.f_rescatador and c_rescatador == st.c_rescatador and
-      brujula_rescatador == st.brujula_rescatador and zapatillas == st.zapatillas);
+    return (f == st.f and c == st.c and brujula == st.brujula 
+           and zapatillas == st.zapatillas);
   }
 
   bool operator<(const EstadoR_N2 &st) const
   {
-    return (f_rescatador < st.f_rescatador) or (f_rescatador==st.f_rescatador and c_rescatador < st.c_rescatador) or
-      (f_rescatador==st.f_rescatador and c_rescatador==st.c_rescatador and
-      brujula_rescatador < st.brujula_rescatador) or (f_rescatador==st.f_rescatador and c_rescatador==st.c_rescatador and
-      brujula_rescatador==st.brujula_rescatador and zapatillas < st.zapatillas);
+    if (f < st.f) return true;
+    else if (f == st.f && c < st.c) return true;
+    else if (f == st.f && c == st.c && brujula < st.brujula) return true;
+    else if (f == st.f && c == st.c && brujula == st.brujula && zapatillas < st.zapatillas) return true;
+    else return false;
   }
 };
 
@@ -83,29 +81,15 @@ struct NodoR_N2{
 
   bool operator==(const NodoR_N2 &nodo) const
   {
-    return (estado == nodo.estado);
+    return (estado == nodo.estado and nodo.energia == energia);
   }
 
   bool operator<(const NodoR_N2 &node) const
-  {
-    return (estado<node.estado);
-  }
-
-  bool operator>(const NodoR_N2 &node) const
   {
     return (energia>node.energia);
   }
 
 };
-
-class Compara_N2{
-  public:
-    bool operator()(const NodoR_N2 &nodo1, const NodoR_N2 &nodo2) const
-    {
-      return nodo1>nodo2;
-    }
-};
-
 
 /*NIVEL 3*/
 
