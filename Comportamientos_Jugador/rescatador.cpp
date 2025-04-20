@@ -1805,13 +1805,13 @@ list<Action> ComportamientoRescatador::DijsktraR(const EstadoR_N2 &inicio, const
 			NodoR_N2 child_WALK = current_node;
 			child_WALK.estado = applyR(WALK, current_node.estado, terreno, altura);
 			child_WALK.energia += FuncionCoste(WALK, current_node.estado, terreno, altura);
-			if(child_WALK.estado.f == final.f and child_WALK.estado.c == final.c){
-				// El hijo generado es solución
-				child_WALK.secuencia.push_back(WALK);
-				current_node = child_WALK;
-				SolutionFound = true;
-			}
-			else if(explored.find(child_WALK.estado) == explored.end()){
+			// if(child_WALK.estado.f == final.f and child_WALK.estado.c == final.c){
+			// 	// El hijo generado es solución
+			// 	child_WALK.secuencia.push_back(WALK);
+			// 	current_node = child_WALK;
+			// 	SolutionFound = true;
+			// } else
+			if(explored.find(child_WALK.estado) == explored.end()){
 				// Se mete en la lista frontier después de añadir a secuencia la acción
 				child_WALK.secuencia.push_back(WALK);
 				frontier.push(child_WALK);
@@ -1821,13 +1821,13 @@ list<Action> ComportamientoRescatador::DijsktraR(const EstadoR_N2 &inicio, const
 				NodoR_N2 child_RUN = current_node;
 				child_RUN.estado = applyR(RUN, current_node.estado, terreno, altura);
 				child_RUN.energia += FuncionCoste(RUN, current_node.estado, terreno, altura);
-				if(child_RUN.estado.f == final.f and child_RUN.estado.c == final.c){
-					// El hijo generado es solución
-					child_RUN.secuencia.push_back(RUN);
-					current_node = child_RUN;
-					SolutionFound = true;
-				}
-				else if(explored.find(child_RUN.estado) == explored.end()){
+				// if(child_RUN.estado.f == final.f and child_RUN.estado.c == final.c){
+				// 	// El hijo generado es solución
+				// 	child_RUN.secuencia.push_back(RUN);
+				// 	current_node = child_RUN;
+				// 	SolutionFound = true;
+				// } else
+				if(explored.find(child_RUN.estado) == explored.end()){
 					// Se mete en la lista frontier después de añadir a secuencia la acción
 					child_RUN.secuencia.push_back(RUN);
 					frontier.push(child_RUN);
@@ -1838,13 +1838,13 @@ list<Action> ComportamientoRescatador::DijsktraR(const EstadoR_N2 &inicio, const
 				NodoR_N2 child_TURN_SR = current_node;
 				child_TURN_SR.estado = applyR(TURN_SR, current_node.estado, terreno, altura);
 				child_TURN_SR.energia += FuncionCoste(TURN_SR, current_node.estado, terreno, altura);
-				if(child_TURN_SR.estado.f == final.f and child_TURN_SR.estado.c == final.c){
-					// El hijo generado es solución
-					child_TURN_SR.secuencia.push_back(TURN_SR);
-					current_node = child_TURN_SR;
-					SolutionFound = true;
-				}
-				else if(explored.find(child_TURN_SR.estado) == explored.end()){
+				// if(child_TURN_SR.estado.f == final.f and child_TURN_SR.estado.c == final.c){
+				// 	// El hijo generado es solución
+				// 	child_TURN_SR.secuencia.push_back(TURN_SR);
+				// 	current_node = child_TURN_SR;
+				// 	SolutionFound = true;
+				// } else
+				if(explored.find(child_TURN_SR.estado) == explored.end()){
 					// Se mete en la lista frontier después de añadir a secuencia la acción
 					child_TURN_SR.secuencia.push_back(TURN_SR);
 					frontier.push(child_TURN_SR);
@@ -1855,13 +1855,13 @@ list<Action> ComportamientoRescatador::DijsktraR(const EstadoR_N2 &inicio, const
 				NodoR_N2 child_TURN_L = current_node;
 				child_TURN_L.estado = applyR(TURN_L, current_node.estado, terreno, altura);
 				child_TURN_L.energia += FuncionCoste(TURN_L, current_node.estado, terreno, altura);
-				if(child_TURN_L.estado.f == final.f and child_TURN_L.estado.c == final.c){
-					// El hijo generado es solución
-					child_TURN_L.secuencia.push_back(TURN_L);
-					current_node = child_TURN_L;
-					SolutionFound = true;
-				}
-				else if(explored.find(child_TURN_L.estado) == explored.end()){
+				// if(child_TURN_L.estado.f == final.f and child_TURN_L.estado.c == final.c){
+				// 	// El hijo generado es solución
+				// 	child_TURN_L.secuencia.push_back(TURN_L);
+				// 	current_node = child_TURN_L;
+				// 	SolutionFound = true;
+				// } else
+				if(explored.find(child_TURN_L.estado) == explored.end()){
 					// Se mete en la lista frontier después de añadir a secuencia la acción
 					child_TURN_L.secuencia.push_back(TURN_L);
 					frontier.push(child_TURN_L);

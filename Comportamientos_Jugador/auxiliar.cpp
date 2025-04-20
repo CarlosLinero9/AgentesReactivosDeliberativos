@@ -1671,13 +1671,13 @@ list<Action> ComportamientoAuxiliar::AlgoritmoAE(const EstadoA_N3 &inicio, const
 			child_WALK.estado = applyA(WALK, current_node.estado, terreno, altura);
 			child_WALK.energia += FuncionCoste_A(WALK, current_node.estado, terreno, altura);
 			child_WALK.energia_heuristica = Heuristica(child_WALK.estado, final);
-			if(child_WALK.estado.f == final.f and child_WALK.estado.c == final.c){
-				// El hijo generado es solución
-				child_WALK.secuencia.push_back(WALK);
-				current_node = child_WALK;
-				SolutionFound = true;
-			}
-			else if(explored.find(child_WALK.estado) == explored.end()){
+			// if(child_WALK.estado.f == final.f and child_WALK.estado.c == final.c){
+			// 	// El hijo generado es solución
+			// 	child_WALK.secuencia.push_back(WALK);
+			// 	current_node = child_WALK;
+			// 	SolutionFound = true;
+			// } else
+			if(explored.find(child_WALK.estado) == explored.end()){
 				// Se mete en la lista frontier después de añadir a secuencia la acción
 				child_WALK.secuencia.push_back(WALK);
 				frontier.push(child_WALK);
@@ -1689,12 +1689,13 @@ list<Action> ComportamientoAuxiliar::AlgoritmoAE(const EstadoA_N3 &inicio, const
 				child_TURN_SR.estado = applyA(TURN_SR, current_node.estado, terreno, altura);
 				child_TURN_SR.energia += FuncionCoste_A(TURN_SR, current_node.estado, terreno, altura);
 				child_TURN_SR.energia_heuristica = Heuristica(child_TURN_SR.estado, final);
-				if(child_TURN_SR.estado.f == final.f and child_TURN_SR.estado.c == final.c){
-					// El hijo generado es solución
-					child_TURN_SR.secuencia.push_back(TURN_SR);
-					current_node = child_TURN_SR;
-					SolutionFound = true;
-				}else if(explored.find(child_TURN_SR.estado) == explored.end()){
+				// if(child_TURN_SR.estado.f == final.f and child_TURN_SR.estado.c == final.c){
+				// 	// El hijo generado es solución
+				// 	child_TURN_SR.secuencia.push_back(TURN_SR);
+				// 	current_node = child_TURN_SR;
+				// 	SolutionFound = true;
+				// }else 
+				if(explored.find(child_TURN_SR.estado) == explored.end()){
 					child_TURN_SR.secuencia.push_back(TURN_SR);
 					frontier.push(child_TURN_SR);
 				}
