@@ -56,25 +56,24 @@ struct NodoA{
 /*NIVEL 3*/
 
 struct EstadoA_N3{
-  ubicacion auxiliar;
-  ubicacion rescatador;
-  bool zapatillas_auxiliar;
-  bool zapatillas_rescatador;
+  int f;
+  int c;
+  int brujula;
+  bool zapatillas;
 
   bool operator==(const EstadoA_N3 &st) const
   {
-    return (auxiliar == st.auxiliar and rescatador == st.rescatador and
-      zapatillas_auxiliar == st.zapatillas_auxiliar and zapatillas_rescatador == st.zapatillas_rescatador);
+    return (f == st.f and c == st.c and brujula == st.brujula 
+           and zapatillas == st.zapatillas);
   }
 
   bool operator<(const EstadoA_N3 &st) const
   {
-    return (auxiliar.f < st.auxiliar.f) or ((auxiliar.f == st.auxiliar.f) and (auxiliar.c < st.auxiliar.c)) or
-    ((auxiliar.f == st.auxiliar.f) and (auxiliar.c == st.auxiliar.c) and (auxiliar.brujula < st.auxiliar.brujula)) or
-    ((auxiliar == st.auxiliar) and (rescatador.f < st.rescatador.f)) or ((auxiliar == st.auxiliar) and (rescatador.f == st.rescatador.f) and (rescatador.c < st.rescatador.c))
-    or ((auxiliar == st.auxiliar) and (rescatador.f == st.rescatador.f) and (rescatador.c == st.rescatador.c) and (rescatador.brujula < st.rescatador.brujula)) or
-    ((auxiliar == st.auxiliar) and (rescatador == st.rescatador) and (zapatillas_auxiliar < st.zapatillas_auxiliar)) or 
-    ((auxiliar == st.auxiliar) and (rescatador == st.rescatador) and (zapatillas_auxiliar == st.zapatillas_auxiliar) and (zapatillas_rescatador < st.zapatillas_rescatador));
+    if (f < st.f) return true;
+    else if (f == st.f && c < st.c) return true;
+    else if (f == st.f && c == st.c && brujula < st.brujula) return true;
+    else if (f == st.f && c == st.c && brujula == st.brujula && zapatillas < st.zapatillas) return true;
+    else return false;
   }
 };
 
@@ -86,28 +85,14 @@ struct NodoA_N3{
 
   bool operator==(const NodoA_N3 &nodo) const
   {
-    return (estado == nodo.estado);
+    return (estado == nodo.estado and energia == nodo.energia and energia_heuristica == nodo.energia_heuristica);
   }
 
   bool operator<(const NodoA_N3 &node) const
   {
-    return (estado < node.estado);
-  }
-
-  bool operator>(const NodoA_N3 &node) const
-  {
     return ((node.energia + node.energia_heuristica) < (energia + energia_heuristica));
   }
 };
-
-class Compara_N3{
-  public:
-    bool operator()(const NodoA_N3 &nodo1, const NodoA_N3 &nodo2) const
-    {
-      return (nodo1>nodo2);
-    }
-};
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // Definicion de la clase ComportamientoAuxiliar///////////////////////////////////////////
@@ -202,7 +187,7 @@ public:
   void VisualizaPlan(const EstadoA_N3 &st, const list<Action> &plan);
   list<Action> AlgoritmoAE(const EstadoA_N3 &inicio, const EstadoA_N3 &final,
     const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura);
-  int Heuristica(const ubicacion &a, const ubicacion &b);
+  int Heuristica(const EstadoA_N3 &a, const EstadoA_N3 &b);
 
 
   /*NIVEL 4*/

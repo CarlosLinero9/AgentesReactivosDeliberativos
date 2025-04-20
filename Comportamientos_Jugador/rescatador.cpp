@@ -1502,7 +1502,6 @@ int ComportamientoRescatador::FuncionCoste(const Action &accion, const EstadoR_N
 				case 'A':
 					coste = 100 + dif_altura * 10;
 					break;
-				case 'B':
 				case 'T':
 					coste = 20 + dif_altura * 5;
 					break;
@@ -1525,7 +1524,6 @@ int ComportamientoRescatador::FuncionCoste(const Action &accion, const EstadoR_N
 				case 'A':
 					coste = 150 + dif_altura * 15;
 					break;
-				case 'B':
 				case 'T':
 					coste = 35 + dif_altura * 5;
 					break;
@@ -1544,7 +1542,6 @@ int ComportamientoRescatador::FuncionCoste(const Action &accion, const EstadoR_N
 				case 'A':
 					coste = 10;
 					break;
-				case 'B':
 				case 'T':
 					coste = 3;
 					break;
@@ -1560,7 +1557,6 @@ int ComportamientoRescatador::FuncionCoste(const Action &accion, const EstadoR_N
 				case 'A':
 					coste = 30;
 					break;
-				case 'B':
 				case 'T':
 					coste = 5;
 					break;
@@ -1639,15 +1635,6 @@ EstadoR_N2 ComportamientoRescatador::applyR(Action accion, const EstadoR_N2 &st,
 					if(check1 and check4 and (check2 or check3)){
 						next = fin;
 					}
-
-
-					// EstadoR_N2 siguiente_1 = NextCasillaRescatador(st);
-					// EstadoR_N2 siguiente_2 = NextCasillaRescatador(siguiente_1);
-					// if(CasillaAccesibleRescatador(st, terreno, altura)){
-					// 	if(CasillaAccesibleRescatador(siguiente_1, terreno, altura)){
-					// 		next = siguiente_2;
-					// 	}
-					// }
 					
 					break;
 				}
@@ -1769,7 +1756,7 @@ void ComportamientoRescatador::VisualizaPlan(const EstadoR_N2 &st, const list<Ac
 				break;
 
 			case TURN_L:
-				cst.brujula = (cst.brujula + 6) % 8; // Adjusted for left turn
+				cst.brujula = (cst.brujula + 6) % 8;
 				break;
 		}
 		it++;

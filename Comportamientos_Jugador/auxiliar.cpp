@@ -1422,13 +1422,16 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_2(Sensores sensores){
 	return accion;
 }
 
+
+
 /*NIVEL 3*/
 
 /*Un ejemplo de heurística es la de Chebysev*/
-int ComportamientoAuxiliar::Heuristica(const ubicacion &a, const ubicacion &b){
+int ComportamientoAuxiliar::Heuristica(const EstadoA_N3 &a, const EstadoA_N3 &b){
 	int dx = std::abs(a.f - b.f);   
 	int dy = std::abs(a.c - b.c); 
 
+	//return 0;
 	if(dx < dy) return dy;
 	else return dx;
 }
@@ -1438,12 +1441,12 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_3(Sensores sensores){
 	if(!hayPlan){
 		//Invocar al método de busqueda
 		EstadoA_N3 inicio, fin;
-		inicio.auxiliar.f = sensores.posF;
-		inicio.auxiliar.c = sensores.posC;
-		inicio.auxiliar.brujula = sensores.rumbo;
-		inicio.zapatillas_auxiliar = tiene_zapatillas;
-		fin.auxiliar.f = sensores.destinoF;
-		fin.auxiliar.c = sensores.destinoC;
+		inicio.f = sensores.posF;
+		inicio.c = sensores.posC;
+		inicio.brujula = sensores.rumbo;
+		inicio.zapatillas = tiene_zapatillas;
+		fin.f = sensores.destinoF;
+		fin.c = sensores.destinoC;
 		plan  = AlgoritmoAE(inicio, fin, mapaResultado, mapaCotas);
 		VisualizaPlan(inicio, plan);
 		hayPlan = plan.size() != 0;
@@ -1467,8 +1470,8 @@ int ComportamientoAuxiliar::FuncionCoste_A(const Action &accion, const EstadoA_N
 	switch(accion){
 		case WALK: {
 			EstadoA_N3 siguiente = NextCasillaAuxiliar(st);
-			int dif_altura = (altura[siguiente.auxiliar.f][siguiente.auxiliar.c] - altura[st.auxiliar.f][st.auxiliar.c]);
-			switch(terreno[st.auxiliar.f][st.auxiliar.c]){
+			int dif_altura = (altura[siguiente.f][siguiente.c] - altura[st.f][st.c]);
+			switch(terreno[st.f][st.c]){
 				case 'A':
 					coste = 100 + dif_altura * 10;
 					break;
@@ -1477,9 +1480,6 @@ int ComportamientoAuxiliar::FuncionCoste_A(const Action &accion, const EstadoA_N
 					break;
 				case 'S':
 					coste = 2 + dif_altura;
-					break;
-				case 'B':
-					coste = 20 + dif_altura * 5;			
 					break;
 				default:
 					coste = 1;
@@ -1490,14 +1490,11 @@ int ComportamientoAuxiliar::FuncionCoste_A(const Action &accion, const EstadoA_N
 	
 	
 		case TURN_SR: {
-			switch(terreno[st.auxiliar.f][st.auxiliar.c]){
+			switch(terreno[st.f][st.c]){
 				case 'A':
 					coste = 10;
 					break;
 				case 'T':
-					coste = 3;
-					break;
-				case 'B':
 					coste = 3;
 					break;
 				default:
@@ -1514,34 +1511,34 @@ int ComportamientoAuxiliar::FuncionCoste_A(const Action &accion, const EstadoA_N
 EstadoA_N3 ComportamientoAuxiliar::NextCasillaAuxiliar(const EstadoA_N3 &st){
 	EstadoA_N3 siguiente = st;
 	
-	switch(st.auxiliar.brujula){
+	switch(st.brujula){
 		case norte:
-			siguiente.auxiliar.f = st.auxiliar.f - 1;
+			siguiente.f = st.f - 1;
 			break;
 		case noreste:
-			siguiente.auxiliar.f = st.auxiliar.f - 1;
-			siguiente.auxiliar.c = st.auxiliar.c + 1;
+			siguiente.f = st.f - 1;
+			siguiente.c = st.c + 1;
 			break;
 		case este:
-			siguiente.auxiliar.c = st.auxiliar.c + 1;
+			siguiente.c = st.c + 1;
 			break;
 		case sureste:
-			siguiente.auxiliar.f = st.auxiliar.f + 1;
-			siguiente.auxiliar.c = st.auxiliar.c + 1;
+			siguiente.f = st.f + 1;
+			siguiente.c = st.c + 1;
 			break;
 		case sur:
-			siguiente.auxiliar.f = st.auxiliar.f + 1;
+			siguiente.f = st.f + 1;
 			break;
 		case suroeste:
-			siguiente.auxiliar.f = st.auxiliar.f + 1;
-			siguiente.auxiliar.c = st.auxiliar.c - 1;
+			siguiente.f = st.f + 1;
+			siguiente.c = st.c - 1;
 			break;
 		case oeste:
-			siguiente.auxiliar.c = st.auxiliar.c - 1;
+			siguiente.c = st.c - 1;
 			break;
 		case noroeste:
-			siguiente.auxiliar.f = st.auxiliar.f - 1;
-			siguiente.auxiliar.c = st.auxiliar.c - 1;
+			siguiente.f = st.f - 1;
+			siguiente.c = st.c - 1;
 			break;
 	}
 	return siguiente;
@@ -1560,15 +1557,15 @@ EstadoA_N3 ComportamientoAuxiliar::applyA(Action accion, const EstadoA_N3 &st, c
 		}
 	
 		case TURN_SR: {
-			next.auxiliar.brujula = (Orientacion)((next.auxiliar.brujula + 1) % 8);
+			next.brujula = (next.brujula + 1) % 8;
 			break;
 		}
 	}
 
-	if(terreno[next.auxiliar.f][next.auxiliar.c] == 'D'){
-		next.zapatillas_auxiliar = true;
+	if(terreno[next.f][next.c] == 'D'){
+		next.zapatillas = true;
 	} else {
-		next.zapatillas_auxiliar = st.zapatillas_auxiliar;
+		next.zapatillas = st.zapatillas;
 	}
 
 	return next;
@@ -1579,14 +1576,12 @@ bool ComportamientoAuxiliar::CasillaAccesibleAuxiliar(const EstadoA_N3 &st, cons
 	bool check1 = false;
 	bool check2 = false;
 	bool check3 = false;
-	bool check4 = false;
 
-	check1 = terreno[next.auxiliar.f][next.auxiliar.c] != 'P' and terreno[next.auxiliar.f][next.auxiliar.c] != 'M';
-	check2 = terreno[next.auxiliar.f][next.auxiliar.c] != 'B' or (terreno[next.auxiliar.f][next.auxiliar.c] == 'B' and st.zapatillas_auxiliar);
-	check3 = abs(altura[next.auxiliar.f][next.auxiliar.c] - altura[st.auxiliar.f][st.auxiliar.c]) <= 1;
-	check4 = next.auxiliar.f == st.rescatador.f and next.auxiliar.c == st.rescatador.c;
+	check1 = terreno[next.f][next.c] != 'P' and terreno[next.f][next.c] != 'M';
+	check2 = terreno[next.f][next.c] != 'B' or (terreno[next.f][next.c] == 'B' and st.zapatillas == true);
+	check3 = abs(altura[next.f][next.c] - altura[st.f][st.c]) <= 1;
 
-	return check1 and check2 and check3 and !check4;
+	return check1 and check2 and check3;
 }
 
 void ComportamientoAuxiliar::VisualizaPlan(const EstadoA_N3 &st, const list<Action> &plan){
@@ -1597,41 +1592,41 @@ void ComportamientoAuxiliar::VisualizaPlan(const EstadoA_N3 &st, const list<Acti
 	while(it != plan.end()){
 		switch(*it){
 			case WALK:
-				switch(cst.auxiliar.brujula){
+				switch(cst.brujula){
 					case 0:
-						cst.auxiliar.f--;
+						cst.f--;
 						break;
 					case 1:
-						cst.auxiliar.f--;
-						cst.auxiliar.c++;
+						cst.f--;
+						cst.c++;
 						break;
 					case 2:
-						cst.auxiliar.c++;
+						cst.c++;
 						break;
 					case 3:
-						cst.auxiliar.f++;
-						cst.auxiliar.c++;
+						cst.f++;
+						cst.c++;
 						break;
 					case 4:
-						cst.auxiliar.f++;
+						cst.f++;
 						break;
 					case 5:
-						cst.auxiliar.f++;
-						cst.auxiliar.c--;
+						cst.f++;
+						cst.c--;
 						break;
 					case 6:
-						cst.auxiliar.c--;
+						cst.c--;
 						break;
 					case 7:
-						cst.auxiliar.f--;
-						cst.auxiliar.c--;
+						cst.f--;
+						cst.c--;
 						break;
 				}
-				mapaConPlan[cst.auxiliar.f][cst.auxiliar.c] = 2;
+				mapaConPlan[cst.f][cst.c] = 2;
 				break;
 
 			case TURN_SR:
-				cst.auxiliar.brujula = (Orientacion)((cst.auxiliar.brujula + 1) % 8);
+				cst.brujula = (cst.brujula + 1) % 8;
 				break;
 		}
 		it++;
@@ -1643,42 +1638,48 @@ list<Action> ComportamientoAuxiliar::AlgoritmoAE(const EstadoA_N3 &inicio, const
 	const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura){
 	
 		NodoA_N3 current_node;
-		priority_queue<NodoA_N3, vector<NodoA_N3>, Compara_N3> frontier;
+		priority_queue<NodoA_N3> frontier;
 		set<EstadoA_N3> explored;
 		list<Action> path;
 
 		current_node.estado = inicio;
 		current_node.energia = 0;
+		current_node.energia_heuristica = 0;
+		if(terreno[current_node.estado.f][current_node.estado.c] == 'D'){
+			current_node.estado.zapatillas = true;
+		}
+
 		frontier.push(current_node);
-		bool SolutionFound = (current_node.estado.auxiliar.f == final.auxiliar.f
-			and current_node.estado.auxiliar.c == final.auxiliar.c);
+		bool SolutionFound = (current_node.estado.f == final.f
+			and current_node.estado.c == final.c);
 
 		while(!SolutionFound and !frontier.empty()){
 			frontier.pop();
 			explored.insert(current_node.estado);
 
 			// Compruebo si estoy en una casilla de las zapatillas
-			if(terreno[current_node.estado.auxiliar.f][current_node.estado.auxiliar.c] == 'D'){
-				current_node.estado.zapatillas_auxiliar = true;
-			}
+			// if(terreno[current_node.estado.f][current_node.estado.c] == 'D'){
+			// 	current_node.estado.zapatillas = true;
+			// }
 
-			if(current_node.estado.auxiliar.f == final.auxiliar.f and current_node.estado.auxiliar.c == final.auxiliar.c){
+			if(current_node.estado.f == final.f and current_node.estado.c == final.c){
 				SolutionFound = true;
 			}
 
 			// Genero el hijo resultante de aplicar la acción WALK
 			NodoA_N3 child_WALK = current_node;
 			child_WALK.estado = applyA(WALK, current_node.estado, terreno, altura);
-			child_WALK.secuencia.push_back(WALK);
 			child_WALK.energia += FuncionCoste_A(WALK, current_node.estado, terreno, altura);
-			child_WALK.energia_heuristica = Heuristica(child_WALK.estado.auxiliar, final.auxiliar);
-			if(child_WALK.estado.auxiliar.f == final.auxiliar.f and child_WALK.estado.auxiliar.c == final.auxiliar.c){
+			child_WALK.energia_heuristica = Heuristica(child_WALK.estado, final);
+			if(child_WALK.estado.f == final.f and child_WALK.estado.c == final.c){
 				// El hijo generado es solución
+				child_WALK.secuencia.push_back(WALK);
 				current_node = child_WALK;
 				SolutionFound = true;
 			}
 			else if(explored.find(child_WALK.estado) == explored.end()){
 				// Se mete en la lista frontier después de añadir a secuencia la acción
+				child_WALK.secuencia.push_back(WALK);
 				frontier.push(child_WALK);
 			}
 
@@ -1686,10 +1687,15 @@ list<Action> ComportamientoAuxiliar::AlgoritmoAE(const EstadoA_N3 &inicio, const
 			if(!SolutionFound){
 				NodoA_N3 child_TURN_SR = current_node;
 				child_TURN_SR.estado = applyA(TURN_SR, current_node.estado, terreno, altura);
-				child_TURN_SR.secuencia.push_back(TURN_SR);
 				child_TURN_SR.energia += FuncionCoste_A(TURN_SR, current_node.estado, terreno, altura);
-				child_TURN_SR.energia_heuristica = Heuristica(child_WALK.estado.auxiliar, final.auxiliar);
-				if(explored.find(child_TURN_SR.estado) == explored.end()){
+				child_TURN_SR.energia_heuristica = Heuristica(child_TURN_SR.estado, final);
+				if(child_TURN_SR.estado.f == final.f and child_TURN_SR.estado.c == final.c){
+					// El hijo generado es solución
+					child_TURN_SR.secuencia.push_back(TURN_SR);
+					current_node = child_TURN_SR;
+					SolutionFound = true;
+				}else if(explored.find(child_TURN_SR.estado) == explored.end()){
+					child_TURN_SR.secuencia.push_back(TURN_SR);
 					frontier.push(child_TURN_SR);
 				}
 			}
