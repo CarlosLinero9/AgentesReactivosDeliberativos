@@ -1625,16 +1625,25 @@ EstadoR_N2 ComportamientoRescatador::applyR(Action accion, const EstadoR_N2 &st,
 				}
 			
 				case RUN: {
-					EstadoR_N2 intermedia = NextCasillaRescatador(st);
-					EstadoR_N2 fin = NextCasillaRescatador(intermedia);
+					// EstadoR_N2 intermedia = NextCasillaRescatador(st);
+					// EstadoR_N2 fin = NextCasillaRescatador(intermedia);
 					
 
-					bool check1 = terreno[fin.f][fin.c] != 'P' and terreno[fin.f][fin.c] != 'M' and terreno[fin.f][fin.c] != 'B';
-					bool check2 = abs(altura[fin.f][fin.c] - altura[st.f][st.c]) <= 1;
-					bool check3 = ((abs(altura[fin.f][fin.c] - altura[st.f][st.c]) <= 2) and st.zapatillas == true);
+					// bool check1 = terreno[fin.f][fin.c] != 'P' and terreno[fin.f][fin.c] != 'M' and terreno[fin.f][fin.c] != 'B';
+					// bool check2 = abs(altura[fin.f][fin.c] - altura[st.f][st.c]) <= 1;
+					// bool check3 = ((abs(altura[fin.f][fin.c] - altura[st.f][st.c]) <= 2) and st.zapatillas == true);
 
-					if(check1 and (check2 or check3)){
-						next = fin;
+					// if(check1 and (check2 or check3)){
+					// 	next = fin;
+					// }
+
+
+					EstadoR_N2 siguiente_1 = NextCasillaRescatador(st);
+					EstadoR_N2 siguiente_2 = NextCasillaRescatador(siguiente_1);
+					if(CasillaAccesibleRescatador(st, terreno, altura)){
+						if(CasillaAccesibleRescatador(siguiente_1, terreno, altura)){
+							next = siguiente_2;
+						}
 					}
 					
 					break;
