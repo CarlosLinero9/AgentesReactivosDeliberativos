@@ -122,97 +122,107 @@ int ComportamientoAuxiliar::VeoCasillaInteresanteA(Sensores &sensores, bool zap)
 	bool c_libre = CasillaLibreA(sensores.agentes[2]);
 	bool d_libre = CasillaLibreA(sensores.agentes[3]);
 	/*Primero me aseguro de que se observa alguna casilla interesante*/
-	int indice_interes = DetectarCasillaInteresanteA(sensores, zap);
-	
-	if(indice_interes != -1){
-		cola = true;
-		switch(indice_interes){
-			case 1:
-				cola_acciones.push(1);
-				cola_acciones.push(3);
-				cola_acciones.push(2);
-				break;
-			case 2:
-				cola_acciones.push(2);
-				break;
-			case 3:
-				cola_acciones.push(3);
-				cola_acciones.push(2);
-				break;
-			case 4:
-				cola_acciones.push(1);
-				cola_acciones.push(3);
-				cola_acciones.push(2);
-				cola_acciones.push(2);
-				break;
-			case 5:
-				cola_acciones.push(2);
-				cola_acciones.push(1);
-				cola_acciones.push(3);
-				cola_acciones.push(2);
-				break;
-			case 6:
-				cola_acciones.push(2);
-				cola_acciones.push(2);
-				break;
-			case 7:
-				cola_acciones.push(2);
-				cola_acciones.push(3);
-				cola_acciones.push(2);
-				break;
-			case 8:
-				cola_acciones.push(3);
-				cola_acciones.push(2);
-				cola_acciones.push(2);
-				break;
-			case 9:
-				cola_acciones.push(1);
-				cola_acciones.push(3);
-				cola_acciones.push(2);
-				cola_acciones.push(2);
-				cola_acciones.push(2);
-				break;
-			case 10:
-				cola_acciones.push(2);
-				cola_acciones.push(1);
-				cola_acciones.push(3);
-				cola_acciones.push(2);
-				cola_acciones.push(2);
-				break;
-			case 11:
-				cola_acciones.push(2);
-				cola_acciones.push(2);
-				cola_acciones.push(1);
-				cola_acciones.push(3);
-				cola_acciones.push(2);
-				break;
-			case 12:
-				cola_acciones.push(2);
-				cola_acciones.push(2);
-				cola_acciones.push(2);
-				break;
-			case 13:
-				cola_acciones.push(2);
-				cola_acciones.push(2);
-				cola_acciones.push(3);
-				cola_acciones.push(2);
-				break;
-			case 14:
-				cola_acciones.push(2);
-				cola_acciones.push(3);
-				cola_acciones.push(2);
-				cola_acciones.push(2);
-				break;
-			case 15:
-				cola_acciones.push(3);
-				cola_acciones.push(2);
-				cola_acciones.push(2);
-				cola_acciones.push(2);
-				break;
-		}
+
+	if (c == 'X' and c_libre) return 2;
+	else if (i == 'X' and i_libre) return 1;
+	else if (d == 'X' and d_libre) return 3;
+	else if(!zap) {
+		if(c == 'D' and c_libre) return 2;
+		else if (i == 'D' and i_libre) return 1;
+		else if (d == 'D' and d_libre) return 3;
 	}
 
-	if(cola){
+	if(!cola){
+		int indice_interes = DetectarCasillaInteresanteA(sensores, zap);
+	
+	if(indice_interes != -1){
+			cola = true;
+			switch(indice_interes){
+				case 1:
+					cola_acciones.push(1);
+					cola_acciones.push(3);
+					cola_acciones.push(2);
+					break;
+				case 2:
+					cola_acciones.push(2);
+					break;
+				case 3:
+					cola_acciones.push(3);
+					cola_acciones.push(2);
+					break;
+				case 4:
+					cola_acciones.push(1);
+					cola_acciones.push(3);
+					cola_acciones.push(2);
+					cola_acciones.push(2);
+					break;
+				case 5:
+					cola_acciones.push(2);
+					cola_acciones.push(1);
+					cola_acciones.push(3);
+					cola_acciones.push(2);
+					break;
+				case 6:
+					cola_acciones.push(2);
+					cola_acciones.push(2);
+					break;
+				case 7:
+					cola_acciones.push(2);
+					cola_acciones.push(3);
+					cola_acciones.push(2);
+					break;
+				case 8:
+					cola_acciones.push(3);
+					cola_acciones.push(2);
+					cola_acciones.push(2);
+					break;
+				case 9:
+					cola_acciones.push(1);
+					cola_acciones.push(3);
+					cola_acciones.push(2);
+					cola_acciones.push(2);
+					cola_acciones.push(2);
+					break;
+				case 10:
+					cola_acciones.push(2);
+					cola_acciones.push(1);
+					cola_acciones.push(3);
+					cola_acciones.push(2);
+					cola_acciones.push(2);
+					break;
+				case 11:
+					cola_acciones.push(2);
+					cola_acciones.push(2);
+					cola_acciones.push(1);
+					cola_acciones.push(3);
+					cola_acciones.push(2);
+					break;
+				case 12:
+					cola_acciones.push(2);
+					cola_acciones.push(2);
+					cola_acciones.push(2);
+					break;
+				case 13:
+					cola_acciones.push(2);
+					cola_acciones.push(2);
+					cola_acciones.push(3);
+					cola_acciones.push(2);
+					break;
+				case 14:
+					cola_acciones.push(2);
+					cola_acciones.push(3);
+					cola_acciones.push(2);
+					cola_acciones.push(2);
+					break;
+				case 15:
+					cola_acciones.push(3);
+					cola_acciones.push(2);
+					cola_acciones.push(2);
+					cola_acciones.push(2);
+					break;
+			}
+		}
+	}else{
 		if(!cola_acciones.empty()){
 			int accion = cola_acciones.front();
 			cola_acciones.pop();
@@ -244,17 +254,6 @@ int ComportamientoAuxiliar::VeoCasillaInteresanteA(Sensores &sensores, bool zap)
 			cola = false;
 			return 0;
 		}
-	}
-
-
-		
-	if (c == 'X' and c_libre) return 2;
-	else if (i == 'X' and i_libre) return 1;
-	else if (d == 'X' and d_libre) return 3;
-	else if(!zap) {
-		if(c == 'D' and c_libre) return 2;
-		else if (i == 'D' and i_libre) return 1;
-		else if (d == 'D' and d_libre) return 3;
 	}
 
 
