@@ -246,10 +246,17 @@ int ComportamientoAuxiliar::VeoCasillaInteresanteA(Sensores &sensores, bool zap)
 		}
 	}
 
-	bool no_visita_frecuente_i = false;
-	bool no_visita_frecuente_c = false;
-	bool no_visita_frecuente_d = false;
-	
+
+		
+	if (c == 'X' and c_libre) return 2;
+	else if (i == 'X' and i_libre) return 1;
+	else if (d == 'X' and d_libre) return 3;
+	else if(!zap) {
+		if(c == 'D' and c_libre) return 2;
+		else if (i == 'D' and i_libre) return 1;
+		else if (d == 'D' and d_libre) return 3;
+	}
+
 
 	int frecuencia_i=0;
 	int frecuencia_c=0;
@@ -263,9 +270,6 @@ int ComportamientoAuxiliar::VeoCasillaInteresanteA(Sensores &sensores, bool zap)
 			frecuencia_i = frecuencia_visita[sensores.posF - 1][sensores.posC - 1];
 			frecuencia_c = frecuencia_visita[sensores.posF - 1][sensores.posC];
 			frecuencia_d = frecuencia_visita[sensores.posF - 1][sensores.posC + 1];
-			// no_visita_frecuente_i = NoVisitaFrecuente(frecuencia_i);
-			// no_visita_frecuente_c = NoVisitaFrecuente(frecuencia_c);
-			// no_visita_frecuente_d = NoVisitaFrecuente(frecuencia_d);
 			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d};
 			break;
 
@@ -274,9 +278,6 @@ int ComportamientoAuxiliar::VeoCasillaInteresanteA(Sensores &sensores, bool zap)
 			frecuencia_i = frecuencia_visita[sensores.posF][sensores.posC - 1];
 			frecuencia_c = frecuencia_visita[sensores.posF - 1][sensores.posC - 1];
 			frecuencia_d = frecuencia_visita[sensores.posF - 1][sensores.posC];
-			// no_visita_frecuente_i = NoVisitaFrecuente(frecuencia_i);
-			// no_visita_frecuente_c = NoVisitaFrecuente(frecuencia_c);
-			// no_visita_frecuente_d = NoVisitaFrecuente(frecuencia_d);
 			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d};
 			break;
 
@@ -285,9 +286,6 @@ int ComportamientoAuxiliar::VeoCasillaInteresanteA(Sensores &sensores, bool zap)
 			frecuencia_i = frecuencia_visita[sensores.posF + 1][sensores.posC - 1];
 			frecuencia_c = frecuencia_visita[sensores.posF][sensores.posC - 1];
 			frecuencia_d = frecuencia_visita[sensores.posF - 1][sensores.posC - 1];
-			// no_visita_frecuente_i = NoVisitaFrecuente(frecuencia_i);
-			// no_visita_frecuente_c = NoVisitaFrecuente(frecuencia_c);
-			// no_visita_frecuente_d = NoVisitaFrecuente(frecuencia_d);
 			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d};
 			break;
 
@@ -296,9 +294,6 @@ int ComportamientoAuxiliar::VeoCasillaInteresanteA(Sensores &sensores, bool zap)
 			frecuencia_i = frecuencia_visita[sensores.posF + 1][sensores.posC];
 			frecuencia_c = frecuencia_visita[sensores.posF + 1][sensores.posC - 1];
 			frecuencia_d = frecuencia_visita[sensores.posF][sensores.posC - 1];
-			// no_visita_frecuente_i = NoVisitaFrecuente(frecuencia_i);
-			// no_visita_frecuente_c = NoVisitaFrecuente(frecuencia_c);
-			// no_visita_frecuente_d = NoVisitaFrecuente(frecuencia_d);
 			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d};
 			break;
 
@@ -307,9 +302,6 @@ int ComportamientoAuxiliar::VeoCasillaInteresanteA(Sensores &sensores, bool zap)
 			frecuencia_i = frecuencia_visita[sensores.posF + 1][sensores.posC + 1];
 			frecuencia_c = frecuencia_visita[sensores.posF + 1][sensores.posC];
 			frecuencia_d = frecuencia_visita[sensores.posF + 1][sensores.posC - 1];
-			// no_visita_frecuente_i = NoVisitaFrecuente(frecuencia_i);
-			// no_visita_frecuente_c = NoVisitaFrecuente(frecuencia_c);
-			// no_visita_frecuente_d = NoVisitaFrecuente(frecuencia_d);
 			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d};
 			break;
 
@@ -318,9 +310,6 @@ int ComportamientoAuxiliar::VeoCasillaInteresanteA(Sensores &sensores, bool zap)
 			frecuencia_i = frecuencia_visita[sensores.posF][sensores.posC + 1];
 			frecuencia_c = frecuencia_visita[sensores.posF + 1][sensores.posC + 1];
 			frecuencia_d = frecuencia_visita[sensores.posF + 1][sensores.posC];
-			// no_visita_frecuente_i = NoVisitaFrecuente(frecuencia_i);
-			// no_visita_frecuente_c = NoVisitaFrecuente(frecuencia_c);
-			// no_visita_frecuente_d = NoVisitaFrecuente(frecuencia_d);
 			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d};
 			break;
 
@@ -329,9 +318,6 @@ int ComportamientoAuxiliar::VeoCasillaInteresanteA(Sensores &sensores, bool zap)
 			frecuencia_i = frecuencia_visita[sensores.posF - 1][sensores.posC + 1];
 			frecuencia_c = frecuencia_visita[sensores.posF][sensores.posC + 1];
 			frecuencia_d = frecuencia_visita[sensores.posF + 1][sensores.posC + 1];
-			// no_visita_frecuente_i = NoVisitaFrecuente(frecuencia_i);
-			// no_visita_frecuente_c = NoVisitaFrecuente(frecuencia_c);
-			// no_visita_frecuente_d = NoVisitaFrecuente(frecuencia_d);
 			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d};
 			break;
 
@@ -340,24 +326,11 @@ int ComportamientoAuxiliar::VeoCasillaInteresanteA(Sensores &sensores, bool zap)
 			frecuencia_i = frecuencia_visita[sensores.posF - 1][sensores.posC];
 			frecuencia_c = frecuencia_visita[sensores.posF - 1][sensores.posC + 1];
 			frecuencia_d = frecuencia_visita[sensores.posF][sensores.posC + 1];
-			// no_visita_frecuente_i = NoVisitaFrecuente(frecuencia_i);
-			// no_visita_frecuente_c = NoVisitaFrecuente(frecuencia_c);
-			// no_visita_frecuente_d = NoVisitaFrecuente(frecuencia_d);
 			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d};
 			break;
 	}
 
 	std::sort(frecuencia_casillas.begin(), frecuencia_casillas.end());  // Ordena de menor a mayor
-
-		
-	if (c == 'X' and c_libre) return 2;
-	else if (i == 'X' and i_libre) return 1;
-	else if (d == 'X' and d_libre) return 3;
-	else if(!zap) {
-		if(c == 'D' and c_libre) return 2;
-		else if (i == 'D' and i_libre) return 1;
-		else if (d == 'D' and d_libre) return 3;
-	}
 
 	for (int freq : frecuencia_casillas) {
 		if (freq == frecuencia_c and c_libre and (c == 'C' or c == 'D')) return 2;

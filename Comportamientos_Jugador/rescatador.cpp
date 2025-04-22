@@ -59,13 +59,14 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_0(Sensores sensor
 	else {
 
 		int pos = VeoCasillaInteresanteR(sensores, tiene_zapatillas);
+		
 		switch (pos){
 			case 2:
 				accion = WALK;
 				break;
 			case 1:
-			cola.push(TURN_L);
-			cola.push(TURN_SR);
+				cola.push(TURN_L);
+				cola.push(TURN_SR);
 				break;
 			case 3:
 				accion = TURN_SR;
@@ -206,97 +207,97 @@ int ComportamientoRescatador::VeoCasillaInteresanteR(Sensores &sensores, bool za
 
 	/*Primero me aseguro de que se observa alguna casilla interesante*/
 	
-	int indice_interes = DetectarCasillaInteresanteR(sensores, zap);
+	if(!sigo_plan){
+		int indice_interes = DetectarCasillaInteresanteR(sensores, zap);
 
-	if(indice_interes != -1){
-		sigo_plan = true;
-		switch(indice_interes){
-			case 1:
-				cola_acciones.push(1);
-				cola_acciones.push(3);
-				cola_acciones.push(2);
-				break;
-			case 2:
-				cola_acciones.push(2);
-				break;
-			case 3:
-				cola_acciones.push(3);
-				cola_acciones.push(2);
-				break;
-			case 4:
-				cola_acciones.push(1);
-				cola_acciones.push(3);
-				cola_acciones.push(2);
-				cola_acciones.push(2);
-				break;
-			case 5:
-				cola_acciones.push(2);
-				cola_acciones.push(1);
-				cola_acciones.push(3);
-				cola_acciones.push(2);
-				break;
-			case 6:
-				cola_acciones.push(2);
-				cola_acciones.push(2);
-				break;
-			case 7:
-				cola_acciones.push(2);
-				cola_acciones.push(3);
-				cola_acciones.push(2);
-				break;
-			case 8:
-				cola_acciones.push(3);
-				cola_acciones.push(2);
-				cola_acciones.push(2);
-				break;
-			case 9:
-				cola_acciones.push(1);
-				cola_acciones.push(3);
-				cola_acciones.push(2);
-				cola_acciones.push(2);
-				cola_acciones.push(2);
-				break;
-			case 10:
-				cola_acciones.push(2);
-				cola_acciones.push(1);
-				cola_acciones.push(3);
-				cola_acciones.push(2);
-				cola_acciones.push(2);
-				break;
-			case 11:
-				cola_acciones.push(2);
-				cola_acciones.push(2);
-				cola_acciones.push(1);
-				cola_acciones.push(3);
-				cola_acciones.push(2);
-				break;
-			case 12:
-				cola_acciones.push(2);
-				cola_acciones.push(2);
-				cola_acciones.push(2);
-				break;
-			case 13:
-				cola_acciones.push(2);
-				cola_acciones.push(2);
-				cola_acciones.push(3);
-				cola_acciones.push(2);
-				break;
-			case 14:
-				cola_acciones.push(2);
-				cola_acciones.push(3);
-				cola_acciones.push(2);
-				cola_acciones.push(2);
-				break;
-			case 15:
-				cola_acciones.push(3);
-				cola_acciones.push(2);
-				cola_acciones.push(2);
-				cola_acciones.push(2);
-				break;
+		if(indice_interes != -1){
+			sigo_plan = true;
+			switch(indice_interes){
+				case 1:
+					cola_acciones.push(1);
+					cola_acciones.push(3);
+					cola_acciones.push(2);
+					break;
+				case 2:
+					cola_acciones.push(2);
+					break;
+				case 3:
+					cola_acciones.push(3);
+					cola_acciones.push(2);
+					break;
+				case 4:
+					cola_acciones.push(1);
+					cola_acciones.push(3);
+					cola_acciones.push(2);
+					cola_acciones.push(2);
+					break;
+				case 5:
+					cola_acciones.push(2);
+					cola_acciones.push(1);
+					cola_acciones.push(3);
+					cola_acciones.push(2);
+					break;
+				case 6:
+					cola_acciones.push(2);
+					cola_acciones.push(2);
+					break;
+				case 7:
+					cola_acciones.push(2);
+					cola_acciones.push(3);
+					cola_acciones.push(2);
+					break;
+				case 8:
+					cola_acciones.push(3);
+					cola_acciones.push(2);
+					cola_acciones.push(2);
+					break;
+				case 9:
+					cola_acciones.push(1);
+					cola_acciones.push(3);
+					cola_acciones.push(2);
+					cola_acciones.push(2);
+					cola_acciones.push(2);
+					break;
+				case 10:
+					cola_acciones.push(2);
+					cola_acciones.push(1);
+					cola_acciones.push(3);
+					cola_acciones.push(2);
+					cola_acciones.push(2);
+					break;
+				case 11:
+					cola_acciones.push(2);
+					cola_acciones.push(2);
+					cola_acciones.push(1);
+					cola_acciones.push(3);
+					cola_acciones.push(2);
+					break;
+				case 12:
+					cola_acciones.push(2);
+					cola_acciones.push(2);
+					cola_acciones.push(2);
+					break;
+				case 13:
+					cola_acciones.push(2);
+					cola_acciones.push(2);
+					cola_acciones.push(3);
+					cola_acciones.push(2);
+					break;
+				case 14:
+					cola_acciones.push(2);
+					cola_acciones.push(3);
+					cola_acciones.push(2);
+					cola_acciones.push(2);
+					break;
+				case 15:
+					cola_acciones.push(3);
+					cola_acciones.push(2);
+					cola_acciones.push(2);
+					cola_acciones.push(2);
+					break;
+			}
 		}
-	}
-
-	if(sigo_plan){
+	}else{
 		if(!cola_acciones.empty()){
 			int accion = cola_acciones.front();
 			cola_acciones.pop();
