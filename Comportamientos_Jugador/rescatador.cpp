@@ -51,11 +51,11 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_0(Sensores sensor
 
 	if(sensores.superficie[0] == 'X'){
 		accion = IDLE;
+	}else if(!cola.empty()){
+		accion = cola.front();
+		cola.pop();
 	}
-	else if(giro45izq != 0){
-		accion = TURN_SR;
-		giro45izq--;
-	}
+	
 	else {
 
 		int pos = VeoCasillaInteresanteR(sensores, tiene_zapatillas);
@@ -64,19 +64,32 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_0(Sensores sensor
 				accion = WALK;
 				break;
 			case 1:
-				giro45izq = 1;
-				accion = TURN_L;
+			cola.push(TURN_L);
+			cola.push(TURN_SR);
 				break;
 			case 3:
 				accion = TURN_SR;
+				break;
+			case 4:
+				accion = RUN;
+				break;
+			case 5:
+				cola.push(TURN_SR);
+				cola.push(RUN);
+				break;
+			case 6:
+				cola.push(TURN_L);
+				cola.push(TURN_SR);
+				cola.push(RUN);
+				
 				break;
 			case 0:
 				if(accion_defecto){
 					accion = TURN_SR;
 				}else{
 					accion_defecto = true;
-					giro45izq = 1;
-					accion = TURN_L;
+					cola.push(TURN_L);
+					cola.push(TURN_SR);
 				}
 				
 				break;
@@ -92,6 +105,46 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_0(Sensores sensor
 
 	last_action = accion;
 	return accion;
+}
+
+//Supongo que el argumento i es bueno
+bool ComportamientoRescatador::PuedeCorrer(int i, Sensores &sensores, bool zap) {
+
+	int altura_actual = sensores.cota[0];
+	int altura_dos_pasos = sensores.cota[i];
+	int diferencia_altura = abs(altura_dos_pasos - altura_actual);
+
+	bool libre_intermedia = false;
+	bool libre_final = false;
+
+	
+	libre_final = ((sensores.superficie[i] == 'C' or sensores.superficie[i] == 'D' or sensores.superficie[i] == 'X') and sensores.agentes[i] == '_');
+
+	switch(i){
+		case 4:
+			libre_intermedia = ((sensores.superficie[1] == 'C' or sensores.superficie[1] == 'D' or sensores.superficie[1] == 'X') and sensores.agentes[1] == '_');
+			break;
+
+		case 6:
+			libre_intermedia = ((sensores.superficie[2] == 'C' or sensores.superficie[2] == 'D' or sensores.superficie[2] == 'X') and sensores.agentes[2] == '_');
+		break;
+
+		case 8:
+			libre_intermedia = ((sensores.superficie[3] == 'C' or sensores.superficie[3] == 'D' or sensores.superficie[3] == 'X') and sensores.agentes[3] == '_');
+		break;
+	}
+	
+	bool transitable = (diferencia_altura <= 1 || (zap && diferencia_altura <= 2));
+
+	// cout << "Transitable: " << transitable << endl;
+	// cout << "Libre Intermedia: " << libre_intermedia << endl;
+	// cout << "Libre Final: " << libre_final << endl;
+	if (transitable and libre_intermedia and libre_final) {
+		//cout << "TRUE" << endl;
+		return true;
+	}
+
+	return false;
 }
 
 
@@ -112,14 +165,51 @@ int ComportamientoRescatador::VeoCasillaInteresanteR(Sensores &sensores, bool za
 	char c = ViablePorAlturaR(sensores.superficie[2], sensores.cota[2]-sensores.cota[0], zap);
 	char d = ViablePorAlturaR(sensores.superficie[3], sensores.cota[3]-sensores.cota[0], zap);
 
+	bool puedeCorrer_i = PuedeCorrer(4, sensores, tiene_zapatillas);
+	bool puedeCorrer_d = PuedeCorrer(8, sensores, tiene_zapatillas);
+	bool puedeCorrer_c = PuedeCorrer(6, sensores, tiene_zapatillas);
+	
+
+	char correr_c = sensores.superficie[6];
+	char correr_i = sensores.superficie[4];
+	char correr_d = sensores.superficie[8];
+
 	bool i_libre = CasillaLibreR(sensores.agentes[1]);
 	bool c_libre = CasillaLibreR(sensores.agentes[2]);
 	bool d_libre = CasillaLibreR(sensores.agentes[3]);
+	
+
+	int frecuencia_i=0;
+	int frecuencia_c=0;
+	int frecuencia_d=0;	
+	int frecuencia_run_i = 0;
+	int frecuencia_run_c = 0;
+	int frecuencia_run_d = 0;
+
+
+	vector<int> frecuencia_casillas;
+	
+	if (c == 'X' and c_libre) return 2;
+	else if (i == 'X' and i_libre) return 1;
+	else if (d == 'X' and d_libre) return 3;
+	else if(correr_c == 'X' and puedeCorrer_c) return 4;
+	else if(correr_i == 'X' and puedeCorrer_i) return 6;
+	else if(correr_d == 'X' and puedeCorrer_d) return 5;
+	else if(!zap) {
+		if(c == 'D' and c_libre) return 2;
+		else if (i == 'D' and i_libre) return 1;
+		else if (d == 'D' and d_libre) return 3;
+		else if(correr_c == 'D' and puedeCorrer_c) return 4;
+		else if(correr_i == 'D' and puedeCorrer_i) return 6;
+		else if(correr_d == 'D' and puedeCorrer_d) return 5;
+	}
+
 	/*Primero me aseguro de que se observa alguna casilla interesante*/
+	
 	int indice_interes = DetectarCasillaInteresanteR(sensores, zap);
 
 	if(indice_interes != -1){
-		cola = true;
+		sigo_plan = true;
 		switch(indice_interes){
 			case 1:
 				cola_acciones.push(1);
@@ -206,7 +296,8 @@ int ComportamientoRescatador::VeoCasillaInteresanteR(Sensores &sensores, bool za
 		}
 	}
 
-	if(cola){
+	if(sigo_plan){
+		cout << "Juego con cola" <<endl;
 		if(!cola_acciones.empty()){
 			int accion = cola_acciones.front();
 			cola_acciones.pop();
@@ -228,34 +319,30 @@ int ComportamientoRescatador::VeoCasillaInteresanteR(Sensores &sensores, bool za
 					}
 					break;
 				default:
-					cola = false;
+					cout << "A" << endl;
+					sigo_plan = false;
 					cola_acciones = queue<int>();
 					return 0; // No se encontró ninguna acción válida
 					break;
 			}
 		}
 		else{
-			cola = false;
+			sigo_plan = false;
 			return 0;
 		}
 	}
 
-	
-
-	int frecuencia_i=0;
-	int frecuencia_c=0;
-	int frecuencia_d=0;	
-
-	vector<int> frecuencia_casillas;
-
 	switch(sensores.rumbo){
 		case norte:
+			frecuencia_run_i = frecuencia_visita[sensores.posF - 2][sensores.posC - 2];
+			frecuencia_run_c = frecuencia_visita[sensores.posF - 2][sensores.posC];
+			frecuencia_run_d = frecuencia_visita[sensores.posF - 2][sensores.posC + 2];
 			
 			frecuencia_i = frecuencia_visita[sensores.posF - 1][sensores.posC - 1];
 			frecuencia_c = frecuencia_visita[sensores.posF - 1][sensores.posC];
 			frecuencia_d = frecuencia_visita[sensores.posF - 1][sensores.posC + 1];
 			
-			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d};
+			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d, frecuencia_run_i, frecuencia_run_c, frecuencia_run_d};
 			break;
 
 		case noroeste:
@@ -263,8 +350,13 @@ int ComportamientoRescatador::VeoCasillaInteresanteR(Sensores &sensores, bool za
 			frecuencia_i = frecuencia_visita[sensores.posF][sensores.posC - 1];
 			frecuencia_c = frecuencia_visita[sensores.posF - 1][sensores.posC - 1];
 			frecuencia_d = frecuencia_visita[sensores.posF - 1][sensores.posC];
+
+			frecuencia_run_i = frecuencia_visita[sensores.posF - 1][sensores.posC - 2];
+			frecuencia_run_c = frecuencia_visita[sensores.posF - 2][sensores.posC - 2];
+			frecuencia_run_d = frecuencia_visita[sensores.posF - 2][sensores.posC];
+
 			
-			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d};
+			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d, frecuencia_run_i, frecuencia_run_c, frecuencia_run_d};
 			break;
 
 		case oeste:
@@ -272,8 +364,12 @@ int ComportamientoRescatador::VeoCasillaInteresanteR(Sensores &sensores, bool za
 			frecuencia_i = frecuencia_visita[sensores.posF + 1][sensores.posC - 1];
 			frecuencia_c = frecuencia_visita[sensores.posF][sensores.posC - 1];
 			frecuencia_d = frecuencia_visita[sensores.posF - 1][sensores.posC - 1];
+
+			frecuencia_run_i = frecuencia_visita[sensores.posF - 2][sensores.posC - 2];
+			frecuencia_run_c = frecuencia_visita[sensores.posF][sensores.posC - 2];
+			frecuencia_run_d = frecuencia_visita[sensores.posF + 2][sensores.posC - 2];
 			
-			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d};
+			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d, frecuencia_run_i, frecuencia_run_c, frecuencia_run_d};
 			break;
 
 		case suroeste:
@@ -281,8 +377,12 @@ int ComportamientoRescatador::VeoCasillaInteresanteR(Sensores &sensores, bool za
 			frecuencia_i = frecuencia_visita[sensores.posF + 1][sensores.posC];
 			frecuencia_c = frecuencia_visita[sensores.posF + 1][sensores.posC - 1];
 			frecuencia_d = frecuencia_visita[sensores.posF][sensores.posC - 1];
+
+			frecuencia_run_i = frecuencia_visita[sensores.posF + 1][sensores.posC - 2];
+			frecuencia_run_c = frecuencia_visita[sensores.posF + 2][sensores.posC - 2];
+			frecuencia_run_d = frecuencia_visita[sensores.posF + 2][sensores.posC];
 			
-			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d};
+			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d, frecuencia_run_i, frecuencia_run_c, frecuencia_run_d};
 			break;
 
 		case sur:
@@ -290,8 +390,12 @@ int ComportamientoRescatador::VeoCasillaInteresanteR(Sensores &sensores, bool za
 			frecuencia_i = frecuencia_visita[sensores.posF + 1][sensores.posC + 1];
 			frecuencia_c = frecuencia_visita[sensores.posF + 1][sensores.posC];
 			frecuencia_d = frecuencia_visita[sensores.posF + 1][sensores.posC - 1];
+
+			frecuencia_run_i = frecuencia_visita[sensores.posF + 2][sensores.posC - 2];
+			frecuencia_run_c = frecuencia_visita[sensores.posF + 2][sensores.posC];
+			frecuencia_run_d = frecuencia_visita[sensores.posF + 2][sensores.posC + 2];
 			
-			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d};
+			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d, frecuencia_run_i, frecuencia_run_c, frecuencia_run_d};
 			break;
 
 		case sureste:
@@ -299,8 +403,12 @@ int ComportamientoRescatador::VeoCasillaInteresanteR(Sensores &sensores, bool za
 			frecuencia_i = frecuencia_visita[sensores.posF][sensores.posC + 1];
 			frecuencia_c = frecuencia_visita[sensores.posF + 1][sensores.posC + 1];
 			frecuencia_d = frecuencia_visita[sensores.posF + 1][sensores.posC];
+
+			frecuencia_run_i = frecuencia_visita[sensores.posF + 1][sensores.posC + 2];
+			frecuencia_run_c = frecuencia_visita[sensores.posF + 2][sensores.posC + 2];
+			frecuencia_run_d = frecuencia_visita[sensores.posF + 2][sensores.posC];
 			
-			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d};
+			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d, frecuencia_run_i, frecuencia_run_c, frecuencia_run_d};
 			break;
 
 		case este:
@@ -308,8 +416,12 @@ int ComportamientoRescatador::VeoCasillaInteresanteR(Sensores &sensores, bool za
 			frecuencia_i = frecuencia_visita[sensores.posF - 1][sensores.posC + 1];
 			frecuencia_c = frecuencia_visita[sensores.posF][sensores.posC + 1];
 			frecuencia_d = frecuencia_visita[sensores.posF + 1][sensores.posC + 1];
+
+			frecuencia_run_i = frecuencia_visita[sensores.posF - 2][sensores.posC + 2];
+			frecuencia_run_c = frecuencia_visita[sensores.posF][sensores.posC + 2];
+			frecuencia_run_d = frecuencia_visita[sensores.posF + 2][sensores.posC + 2];
 			
-			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d};
+			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d, frecuencia_run_i, frecuencia_run_c, frecuencia_run_d};
 			break;
 
 		case noreste:
@@ -317,27 +429,24 @@ int ComportamientoRescatador::VeoCasillaInteresanteR(Sensores &sensores, bool za
 			frecuencia_i = frecuencia_visita[sensores.posF - 1][sensores.posC];
 			frecuencia_c = frecuencia_visita[sensores.posF - 1][sensores.posC + 1];
 			frecuencia_d = frecuencia_visita[sensores.posF][sensores.posC + 1];
+
+			frecuencia_run_i = frecuencia_visita[sensores.posF - 1][sensores.posC + 2];
+			frecuencia_run_c = frecuencia_visita[sensores.posF - 2][sensores.posC + 2];
+			frecuencia_run_d = frecuencia_visita[sensores.posF - 2][sensores.posC];
 			
-			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d};
+			frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d, frecuencia_run_i, frecuencia_run_c, frecuencia_run_d};
 			break;
 	}
 
 	std::sort(frecuencia_casillas.begin(), frecuencia_casillas.end());  // Ordena de menor a mayor
 
-		
-	if (c == 'X' and c_libre) return 2;
-	else if (i == 'X' and i_libre) return 1;
-	else if (d == 'X' and d_libre) return 3;
-	else if(!zap) {
-		if(c == 'D' and c_libre) return 2;
-		else if (i == 'D' and i_libre) return 1;
-		else if (d == 'D' and d_libre) return 3;
-	}
-
 	for (int freq : frecuencia_casillas) {
 		if (freq == frecuencia_c and c_libre and (c == 'C' or c == 'D')) return 2;
 		else if (freq == frecuencia_i and i_libre and (i == 'C' or i == 'D')) return 1;
 		else if (freq == frecuencia_d and d_libre and (d == 'C' or d == 'D')) return 3;
+		else if (freq == frecuencia_run_c and puedeCorrer_c and (correr_c == 'C' or correr_c == 'D')) return 4;
+		else if (freq == frecuencia_run_i and puedeCorrer_i and (correr_i == 'C' or correr_i == 'D')) return 6;
+		else if (freq == frecuencia_run_d and puedeCorrer_d and (correr_d == 'C' or correr_d == 'D')) return 5;
 	}
 
 	return 0;
@@ -797,6 +906,9 @@ void ComportamientoRescatador::SituarSensorenMapaR(vector<vector<unsigned char>>
 			break;
 	}
 }
+
+
+
 
 /*NIVEL 1*/
 
@@ -1496,8 +1608,11 @@ int ComportamientoRescatador::FuncionCoste(const Action &accion, const EstadoR_N
 
 	switch(accion){
 		case WALK: {
-			EstadoR_N2 siguiente = NextCasillaRescatador(st);
+			EstadoR_N2 siguiente =  applyR(WALK, st, terreno, altura);
 			int dif_altura = (altura[siguiente.f][siguiente.c] - altura[st.f][st.c]);
+
+			if(st.zapatillas == true) dif_altura = 0;
+
 			switch(terreno[st.f][st.c]){
 				case 'A':
 					coste = 100 + dif_altura * 10;
@@ -1516,11 +1631,14 @@ int ComportamientoRescatador::FuncionCoste(const Action &accion, const EstadoR_N
 		}
 	
 		case RUN: {
-			EstadoR_N2 siguiente_1 = NextCasillaRescatador(st);
-			EstadoR_N2 siguiente_2 = NextCasillaRescatador(siguiente_1);
-	
+			
+			EstadoR_N2 siguiente_2 = applyR(RUN, st, terreno, altura);
+			
 			int dif_altura = (altura[siguiente_2.f][siguiente_2.c] - altura[st.f][st.c]);
-			switch(terreno[st.f][st.c]){
+
+			//Gasto es independiente si hay zapatillas
+			if(st.zapatillas == true) dif_altura = 0;
+			switch (terreno[st.f][st.c]) {
 				case 'A':
 					coste = 150 + dif_altura * 15;
 					break;
@@ -1534,13 +1652,14 @@ int ComportamientoRescatador::FuncionCoste(const Action &accion, const EstadoR_N
 					coste = 1;
 					break;
 			}
+			
 			break;
 		}
 	
 		case TURN_SR: {
 			switch(terreno[st.f][st.c]){
 				case 'A':
-					coste = 10;
+					coste = 16;
 					break;
 				case 'T':
 					coste = 3;

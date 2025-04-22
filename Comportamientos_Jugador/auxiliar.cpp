@@ -1492,7 +1492,7 @@ int ComportamientoAuxiliar::FuncionCoste_A(const Action &accion, const EstadoA_N
 		case TURN_SR: {
 			switch(terreno[st.f][st.c]){
 				case 'A':
-					coste = 10;
+					coste = 16; //coste = 10
 					break;
 				case 'T':
 					coste = 3;

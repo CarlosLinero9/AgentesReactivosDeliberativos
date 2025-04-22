@@ -117,7 +117,8 @@ public:
     pasos = 0;
     objetivo = {-1, -1};
     cola_acciones = queue<int>();
-    cola = false;
+    cola = queue<Action>();
+    sigo_plan = false;
   }
 
   ComportamientoRescatador(std::vector<std::vector<unsigned char>> mapaR, std::vector<std::vector<unsigned char>> mapaC) : Comportamiento(mapaR,mapaC)
@@ -144,6 +145,7 @@ public:
   bool CasillaLibreR(char casilla);
   void SituarSensorenMapaR(vector<vector<unsigned char>> &m, vector<vector<unsigned char>> &a, Sensores sensores);
   int DetectarCasillaInteresanteR(Sensores &sensores, bool zap);
+  bool PuedeCorrer(int i, Sensores &sensores, bool zap);
   // void RefrescarmatrizR(vector<vector<int>> &m);
   // int minimo(int a, int b, int c);
 
@@ -215,10 +217,13 @@ private:
   // Variables de Estado
   bool accion_defecto;
   queue<int> cola_acciones;
-  bool cola;
+  queue<Action> cola;
+  bool corriendo;
+  bool sigo_plan;
   Action last_action;
   bool tiene_zapatillas;
   int giro45izq;
+  int giro45dech;
   vector<vector<int>> frecuencia_visita;
   vector<vector<int>> frecuencia_visita_aux;
   int pasos;
