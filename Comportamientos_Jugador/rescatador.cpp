@@ -297,7 +297,6 @@ int ComportamientoRescatador::VeoCasillaInteresanteR(Sensores &sensores, bool za
 	}
 
 	if(sigo_plan){
-		cout << "Juego con cola" <<endl;
 		if(!cola_acciones.empty()){
 			int accion = cola_acciones.front();
 			cola_acciones.pop();
@@ -319,7 +318,6 @@ int ComportamientoRescatador::VeoCasillaInteresanteR(Sensores &sensores, bool za
 					}
 					break;
 				default:
-					cout << "A" << endl;
 					sigo_plan = false;
 					cola_acciones = queue<int>();
 					return 0; // No se encontró ninguna acción válida
