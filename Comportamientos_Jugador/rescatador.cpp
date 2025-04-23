@@ -1607,50 +1607,58 @@ int ComportamientoRescatador::FuncionCoste(const Action &accion, const EstadoR_N
 
 	switch(accion){
 		case WALK: {
-			EstadoR_N2 siguiente =  applyR(WALK, st, terreno, altura);
+			EstadoR_N2 siguiente = NextCasillaRescatador(st);
 			int dif_altura = (altura[siguiente.f][siguiente.c] - altura[st.f][st.c]);
+			int signo;
+			if(dif_altura < 0) signo = -1;
+			else if(dif_altura > 0) signo = 1;
+			else signo = 0;
 
-			if(st.zapatillas == true) dif_altura = 0;
-
+			
 			switch(terreno[st.f][st.c]){
 				case 'A':
-					coste = 100 + dif_altura * 10;
+					coste = 100 + signo * 10;
 					break;
 				case 'T':
-					coste = 20 + dif_altura * 5;
+					coste = 20 + signo * 5;
 					break;
 				case 'S':
-					coste = 2 + dif_altura;
+					coste = 2 + signo;
 					break;
 				default:
 					coste = 1;
 					break;
-			}
+				}
+			
 			break;
 		}
 	
 		case RUN: {
-			
-			EstadoR_N2 siguiente_2 = applyR(RUN, st, terreno, altura);
+			EstadoR_N2 siguiente = NextCasillaRescatador(st);
+			EstadoR_N2 siguiente_2 = NextCasillaRescatador(siguiente);
 			
 			int dif_altura = (altura[siguiente_2.f][siguiente_2.c] - altura[st.f][st.c]);
 
-			//Gasto es independiente si hay zapatillas
-			if(st.zapatillas == true) dif_altura = 0;
-			switch (terreno[st.f][st.c]) {
+			int signo;
+			if(dif_altura < 0) signo = -1;
+			else if(dif_altura > 0) signo = 1;
+			else signo = 0;
+
+			switch(terreno[st.f][st.c]){
 				case 'A':
-					coste = 150 + dif_altura * 15;
+					coste = 150 + signo * 15;
 					break;
 				case 'T':
-					coste = 35 + dif_altura * 5;
+					coste = 35 + signo * 5;
 					break;
 				case 'S':
-					coste = 3 + dif_altura * 2;
+					coste = 3 + signo * 2;
 					break;
 				default:
 					coste = 1;
 					break;
 			}
+			
 			
 			break;
 		}
@@ -1661,7 +1669,7 @@ int ComportamientoRescatador::FuncionCoste(const Action &accion, const EstadoR_N
 					coste = 16;
 					break;
 				case 'T':
-					coste = 3;
+					coste = 5;
 					break;
 				default:
 					coste = 1;
@@ -1934,6 +1942,7 @@ list<Action> ComportamientoRescatador::DijsktraR(const EstadoR_N2 &inicio, const
 				child_WALK.secuencia.push_back(WALK);
 				frontier.push(child_WALK);
 			}
+			//cout << "Hijo WALK " << iteraciones << " consume " << child_WALK.energia << endl;
 
 			if(!SolutionFound){
 				NodoR_N2 child_RUN = current_node;
@@ -1950,6 +1959,7 @@ list<Action> ComportamientoRescatador::DijsktraR(const EstadoR_N2 &inicio, const
 					child_RUN.secuencia.push_back(RUN);
 					frontier.push(child_RUN);
 				}
+				//cout << "Hijo RUN " << iteraciones << " consume " << child_RUN.energia << endl;
 			}
 
 			if(!SolutionFound){
@@ -1967,9 +1977,10 @@ list<Action> ComportamientoRescatador::DijsktraR(const EstadoR_N2 &inicio, const
 					child_TURN_SR.secuencia.push_back(TURN_SR);
 					frontier.push(child_TURN_SR);
 				}
+				//cout << "Hijo TURN_SR " << iteraciones << " consume " << child_TURN_SR.energia << endl;
+			}
 			
-
-			
+			if(!SolutionFound){
 				NodoR_N2 child_TURN_L = current_node;
 				child_TURN_L.estado = applyR(TURN_L, current_node.estado, terreno, altura);
 				child_TURN_L.energia += FuncionCoste(TURN_L, current_node.estado, terreno, altura);
@@ -1984,8 +1995,10 @@ list<Action> ComportamientoRescatador::DijsktraR(const EstadoR_N2 &inicio, const
 					child_TURN_L.secuencia.push_back(TURN_L);
 					frontier.push(child_TURN_L);
 				}
-			}
+				//cout << "Hijo TURN_L " << iteraciones << " consume " << child_TURN_L.energia << endl;
 			
+			}
+	
 
 			//Paso a evaluar el siguiente nodo en la lista "frontier"
 			if(!SolutionFound and !frontier.empty()){
@@ -2019,6 +2032,97 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_3(Sensores sensor
 
 /*NIVEL 4*/
 
-Action ComportamientoRescatador::ComportamientoRescatadorNivel_4(Sensores sensores)
-{
-}
+// Action ComportamientoRescatador::ComportamientoRescatadorNivel_4(Sensores sensores)
+// {
+// 	Action accion = IDLE;
+
+// 	// Situar sensores en el mapa
+// 	SituarSensorenMapaR(mapaResultado, mapaCotas, sensores);
+
+// 	// Si el rescatador está en la posición del accidentado
+// 	if (sensores.posF == sensores.destinoF && sensores.posC == sensores.destinoC) {
+// 		if (sensores.gravedad == 0) {
+// 			// Caso no grave: misión completada
+// 			return IDLE; // Misión completada, esperar nueva misión
+// 		} else {
+// 			// Caso grave: avisar al auxiliar
+// 			if (!auxiliarAvisado) {
+// 				auxiliarAvisado = true;
+// 				return CALL_ON; // Avisar al auxiliar
+// 			} else {
+// 				// Esperar al auxiliar
+// 				return IDLE;
+// 			}
+// 		}
+// 	}
+
+// 	// Si no hay plan, calcular uno
+// 	if (!hayPlan) {
+// 		EstadoR_N2 inicio, fin;
+// 		inicio.f = sensores.posF;
+// 		inicio.c = sensores.posC;
+// 		inicio.brujula = sensores.rumbo;
+// 		inicio.zapatillas = tiene_zapatillas;
+// 		fin.f = sensores.destinoF;
+// 		fin.c = sensores.destinoC;
+
+// 		plan = DijsktraR(inicio, fin, mapaResultado, mapaCotas);
+// 		hayPlan = !plan.empty();
+// 	}
+
+// 	// Ejecutar el plan si existe
+// 	if (hayPlan && !plan.empty()) {
+// 		accion = plan.front();
+// 		plan.pop_front();
+// 	}
+
+// 	// Si el plan se ha agotado, reiniciar
+// 	if (plan.empty()) {
+// 		hayPlan = false;
+// 	}
+
+// 	return accion;
+// }
+
+// // Añadir lógica para gestionar múltiples accidentados
+// void ComportamientoRescatador::GestionarAccidentados(Sensores sensores) {
+// 	// Si no hay un objetivo actual, buscar el accidentado más cercano
+// 	if (objetivo.first == -1 && objetivo.second == -1) {
+// 		int distanciaMinima = INT_MAX;
+// 		for (auto &accidentado : listaAccidentados) {
+// 			int distancia = abs(sensores.posF - accidentado.first) + abs(sensores.posC - accidentado.second);
+// 			if (distancia < distanciaMinima) {
+// 				distanciaMinima = distancia;
+// 				objetivo = accidentado;
+// 			}
+// 		}
+// 	}
+
+// 	// Si se alcanza el objetivo, eliminarlo de la lista
+// 	if (sensores.posF == objetivo.first && sensores.posC == objetivo.second) {
+// 		listaAccidentados.erase(std::remove(listaAccidentados.begin(), listaAccidentados.end(), objetivo), listaAccidentados.end());
+// 		objetivo = {-1, -1};
+// 	}
+// }
+
+// // Añadir lógica para evitar colisiones con el auxiliar
+// bool ComportamientoRescatador::EvitarColision(Sensores sensores) {
+// 	if (sensores.agentes[0] == 'A') {
+// 		// Si el auxiliar está en la misma casilla, moverse para evitar colisión
+// 		if (!cola.empty()) {
+// 			cola.push(TURN_SR);
+// 			cola.push(WALK);
+// 			return true;
+// 		}
+// 	}
+// 	return false;
+// }
+
+// // Añadir lógica para priorizar gravedad de accidentados
+// void ComportamientoRescatador::PriorizarAccidentados(Sensores sensores) {
+// 	std::sort(listaAccidentados.begin(), listaAccidentados.end(), [&](const std::pair<int, int> &a, const std::pair<int, int> &b) {
+// 		int gravedadA = mapaGravedad[a.first][a.second];
+// 		int gravedadB = mapaGravedad[b.first][b.second];
+// 		return gravedadA > gravedadB; // Priorizar mayor gravedad
+// 	});
+// }

@@ -1690,5 +1690,59 @@ list<Action> ComportamientoAuxiliar::AlgoritmoAE(const EstadoA_N3 &inicio, const
 }
 
 /*NIVEL 4*/
-Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_4(Sensores sensores){
-}
+// Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_4(Sensores sensores) {
+// 	Action accion = IDLE;
+
+// 	// Si el auxiliar no conoce la posición del accidentado, espera a recibir la llamada
+// 	if (sensores.destinoF == -1 && sensores.destinoC == -1) {
+// 		return IDLE;
+// 	}
+
+// 	// Si el auxiliar conoce la posición del accidentado, planifica el camino hacia él
+// 	if (!hayPlan) {
+// 		EstadoA_N3 inicio, fin;
+// 		inicio.f = sensores.posF;
+// 		inicio.c = sensores.posC;
+// 		inicio.brujula = sensores.rumbo;
+// 		inicio.zapatillas = tiene_zapatillas;
+// 		fin.f = sensores.destinoF;
+// 		fin.c = sensores.destinoC;
+
+// 		// Generar el plan utilizando el algoritmo A*
+// 		plan = AlgoritmoAE(inicio, fin, mapaResultado, mapaCotas);
+// 		VisualizaPlan(inicio, plan);
+// 		hayPlan = !plan.empty();
+// 	}
+
+// 	// Ejecutar el plan si existe
+// 	if (hayPlan && !plan.empty()) {
+// 		accion = plan.front();
+// 		plan.pop_front();
+// 	}
+
+// 	// Si el plan se ha completado, reiniciar el estado
+// 	if (plan.empty()) {
+// 		hayPlan = false;
+// 	}
+
+// 	return accion;
+// }
+
+// void ComportamientoAuxiliar::ActualizarMapaConAccidentado(Sensores sensores) {
+// 	// Actualiza el mapa con la posición del accidentado si es conocida
+// 	if (sensores.destinoF != -1 && sensores.destinoC != -1) {
+// 		mapaResultado[sensores.destinoF][sensores.destinoC] = 'X'; // Marca la posición del accidentado
+// 	}
+// }
+
+// bool ComportamientoAuxiliar::EsAccionValida(Action accion, const EstadoA_N3 &estado, const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura) {
+// 	// Comprueba si una acción es válida en función del terreno y la altura
+// 	EstadoA_N3 siguiente = applyA(accion, estado, terreno, altura);
+// 	return CasillaAccesibleAuxiliar(siguiente, terreno, altura);
+// }
+
+// void ComportamientoAuxiliar::PriorizarAccionesParaRescate() {
+// 	// Implementa una lógica para priorizar acciones en función de la cercanía al accidentado
+// 	// o de la urgencia del rescate
+// 	// Este método puede ser utilizado para ajustar el comportamiento del auxiliar en el nivel 4
+// }
