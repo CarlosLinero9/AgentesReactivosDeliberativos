@@ -79,7 +79,7 @@ struct EstadoA_N3{
 
 struct NodoA_N3{
   EstadoA_N3 estado;
-  list<Action> secuencia;
+  vector<Action> secuencia;
   int energia;
   int energia_heuristica;
 
@@ -159,18 +159,18 @@ public:
 
 
   /*TUTORIAL*/
-  Action ComportamientoAuxiliarNivel_E(Sensores sensores);
-  list<Action> AnchuraAuxiliar(const EstadoA &inicio, const EstadoA &final,
-    const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura);
-  void VisualizaPlan(const EstadoA &st, const list<Action> &plan);
-  bool CasillaAccesibleAuxiliar(const EstadoA &st, const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura);
-  EstadoA NextCasillaAuxiliar(const EstadoA &st);
-  EstadoA applyA(Action accion, const EstadoA &st, const vector<vector<unsigned char>> &terreno,
-    const vector<vector<unsigned char>> &altura);
-  bool Find(const NodoA &st,const list<NodoA> &lista);
-  void AnularMatrizA(vector<vector<unsigned char>> &m);
-  list<Action> AnchuraAuxiliar_V2(const EstadoA &inicio, const EstadoA &final,
-    const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura);
+  // Action ComportamientoAuxiliarNivel_E(Sensores sensores);
+  // list<Action> AnchuraAuxiliar(const EstadoA &inicio, const EstadoA &final,
+  //   const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura);
+  // void VisualizaPlan(const EstadoA &st, const vector<Action> &plan);
+  // bool CasillaAccesibleAuxiliar(const EstadoA &st, const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura);
+  // EstadoA NextCasillaAuxiliar(const EstadoA &st);
+  // EstadoA applyA(Action accion, const EstadoA &st, const vector<vector<unsigned char>> &terreno,
+  //   const vector<vector<unsigned char>> &altura);
+  // bool Find(const NodoA &st,const list<NodoA> &lista);
+   void AnularMatrizA(vector<vector<unsigned char>> &m);
+  // list<Action> AnchuraAuxiliar_V2(const EstadoA &inicio, const EstadoA &final,
+  //   const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura);
 
   /*NIVEL 2*/
   Action ComportamientoAuxiliarNivel_2(Sensores sensores);
@@ -184,8 +184,8 @@ public:
     const vector<vector<unsigned char>> &altura);
   bool CasillaAccesibleAuxiliar(const EstadoA_N3 &st, 
     const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura);
-  void VisualizaPlan(const EstadoA_N3 &st, const list<Action> &plan);
-  list<Action> AlgoritmoAE(const EstadoA_N3 &inicio, const EstadoA_N3 &final,
+  void VisualizaPlan(const EstadoA_N3 &st, const vector<Action> &plan);
+  vector<Action> AlgoritmoAE(const EstadoA_N3 &inicio, const EstadoA_N3 &final,
     const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura);
   int Heuristica(const EstadoA_N3 &a, const EstadoA_N3 &b);
 
@@ -220,7 +220,7 @@ private:
 
   /*NIVELES 2 Y 3*/
   //Variables de estado
-  list<Action> plan;
+  vector<Action> plan;
   bool hayPlan;
 };
 
