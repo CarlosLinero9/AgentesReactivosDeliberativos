@@ -1669,7 +1669,7 @@ int ComportamientoRescatador::FuncionCoste(const Action &accion, const EstadoR_N
 					coste = 16;
 					break;
 				case 'T':
-					coste = 5;
+					coste = 3;
 					break;
 				default:
 					coste = 1;
