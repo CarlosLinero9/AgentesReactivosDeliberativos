@@ -32,7 +32,7 @@ struct EstadoR{
 
 struct NodoR{
   EstadoR estado;
-  list<Action> secuencia;
+  list<Action> secuencia; //vector aquí
 
   bool operator==(const NodoR &nodo) const
   {
@@ -55,7 +55,7 @@ struct NodoR{
 struct EstadoR_N2{
   int f;
   int c;
-  int brujula;
+  Orientacion brujula;
   bool zapatillas;
 
   bool operator==(const EstadoR_N2 &st) const
@@ -81,14 +81,25 @@ struct NodoR_N2{
 
   bool operator==(const NodoR_N2 &nodo) const
   {
-    return (estado == nodo.estado and nodo.energia == energia);
+    return (estado == nodo.estado);
   }
 
   bool operator<(const NodoR_N2 &node) const
   {
-    return (energia>node.energia);
+    return (estado<node.estado);
   }
 
+  bool operator>(const NodoR_N2 &nodo) const
+  {
+    return (energia>nodo.energia);
+  }
+
+};
+
+struct Compare {
+  bool operator()(const NodoR_N2& a, const NodoR_N2& b) {
+      return (a>b);
+  }
 };
 
 /*NIVEL 3*/
@@ -125,6 +136,7 @@ public:
   {
     // Inicializar Variables de Estado Niveles 2,3
     hayPlan = false;
+    tiene_zapatillas = false;
   }
   ComportamientoRescatador(const ComportamientoRescatador &comport) : Comportamiento(comport) {}
   ~ComportamientoRescatador() {}

@@ -85,7 +85,7 @@ struct NodoA_N3{
 
   bool operator==(const NodoA_N3 &nodo) const
   {
-    return (estado == nodo.estado and energia == nodo.energia and energia_heuristica == nodo.energia_heuristica);
+    return (estado == nodo.estado);
   }
 
   bool operator<(const NodoA_N3 &node) const

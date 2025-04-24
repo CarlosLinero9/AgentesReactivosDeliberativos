@@ -1756,8 +1756,6 @@ EstadoR_N2 ComportamientoRescatador::applyR(Action accion, const EstadoR_N2 &st,
 					bool check3 = ((abs(altura[fin.f][fin.c] - altura[st.f][st.c]) <= 2) and st.zapatillas == true);
 					bool check4 = terreno[intermedia.f][intermedia.c] != 'P' and terreno[intermedia.f][intermedia.c] != 'M' and terreno[intermedia.f][intermedia.c] != 'B';
 
-
-
 					if(check1 and check4 and (check2 or check3)){
 						next = fin;
 					}
@@ -1766,12 +1764,12 @@ EstadoR_N2 ComportamientoRescatador::applyR(Action accion, const EstadoR_N2 &st,
 				}
 			
 				case TURN_SR: {
-					next.brujula = (next.brujula + 1) % 8;
+					next.brujula = (Orientacion)((next.brujula + 1) % 8);
 					break;
 				}
 			
 				case TURN_L: {
-					next.brujula = (next.brujula + 6) % 8;
+					next.brujula = (Orientacion)((next.brujula + 6) % 8);
 					break;
 				}
 			}
@@ -1779,9 +1777,6 @@ EstadoR_N2 ComportamientoRescatador::applyR(Action accion, const EstadoR_N2 &st,
 
 			if(terreno[next.f][next.c] == 'D'){
 				next.zapatillas = true;
-			}
-			else{
-				next.zapatillas = st.zapatillas;
 			}
 		
 			return next;
@@ -1794,8 +1789,8 @@ bool ComportamientoRescatador::CasillaAccesibleRescatador(const EstadoR_N2 &st, 
 		bool check3 = false;
 
 		check1 = terreno[next.f][next.c] != 'P' and terreno[next.f][next.c] != 'M' and terreno[next.f][next.c] != 'B';
-		check2 = abs(altura[next.f][next.c] - altura[st.f][st.c]) <= 1;
-		check3 = ((abs(altura[next.f][next.c] - altura[st.f][st.c]) <= 2) and st.zapatillas == true);
+		check2 = (abs(altura[next.f][next.c] - altura[st.f][st.c]) <= 1);
+		check3 = ((abs(altura[next.f][next.c] - altura[st.f][st.c]) <= 2) and st.zapatillas);
 
 		return check1 and (check2 or check3);
 }
@@ -1878,11 +1873,11 @@ void ComportamientoRescatador::VisualizaPlan(const EstadoR_N2 &st, const list<Ac
 				break;
 
 			case TURN_SR:
-				cst.brujula = (cst.brujula + 1) % 8;
+				cst.brujula = (Orientacion)((cst.brujula + 1) % 8);
 				break;
 
 			case TURN_L:
-				cst.brujula = (cst.brujula + 6) % 8;
+				cst.brujula = (Orientacion)((cst.brujula + 6) % 8);
 				break;
 		}
 		it++;
@@ -1896,7 +1891,7 @@ list<Action> ComportamientoRescatador::DijsktraR(const EstadoR_N2 &inicio, const
     const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura){
 
 		NodoR_N2 current_node;
-		priority_queue<NodoR_N2> frontier;
+		priority_queue<NodoR_N2, vector<NodoR_N2>, Compare> frontier;
 		set<EstadoR_N2> explored;
 		list<Action> path;
 
@@ -1913,11 +1908,9 @@ list<Action> ComportamientoRescatador::DijsktraR(const EstadoR_N2 &inicio, const
 			and current_node.estado.c == final.c);
 
 		while(!SolutionFound and !frontier.empty()){
-			//cout << current_node.energia << endl;
 
 			iteraciones++;
 			frontier.pop();
-			//if(frontier.empty()) cout << "Vacio" << endl;
 
 			explored.insert(current_node.estado);
 
@@ -1927,76 +1920,44 @@ list<Action> ComportamientoRescatador::DijsktraR(const EstadoR_N2 &inicio, const
 
 
 			
-			//Genero el hijo resultante de aplicar la accion WALK
 			NodoR_N2 child_WALK = current_node;
 			child_WALK.estado = applyR(WALK, current_node.estado, terreno, altura);
+			child_WALK.secuencia.push_back(WALK);
 			child_WALK.energia += FuncionCoste(WALK, current_node.estado, terreno, altura);
-			// if(child_WALK.estado.f == final.f and child_WALK.estado.c == final.c){
-			// 	// El hijo generado es solución
-			// 	child_WALK.secuencia.push_back(WALK);
-			// 	current_node = child_WALK;
-			// 	SolutionFound = true;
-			// } else
+			
 			if(explored.find(child_WALK.estado) == explored.end()){
-				// Se mete en la lista frontier después de añadir a secuencia la acción
-				child_WALK.secuencia.push_back(WALK);
 				frontier.push(child_WALK);
 			}
-			//cout << "Hijo WALK " << iteraciones << " consume " << child_WALK.energia << endl;
 
 			if(!SolutionFound){
 				NodoR_N2 child_RUN = current_node;
 				child_RUN.estado = applyR(RUN, current_node.estado, terreno, altura);
+				child_RUN.secuencia.push_back(RUN);
 				child_RUN.energia += FuncionCoste(RUN, current_node.estado, terreno, altura);
-				// if(child_RUN.estado.f == final.f and child_RUN.estado.c == final.c){
-				// 	// El hijo generado es solución
-				// 	child_RUN.secuencia.push_back(RUN);
-				// 	current_node = child_RUN;
-				// 	SolutionFound = true;
-				// } else
+				
 				if(explored.find(child_RUN.estado) == explored.end()){
-					// Se mete en la lista frontier después de añadir a secuencia la acción
-					child_RUN.secuencia.push_back(RUN);
 					frontier.push(child_RUN);
 				}
-				//cout << "Hijo RUN " << iteraciones << " consume " << child_RUN.energia << endl;
 			}
 
 			if(!SolutionFound){
 				NodoR_N2 child_TURN_SR = current_node;
 				child_TURN_SR.estado = applyR(TURN_SR, current_node.estado, terreno, altura);
+				child_TURN_SR.secuencia.push_back(TURN_SR);
 				child_TURN_SR.energia += FuncionCoste(TURN_SR, current_node.estado, terreno, altura);
-				// if(child_TURN_SR.estado.f == final.f and child_TURN_SR.estado.c == final.c){
-				// 	// El hijo generado es solución
-				// 	child_TURN_SR.secuencia.push_back(TURN_SR);
-				// 	current_node = child_TURN_SR;
-				// 	SolutionFound = true;
-				// } else
+				
 				if(explored.find(child_TURN_SR.estado) == explored.end()){
-					// Se mete en la lista frontier después de añadir a secuencia la acción
-					child_TURN_SR.secuencia.push_back(TURN_SR);
 					frontier.push(child_TURN_SR);
 				}
-				//cout << "Hijo TURN_SR " << iteraciones << " consume " << child_TURN_SR.energia << endl;
-			}
 			
-			if(!SolutionFound){
 				NodoR_N2 child_TURN_L = current_node;
 				child_TURN_L.estado = applyR(TURN_L, current_node.estado, terreno, altura);
+				child_TURN_L.secuencia.push_back(TURN_L);
 				child_TURN_L.energia += FuncionCoste(TURN_L, current_node.estado, terreno, altura);
-				// if(child_TURN_L.estado.f == final.f and child_TURN_L.estado.c == final.c){
-				// 	// El hijo generado es solución
-				// 	child_TURN_L.secuencia.push_back(TURN_L);
-				// 	current_node = child_TURN_L;
-				// 	SolutionFound = true;
-				// } else
+				
 				if(explored.find(child_TURN_L.estado) == explored.end()){
-					// Se mete en la lista frontier después de añadir a secuencia la acción
-					child_TURN_L.secuencia.push_back(TURN_L);
 					frontier.push(child_TURN_L);
-				}
-				//cout << "Hijo TURN_L " << iteraciones << " consume " << child_TURN_L.energia << endl;
-			
+				}			
 			}
 	
 

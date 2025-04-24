@@ -1443,15 +1443,20 @@ int ComportamientoAuxiliar::FuncionCoste_A(const Action &accion, const EstadoA_N
 		case WALK: {
 			EstadoA_N3 siguiente = NextCasillaAuxiliar(st);
 			int dif_altura = (altura[siguiente.f][siguiente.c] - altura[st.f][st.c]);
+
+			int signo;
+			if(dif_altura < 0) signo = -1;
+			else if(dif_altura > 0) signo = 1;
+			else signo = 0;
 			switch(terreno[st.f][st.c]){
 				case 'A':
-					coste = 100 + dif_altura * 10;
+					coste = 100 + signo * 10;
 					break;
 				case 'T':
-					coste = 20 + dif_altura * 5;
+					coste = 20 + signo * 5;
 					break;
 				case 'S':
-					coste = 2 + dif_altura;
+					coste = 2 + signo;
 					break;
 				default:
 					coste = 1;
@@ -1464,7 +1469,7 @@ int ComportamientoAuxiliar::FuncionCoste_A(const Action &accion, const EstadoA_N
 		case TURN_SR: {
 			switch(terreno[st.f][st.c]){
 				case 'A':
-					coste = 16; //coste = 10
+					coste = 16;
 					break;
 				case 'T':
 					coste = 3;
@@ -1613,6 +1618,7 @@ list<Action> ComportamientoAuxiliar::AlgoritmoAE(const EstadoA_N3 &inicio, const
 		priority_queue<NodoA_N3> frontier;
 		set<EstadoA_N3> explored;
 		list<Action> path;
+		int iteraciones = 0;
 
 		current_node.estado = inicio;
 		current_node.energia = 0;
@@ -1626,13 +1632,9 @@ list<Action> ComportamientoAuxiliar::AlgoritmoAE(const EstadoA_N3 &inicio, const
 			and current_node.estado.c == final.c);
 
 		while(!SolutionFound and !frontier.empty()){
+			iteraciones++;
 			frontier.pop();
 			explored.insert(current_node.estado);
-
-			// Compruebo si estoy en una casilla de las zapatillas
-			// if(terreno[current_node.estado.f][current_node.estado.c] == 'D'){
-			// 	current_node.estado.zapatillas = true;
-			// }
 
 			if(current_node.estado.f == final.f and current_node.estado.c == final.c){
 				SolutionFound = true;
@@ -1641,17 +1643,12 @@ list<Action> ComportamientoAuxiliar::AlgoritmoAE(const EstadoA_N3 &inicio, const
 			// Genero el hijo resultante de aplicar la acción WALK
 			NodoA_N3 child_WALK = current_node;
 			child_WALK.estado = applyA(WALK, current_node.estado, terreno, altura);
+			child_WALK.secuencia.push_back(WALK);
 			child_WALK.energia += FuncionCoste_A(WALK, current_node.estado, terreno, altura);
 			child_WALK.energia_heuristica = Heuristica(child_WALK.estado, final);
-			// if(child_WALK.estado.f == final.f and child_WALK.estado.c == final.c){
-			// 	// El hijo generado es solución
-			// 	child_WALK.secuencia.push_back(WALK);
-			// 	current_node = child_WALK;
-			// 	SolutionFound = true;
-			// } else
+
 			if(explored.find(child_WALK.estado) == explored.end()){
 				// Se mete en la lista frontier después de añadir a secuencia la acción
-				child_WALK.secuencia.push_back(WALK);
 				frontier.push(child_WALK);
 			}
 
@@ -1659,16 +1656,11 @@ list<Action> ComportamientoAuxiliar::AlgoritmoAE(const EstadoA_N3 &inicio, const
 			if(!SolutionFound){
 				NodoA_N3 child_TURN_SR = current_node;
 				child_TURN_SR.estado = applyA(TURN_SR, current_node.estado, terreno, altura);
+				child_TURN_SR.secuencia.push_back(TURN_SR);
 				child_TURN_SR.energia += FuncionCoste_A(TURN_SR, current_node.estado, terreno, altura);
 				child_TURN_SR.energia_heuristica = Heuristica(child_TURN_SR.estado, final);
-				// if(child_TURN_SR.estado.f == final.f and child_TURN_SR.estado.c == final.c){
-				// 	// El hijo generado es solución
-				// 	child_TURN_SR.secuencia.push_back(TURN_SR);
-				// 	current_node = child_TURN_SR;
-				// 	SolutionFound = true;
-				// }else 
+				 
 				if(explored.find(child_TURN_SR.estado) == explored.end()){
-					child_TURN_SR.secuencia.push_back(TURN_SR);
 					frontier.push(child_TURN_SR);
 				}
 			}
@@ -1686,6 +1678,9 @@ list<Action> ComportamientoAuxiliar::AlgoritmoAE(const EstadoA_N3 &inicio, const
 		}
 
 		if(SolutionFound) path = current_node.secuencia;
+		cout << "En abierto hay " << frontier.size() << " nodos\n";
+		cout << "En cerrado hay " << explored.size() << " nodos\n";
+		cout << "Se han realizado " << iteraciones << " iteraciones\n";
 		return path;
 }
 
