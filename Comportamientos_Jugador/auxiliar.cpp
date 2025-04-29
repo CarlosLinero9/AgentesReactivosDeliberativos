@@ -834,37 +834,6 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_1(Sensores sensores)
 			CalcularObjetivoA();
 		}
 
-		if(pasos == MAX_PASOS){
-			objetivo.first = -1;
-			objetivo.second = -1;
-
-			int distancia = 5000;
-
-			for(int i = 0; i < mapaResultado.size() -3; i++){
-				for(int j = 0; j < mapaResultado[i].size()-3; j++){
-					int dist = abs(i - sensores.posF) + abs(j - sensores.posC);
-					if(mapaResultado[i][j] == '?' and dist < distancia){
-			
-						distancia = dist;
-						objetivo.first = i;
-						objetivo.second = j;
-						
-					}
-				}
-			}
-			if(objetivo.first != -1 and objetivo.second != -1){
-				GuardarFrecuenciasA();
-				CalcularObjetivoA();
-
-				if(sensores.posF == objetivo.first and sensores.posC == objetivo.second){
-					objetivo.first = -1;
-					objetivo.second = -1;
-					RecuperarFrecuenciasA();
-				}
-			}
-			pasos = 0;
-		}
-
 		int pos = VeoCasillaInteresanteA_N1(sensores, tiene_zapatillas);
 		switch (pos){
 			case 2:

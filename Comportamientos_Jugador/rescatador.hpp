@@ -125,7 +125,6 @@ public:
     accion_defecto = false;
     frecuencia_visita = vector<vector<int>>(mapaResultado.size(), vector<int>(mapaResultado[0].size(), 0));
     frecuencia_visita_aux = vector<vector<int>>(mapaResultado.size(), vector<int>(mapaResultado[0].size(), 0));
-    pasos = 0;
     objetivo = {-1, -1};
     cola_acciones = queue<int>();
     cola = queue<Action>();
@@ -222,7 +221,7 @@ private:
   //Constantes
 
   /*NIVEL 0, 1 y 4*/
-  const int SUMA_AL_VISITAR = 4; //Suma que se le añade a la casilla que se va a visitar
+  const int SUMA_AL_VISITAR = 30; //Suma que se le añade a la casilla que se va a visitar
   const int SUMA_AL_VER = 1; //Suma que se le añade a la casilla que se ve en el cono de vision
 
   // Variables de Estado
@@ -237,7 +236,6 @@ private:
   int giro45dech;
   vector<vector<int>> frecuencia_visita;
   vector<vector<int>> frecuencia_visita_aux;
-  int pasos;
   pair<int,int> objetivo;
 
   /*NIVELES 2 Y 3*/
