@@ -1022,9 +1022,6 @@ int ComportamientoAuxiliar::VeoCasillaInteresanteA_N1(Sensores &sensores, bool z
 
 	std::sort(frecuencia_casillas.begin(), frecuencia_casillas.end());  // Ordena de menor a mayor
 
-	if (c == 'X' and c_libre) return 2;
-	else if (i == 'X' and i_libre) return 1;
-	else if (d == 'X' and d_libre) return 3;
 	if(!zap) {
 		if(c == 'D' and c_libre) return 2;
 		else if (i == 'D' and i_libre) return 1;
