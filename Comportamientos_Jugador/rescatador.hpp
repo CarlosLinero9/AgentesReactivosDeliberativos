@@ -222,7 +222,6 @@ private:
   //Constantes
 
   /*NIVEL 0, 1 y 4*/
-  const int MAX_PASOS = 75;  //Maximo de pasos antes de refrescar la matriz
   const int SUMA_AL_VISITAR = 4; //Suma que se le añade a la casilla que se va a visitar
   const int SUMA_AL_VER = 1; //Suma que se le añade a la casilla que se ve en el cono de vision
 
