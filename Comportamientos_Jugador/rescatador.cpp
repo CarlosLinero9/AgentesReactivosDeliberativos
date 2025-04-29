@@ -1003,6 +1003,9 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_1(Sensores sensor
 				}
 				//cout << "Defecto" << endl;
 				break;
+			case 4:
+				accion = RUN;
+				break;
 		}
 	}
 
@@ -1040,6 +1043,7 @@ int ComportamientoRescatador::DetectarCasillaZapatillasR(Sensores &sensores, boo
 
 bool ComportamientoRescatador::EsTransitableR(char casilla){
 	
+	//Tengo que considerar las casillas 'B', 'T' y 'A'
 	if(casilla == 'X' or casilla == 'C' or casilla == 'D'
 		or casilla == 'S') return true;
 	else return false;
