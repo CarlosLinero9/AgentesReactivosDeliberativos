@@ -148,9 +148,6 @@ public:
   int DetectarCasillaZapatillasA(Sensores &sensores, bool zap);
   int VeoCasillaInteresanteA_N1(Sensores & sensores, bool zap);
   bool EsTransitableA(char casilla);
-  void CalcularObjetivoA();
-  void GuardarFrecuenciasA();
-  void RecuperarFrecuenciasA();
   
 
   ///////////////////////////////////////////////////////////////////////////////////////////
@@ -159,19 +156,8 @@ public:
 
 
   /*TUTORIAL*/
-  // Action ComportamientoAuxiliarNivel_E(Sensores sensores);
-  // list<Action> AnchuraAuxiliar(const EstadoA &inicio, const EstadoA &final,
-  //   const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura);
-  // void VisualizaPlan(const EstadoA &st, const vector<Action> &plan);
-  // bool CasillaAccesibleAuxiliar(const EstadoA &st, const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura);
-  // EstadoA NextCasillaAuxiliar(const EstadoA &st);
-  // EstadoA applyA(Action accion, const EstadoA &st, const vector<vector<unsigned char>> &terreno,
-  //   const vector<vector<unsigned char>> &altura);
-  // bool Find(const NodoA &st,const list<NodoA> &lista);
    void AnularMatrizA(vector<vector<unsigned char>> &m);
-  // list<Action> AnchuraAuxiliar_V2(const EstadoA &inicio, const EstadoA &final,
-  //   const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura);
-
+  
   /*NIVEL 2*/
   Action ComportamientoAuxiliarNivel_2(Sensores sensores);
   

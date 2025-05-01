@@ -163,7 +163,6 @@ public:
   int DetectarCasillaZapatillasR(Sensores &sensores, bool zap);
   int VeoCasillaInteresanteR_N1(Sensores & sensores, bool zap);
   bool EsTransitableR(char casilla);
-  void CalcularObjetivoR();
   bool PuedeCorrer_N1(int i, Sensores &sensores, bool zap);
 
   

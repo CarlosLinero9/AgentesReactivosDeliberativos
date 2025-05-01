@@ -910,32 +910,6 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_1(Sensores sensor
 		cola.pop();
 	}
 	else {
-
-		// if((sensores.posF == objetivo.first and sensores.posC == objetivo.second)
-		// 	or (objetivo.first == -1 and objetivo.second == -1) or 
-		// (mapaResultado[objetivo.first][objetivo.second] != '?')){
-		// 	cout << "Objetivo alcanzado" << endl;
-		// 	objetivo.first = -1;
-		// 	objetivo.second = -1;
-
-		// 	int distancia = 5000;
-
-		// 	for(int i = 0; i < mapaResultado.size() -3; i++){
-		// 		for(int j = 0; j < mapaResultado[i].size()-3; j++){
-		// 			int dist = abs(i - sensores.posF) + abs(j - sensores.posC);
-		// 			if(mapaResultado[i][j] == '?' and dist < distancia){
-			
-		// 				distancia = dist;
-		// 				objetivo.first = i;
-		// 				objetivo.second = j;
-						
-		// 			}
-		// 		}
-		// 	}
-
-		// 	CalcularObjetivoR();
-		// }
-
 		int pos = VeoCasillaInteresanteR_N1(sensores, tiene_zapatillas);
 		switch (pos){
 			case 2:
@@ -1237,22 +1211,6 @@ int ComportamientoRescatador::VeoCasillaInteresanteR_N1(Sensores &sensores, bool
 	}
 
 	return 0;	
-}
-
-void ComportamientoRescatador::CalcularObjetivoR(){
-	
-	// Si se encuentra un objetivo, recalcular las frecuencias
-    if (objetivo.first != -1) {
-        for (int i = 0; i < frecuencia_visita.size(); i++) {
-            for (int j = 0; j < frecuencia_visita[0].size(); j++) {
-                if (i == objetivo.first && j == objetivo.second) {
-                    frecuencia_visita[i][j] = 0; // El objetivo tiene prioridad máxima
-                } else {
-                    frecuencia_visita[i][j] = abs(i - objetivo.first) + abs(j - objetivo.second);
-                }
-            }
-        }
-    }
 }
 
 
