@@ -810,29 +810,29 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_1(Sensores sensores)
 	}
 	else {
 
-		if(sensores.posF == objetivo.first and sensores.posC == objetivo.second){
-			objetivo.first = -1;
-			objetivo.second = -1;
-			RecuperarFrecuenciasA();
+		// if(sensores.posF == objetivo.first and sensores.posC == objetivo.second){
+		// 	objetivo.first = -1;
+		// 	objetivo.second = -1;
+		// 	RecuperarFrecuenciasA();
 
-			int distancia = 5000;
+		// 	int distancia = 5000;
 
-			for(int i = 0; i < mapaResultado.size() -3; i++){
-				for(int j = 0; j < mapaResultado[i].size()-3; j++){
-					int dist = abs(i - sensores.posF) + abs(j - sensores.posC);
-					if(mapaResultado[i][j] == '?' and dist < distancia){
+		// 	for(int i = 0; i < mapaResultado.size() -3; i++){
+		// 		for(int j = 0; j < mapaResultado[i].size()-3; j++){
+		// 			int dist = abs(i - sensores.posF) + abs(j - sensores.posC);
+		// 			if(mapaResultado[i][j] == '?' and dist < distancia){
 			
-						distancia = dist;
-						objetivo.first = i;
-						objetivo.second = j;
+		// 				distancia = dist;
+		// 				objetivo.first = i;
+		// 				objetivo.second = j;
 						
-					}
-				}
-			}
+		// 			}
+		// 		}
+		// 	}
 
-			GuardarFrecuenciasA();
-			CalcularObjetivoA();
-		}
+		// 	GuardarFrecuenciasA();
+		// 	CalcularObjetivoA();
+		// }
 
 		int pos = VeoCasillaInteresanteA_N1(sensores, tiene_zapatillas);
 		switch (pos){
@@ -909,6 +909,13 @@ int ComportamientoAuxiliar::VeoCasillaInteresanteA_N1(Sensores &sensores, bool z
 	bool c_libre = CasillaLibreA(sensores.agentes[2]);
 	bool d_libre = CasillaLibreA(sensores.agentes[3]);
 	//cout << "i: " << i << " c: " << c << " d: " << d << endl;
+
+	if(!zap) {
+		if(c == 'D' and c_libre) return 2;
+		else if (i == 'D' and i_libre) return 1;
+		else if (d == 'D' and d_libre) return 3;
+	}
+
 	if(!zap){
 		int indice_interes = DetectarCasillaZapatillasA(sensores, zap);
 
@@ -1021,12 +1028,6 @@ int ComportamientoAuxiliar::VeoCasillaInteresanteA_N1(Sensores &sensores, bool z
 	frecuencia_casillas = {frecuencia_i, frecuencia_c, frecuencia_d};
 
 	std::sort(frecuencia_casillas.begin(), frecuencia_casillas.end());  // Ordena de menor a mayor
-
-	if(!zap) {
-		if(c == 'D' and c_libre) return 2;
-		else if (i == 'D' and i_libre) return 1;
-		else if (d == 'D' and d_libre) return 3;
-	}
 
 	for (int freq : frecuencia_casillas) {
 		if (freq == frecuencia_c && c_libre and EsTransitableA(sensores.superficie[2]) and c!='P') return 2;
