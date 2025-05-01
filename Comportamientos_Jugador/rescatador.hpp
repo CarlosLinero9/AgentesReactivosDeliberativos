@@ -166,8 +166,6 @@ public:
   int VeoCasillaInteresanteR_N1(Sensores & sensores, bool zap);
   bool EsTransitableR(char casilla);
   void CalcularObjetivoR();
-  void GuardarFrecuenciasR();
-  void RecuperarFrecuenciasR();
   
   
   ///////////////////////////////////////////////////////////////////////////////////////////
