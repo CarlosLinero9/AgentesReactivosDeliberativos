@@ -122,7 +122,6 @@ public:
     last_action = IDLE;
     tiene_zapatillas = false;
     accion_defecto = false;
-    giro45izq = 0;
     frecuencia_visita = vector<vector<int>>(mapaResultado.size(), vector<int>(mapaResultado[0].size(), 0));
     objetivo = {-1, -1};
     cola_acciones = queue<int>();
@@ -150,12 +149,12 @@ public:
   /*NIVEL 0*/
   Action ComportamientoRescatadorNivel_0(Sensores sensores);
   //bool NoVisitaFrecuente(int frecuencia);
-  int VeoCasillaInteresanteR(Sensores & sensores, bool zap);
+  int VeoCasillaInteresanteR_N0(Sensores & sensores, bool zap);
   char ViablePorAlturaR (char casilla, int dif, bool zap);
   bool CasillaLibreR(char casilla);
   void SituarSensorenMapaR(vector<vector<unsigned char>> &m, vector<vector<unsigned char>> &a, Sensores sensores);
   int DetectarCasillaInteresanteR(Sensores &sensores, bool zap);
-  bool PuedeCorrer(int i, Sensores &sensores, bool zap);
+  bool PuedeCorrer_N0(int i, Sensores &sensores, bool zap);
   // void RefrescarmatrizR(vector<vector<int>> &m);
   // int minimo(int a, int b, int c);
 
@@ -165,6 +164,8 @@ public:
   int VeoCasillaInteresanteR_N1(Sensores & sensores, bool zap);
   bool EsTransitableR(char casilla);
   void CalcularObjetivoR();
+  bool PuedeCorrer_N1(int i, Sensores &sensores, bool zap);
+
   
   
   ///////////////////////////////////////////////////////////////////////////////////////////
@@ -230,8 +231,7 @@ private:
   bool tiene_zapatillas;
   vector<vector<int>> frecuencia_visita;
   pair<int,int> objetivo;
-  int giro45izq;
-
+  
   /*NIVELES 2 Y 3*/
   //Variables de estado
   list<Action> plan;
