@@ -121,10 +121,9 @@ public:
     // Inicializar Variables de Estado Niveles 0,1,4
     last_action = IDLE;
     tiene_zapatillas = false;
-    giro45izq = 0;
     accion_defecto = false;
+    giro45izq = 0;
     frecuencia_visita = vector<vector<int>>(mapaResultado.size(), vector<int>(mapaResultado[0].size(), 0));
-    frecuencia_visita_aux = vector<vector<int>>(mapaResultado.size(), vector<int>(mapaResultado[0].size(), 0));
     objetivo = {-1, -1};
     cola_acciones = queue<int>();
     cola = queue<Action>();
@@ -226,15 +225,12 @@ private:
   bool accion_defecto;
   queue<int> cola_acciones;
   queue<Action> cola;
-  bool corriendo;
   bool sigo_plan;
   Action last_action;
   bool tiene_zapatillas;
-  int giro45izq;
-  int giro45dech;
   vector<vector<int>> frecuencia_visita;
-  vector<vector<int>> frecuencia_visita_aux;
   pair<int,int> objetivo;
+  int giro45izq;
 
   /*NIVELES 2 Y 3*/
   //Variables de estado
