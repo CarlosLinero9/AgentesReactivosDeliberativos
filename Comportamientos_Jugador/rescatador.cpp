@@ -143,7 +143,7 @@ bool ComportamientoRescatador::PuedeCorrer_N0(int i, Sensores &sensores, bool za
 
 
 int ComportamientoRescatador::DetectarCasillaInteresanteR(Sensores &sensores, bool zap) {
-    for (int i = 0; i < sensores.superficie.size(); ++i) {
+    for (int i = 1; i < sensores.superficie.size(); ++i) {
         char casilla = sensores.superficie[i];
         if (((casilla == 'D' and !zap) or casilla == 'X') and CasillaLibreR(sensores.agentes[i])) {
             return i; // Retorna el índice de la casilla interesante
@@ -948,6 +948,12 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_1(Sensores sensor
 				cola.push(RUN);
 				
 				break;
+
+			case 7:
+				cola.push(TURN_L);
+				cola.push(TURN_L);
+				
+				break;
 		}
 	}
 
@@ -957,13 +963,24 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_1(Sensores sensor
 }
 
 int ComportamientoRescatador::DetectarCasillaZapatillasR(Sensores &sensores, bool zap) {
-    for (int i = 0; i < sensores.superficie.size(); ++i) {
+    for (int i = 1; i < sensores.superficie.size(); ++i) {
         char casilla = sensores.superficie[i];
         if (casilla == 'D' and !zap) {
             return i; // Retorna el índice de la casilla interesante
 		}    
     }
     return -1; // No se encontró ninguna casilla interesante
+}
+
+bool ComportamientoRescatador::DetectarAgenteR(Sensores &sensores) {
+	for (int i = 1; i < sensores.agentes.size(); ++i) {
+		
+		if (sensores.agentes[i] == 'a') {
+			cout << i << endl;
+			return true; // Se encontró un agente
+		}    
+	}
+	return false; // No se encontró ningún agente
 }
 
 bool ComportamientoRescatador::EsTransitableR(char casilla){
@@ -1080,6 +1097,11 @@ int ComportamientoRescatador::VeoCasillaInteresanteR_N1(Sensores &sensores, bool
 			}
 		}
 	}
+
+	if(DetectarAgenteR(sensores) == true){
+		cout << "Agente detectado" << endl;
+		return 7;
+	} 
 
 	int frecuencia_i=0;
 	int frecuencia_c=0;

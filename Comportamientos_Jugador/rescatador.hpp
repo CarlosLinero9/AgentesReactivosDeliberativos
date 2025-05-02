@@ -164,6 +164,9 @@ public:
   int VeoCasillaInteresanteR_N1(Sensores & sensores, bool zap);
   bool EsTransitableR(char casilla);
   bool PuedeCorrer_N1(int i, Sensores &sensores, bool zap);
+  bool DetectarAgenteR(Sensores &sensores);
+
+
 
   
   
