@@ -9,6 +9,8 @@
 #include <queue>
 #include <iostream>
 #include <algorithm>
+#include <map>
+
 
 #include "comportamientos/comportamiento.hpp"
 
@@ -105,7 +107,45 @@ struct Compare {
 /*NIVEL 3*/
 
 /*NIVEL 4*/
+struct EstadoR_N4{
+  int f;
+  int c;
+  Orientacion brujula;
+  bool zapatillas;
 
+
+  bool operator==(const EstadoR_N4 &st) const
+  {
+    return (f == st.f and c == st.c and brujula == st.brujula 
+           and zapatillas == st.zapatillas);
+  }
+
+  bool operator<(const EstadoR_N4 &st) const
+  {
+    if (f < st.f) return true;
+    else if (f == st.f && c < st.c) return true;
+    else if (f == st.f && c == st.c && brujula < st.brujula) return true;
+    else if (f == st.f && c == st.c && brujula == st.brujula && zapatillas < st.zapatillas) return true;
+    else return false;
+  }
+};
+
+struct NodoR_N4{
+  EstadoR_N4 estado;
+  vector<Action> secuencia;
+  int energia;
+  int energia_heuristica;
+
+  bool operator==(const NodoR_N4 &nodo) const
+  {
+    return (estado == nodo.estado);
+  }
+
+  bool operator<(const NodoR_N4 &node) const
+  {
+    return ((node.energia + node.energia_heuristica) < (energia + energia_heuristica));
+  }
+};
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -127,6 +167,12 @@ public:
     cola_acciones = queue<int>();
     cola = queue<Action>();
     sigo_plan = false;
+    plan_N4 = vector<Action>();
+    plan = list<Action>();
+    hayPlan = false;
+    hayPlanEnergia = false;
+    auxiliarAvisado = false;
+
   }
 
   ComportamientoRescatador(std::vector<std::vector<unsigned char>> mapaR, std::vector<std::vector<unsigned char>> mapaC) : Comportamiento(mapaR,mapaC)
@@ -134,6 +180,7 @@ public:
     // Inicializar Variables de Estado Niveles 2,3
     hayPlan = false;
     tiene_zapatillas = false;
+    plan = list<Action>();
   }
   ComportamientoRescatador(const ComportamientoRescatador &comport) : Comportamiento(comport) {}
   ~ComportamientoRescatador() {}
@@ -208,6 +255,20 @@ public:
 
   /*NIVEL 4*/
   Action ComportamientoRescatadorNivel_4(Sensores sensores);
+  vector<Action> AlgoritmoAE(const EstadoR_N4 &inicio, const EstadoR_N4 &final,
+    const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura);
+  int Heuristica(const EstadoR_N4 &a, const EstadoR_N4 &b);
+  void VisualizaPlan(const EstadoR_N4 &st, const vector<Action> &plan);
+  int FuncionCoste_R(const Action &accion, const EstadoR_N4 &st, const vector<vector<unsigned char>> &terreno,
+    const vector<vector<unsigned char>> &altura);
+  EstadoR_N4 NextCasillaRescatador(const EstadoR_N4 &st);
+  EstadoR_N4 applyR(Action accion, const EstadoR_N4 &st, const vector<vector<unsigned char>> &terreno,
+    const vector<vector<unsigned char>> &altura);
+  void ModificarMapa(const Sensores &sensores, vector<vector<unsigned char>> &m, vector<vector<unsigned char>> &a);
+  bool EsAccionValida(const Action &accion, const EstadoR_N4 &estado);
+
+
+
   
   
 
@@ -237,7 +298,15 @@ private:
   /*NIVELES 2 Y 3*/
   //Variables de estado
   list<Action> plan;
+  vector<Action> plan_N4;
   bool hayPlan;
+  bool hayPlanEnergia;
+  map<EstadoR_N4, set<Action>> accionesProhibidas;
+
+  EstadoR_N4 current_state;
+  EstadoR_N4 last_state;
+
+  bool auxiliarAvisado;
 };
 
 #endif

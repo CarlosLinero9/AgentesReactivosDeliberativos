@@ -120,6 +120,7 @@ public:
   {
     // Inicializar Variables de Estado Niveles 2,3
     hayPlan = false;
+    plan = vector<Action>();
   }
   ComportamientoAuxiliar(const ComportamientoAuxiliar &comport) : Comportamiento(comport) {}
   ~ComportamientoAuxiliar() {}
