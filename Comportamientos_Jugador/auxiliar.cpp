@@ -804,6 +804,13 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_1(Sensores sensores)
 	SituarSensorenMapaA(mapaResultado, mapaCotas, sensores);
 	if(sensores.superficie[0] == 'D') tiene_zapatillas = true;
 
+	if(mapaResultado[sensores.posF][sensores.posC] == 'X'){
+		while(sensores.energia <= 2000){
+			return IDLE;
+		}
+	}
+
+
 	if(giro45izq != 0){
 		accion = TURN_SR;
 		giro45izq--;
@@ -1344,61 +1351,61 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_4(Sensores sensores){
 	}
 	
 	
-	if(sensores.energia < 500){
-		cout << "Me quedo sin energia\n";
-		if(mapaResultado[sensores.posF][sensores.posC] == 'X'){
+	
+	if(mapaResultado[sensores.posF][sensores.posC] == 'X'){
+		while(sensores.energia != 3000){
 			return IDLE;
-		}else{
-			if(!hayPlanEnergia){
-				int distancia = 5000;
-				int f;
-				int c;
-				for(int i = 0; i < mapaResultado.size(); i++){
-					for(int j = 0; j < mapaResultado[0].size(); j++){
-						if(mapaResultado[i][j] == 'X' and abs(i - sensores.posF) + abs(j - sensores.posC) < distancia){
-							distancia = abs(i - sensores.posF) + abs(j - sensores.posC);
-							f = i;
-							c = j;
-						}
+		}
+	}else if(sensores.energia < 500){
+		if(!hayPlanEnergia){
+			int distancia = 5000;
+			int f;
+			int c;
+			for(int i = 0; i < mapaResultado.size(); i++){
+				for(int j = 0; j < mapaResultado[0].size(); j++){
+					if(mapaResultado[i][j] == 'X' and abs(i - sensores.posF) + abs(j - sensores.posC) < distancia){
+						distancia = abs(i - sensores.posF) + abs(j - sensores.posC);
+						f = i;
+						c = j;
 					}
 				}
-				EstadoA_N4 inicio, fin;
-				inicio.f = sensores.posF;
-				inicio.c = sensores.posC;
-				inicio.brujula = sensores.rumbo;
-				inicio.zapatillas = tiene_zapatillas;
-				fin.f = f;
-				fin.c = c;
-				f_dest = f;
-				c_dest = c;
-				current_state = inicio;
-				plan_N4  = AlgoritmoAE_N4(inicio, fin, mapaResultado, mapaCotas);
-				VisualizaPlan(inicio, plan_N4);
-				hayPlanEnergia = plan_N4.size() != 0;
+			}
+			EstadoA_N4 inicio, fin;
+			inicio.f = sensores.posF;
+			inicio.c = sensores.posC;
+			inicio.brujula = sensores.rumbo;
+			inicio.zapatillas = tiene_zapatillas;
+			fin.f = f;
+			fin.c = c;
+			f_dest = f;
+			c_dest = c;
+			current_state = inicio;
+			plan_N4  = AlgoritmoAE_N4(inicio, fin, mapaResultado, mapaCotas);
+			VisualizaPlan(inicio, plan_N4);
+			hayPlanEnergia = plan_N4.size() != 0;
 
-			}
-			if(hayPlanEnergia and plan_N4.size()>0){
-				accion = plan_N4.front();
-
-				last_state = current_state;
-				current_state = applyA(accion, current_state, mapaResultado, mapaCotas);
-				if(current_state == last_state){
-					accionesProhibidas[last_state].insert(accion);
-					hayPlanEnergia = false;
-					plan_N4.clear();
-					return IDLE;
-				}else{
-					accion = plan_N4.front();
-					auto it = plan_N4.begin();
-					it = plan_N4.erase(it);
-				}
-			}
-			if(plan_N4.size()==0 and hayPlanEnergia){
-				hayPlanEnergia=false;
-			}
-			return accion;
 		}
+		if(hayPlanEnergia and plan_N4.size()>0){
+			accion = plan_N4.front();
+			last_state = current_state;
+			current_state = applyA(accion, current_state, mapaResultado, mapaCotas);
+			if(current_state == last_state){
+				accionesProhibidas[last_state].insert(accion);
+				hayPlanEnergia = false;
+				plan_N4.clear();
+				return IDLE;
+			}else{
+				accion = plan_N4.front();
+				auto it = plan_N4.begin();
+				it = plan_N4.erase(it);
+			}
+		}
+		if(plan_N4.size()==0 and hayPlanEnergia){
+			hayPlanEnergia=false;
+		}
+		return accion;
 	}
+	
 
 
 	if (sensores.venpaca) {
