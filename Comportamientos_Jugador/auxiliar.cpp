@@ -1345,6 +1345,7 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_4(Sensores sensores){
 	
 	
 	if(sensores.energia < 500){
+		cout << "Me quedo sin energia\n";
 		if(mapaResultado[sensores.posF][sensores.posC] == 'X'){
 			return IDLE;
 		}else{
@@ -1401,7 +1402,7 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_4(Sensores sensores){
 
 
 	if (sensores.venpaca) {
-		cout << "Venpaca: " << sensores.venpaca << endl;
+		//cout << "Venpaca: " << sensores.venpaca << endl;
 		if(!hayPlan){
 			//cout << "Planeo de Inicio\n";
 			EstadoA_N4 inicio, fin;

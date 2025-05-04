@@ -2038,15 +2038,19 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_4(Sensores sensor
 			// El accidentado no requiere ayuda urgente, misión completada
 			return IDLE; // Esperar nueva misión
 		} else {
-			if (!auxiliarAvisado) {
-				auxiliarAvisado = true;
-				return CALL_ON; // Avisar al auxiliar
-			} else if (sensores.energia < 500) {
-				return CALL_OFF; // Renunciar a la misión si la energía es baja
-			} else {
-				return IDLE; // Esperar al auxiliar
+			if(sensores.energia < 500 or sensores.tiempo > 200){
+				return CALL_OFF; // Renunciar a la misión si la energía es baja o el tiempo es alto
+			}else{
+				if (!auxiliarAvisado) {
+					auxiliarAvisado = true;
+					return CALL_ON; // Avisar al auxiliar
+				} else {
+					return IDLE; // Esperar al auxiliar
+				}
 			}
 		}
+	}else{
+		auxiliarAvisado = false; // Reiniciar el estado del aviso al auxiliar
 	}
 
 	if(sensores.energia < 500){
@@ -2941,6 +2945,8 @@ void ComportamientoRescatador::ModificarMapaR(const Sensores &sensores, vector<v
 	}
 }
 
+
+//Esto no puedo aplicarlo una vez considere el comportamiento de dinamico de los vandalos y excursionistas
 bool ComportamientoRescatador::EsAccionValidaR(const Action &accion, const EstadoR_N4 &estado) {
 	if (accionesProhibidas[estado].count(accion) > 0) {
         return false; // La acción está prohibida
