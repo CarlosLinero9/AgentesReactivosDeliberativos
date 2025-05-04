@@ -10,6 +10,7 @@
 #include <utility>
 #include <algorithm>
 #include <set>
+#include <map>
 
 #include "comportamientos/comportamiento.hpp"
 
@@ -94,6 +95,47 @@ struct NodoA_N3{
   }
 };
 
+/*NIVEL 4*/
+struct EstadoA_N4{
+  int f;
+  int c;
+  Orientacion brujula;
+  bool zapatillas;
+
+
+  bool operator==(const EstadoA_N4 &st) const
+  {
+    return (f == st.f and c == st.c and brujula == st.brujula 
+           and zapatillas == st.zapatillas);
+  }
+
+  bool operator<(const EstadoA_N4 &st) const
+  {
+    if (f < st.f) return true;
+    else if (f == st.f && c < st.c) return true;
+    else if (f == st.f && c == st.c && brujula < st.brujula) return true;
+    else if (f == st.f && c == st.c && brujula == st.brujula && zapatillas < st.zapatillas) return true;
+    else return false;
+  }
+};
+
+struct NodoA_N4{
+  EstadoA_N4 estado;
+  vector<Action> secuencia;
+  int energia;
+  int energia_heuristica;
+
+  bool operator==(const NodoA_N4 &nodo) const
+  {
+    return (estado == nodo.estado);
+  }
+
+  bool operator<(const NodoA_N4 &node) const
+  {
+    return ((node.energia + node.energia_heuristica) < (energia + energia_heuristica));
+  }
+};
+
 ///////////////////////////////////////////////////////////////////////////////////////////
 // Definicion de la clase ComportamientoAuxiliar///////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -115,6 +157,11 @@ public:
     objetivo = {-1, -1};
     cola = false;
     cola_acciones = queue<int>();
+    plan_N4 = vector<Action>();
+    hayPlan = false;
+    hayPlanEnergia = false;
+    f_dest = -1;
+    c_dest = -1;
   }
   ComportamientoAuxiliar(std::vector<std::vector<unsigned char>> mapaR, std::vector<std::vector<unsigned char>> mapaC) : Comportamiento(mapaR,mapaC)
   {
@@ -179,6 +226,23 @@ public:
 
   /*NIVEL 4*/
   Action ComportamientoAuxiliarNivel_4(Sensores sensores);
+  vector<Action> AlgoritmoAE_N4(const EstadoA_N4 &inicio, const EstadoA_N4 &final,
+    const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura);
+  int Heuristica(const EstadoA_N4 &a, const EstadoA_N4 &b);
+  void VisualizaPlan(const EstadoA_N4 &st, const vector<Action> &plan);
+  int FuncionCoste_A(const Action &accion, const EstadoA_N4 &st, const vector<vector<unsigned char>> &terreno,
+    const vector<vector<unsigned char>> &altura);
+  EstadoA_N4 NextCasillaAuxiliar(const EstadoA_N4 &st);
+  EstadoA_N4 applyA(Action accion, const EstadoA_N4 &st, const vector<vector<unsigned char>> &terreno,
+    const vector<vector<unsigned char>> &altura);
+  void ModificarMapaA(const Sensores &sensores, vector<vector<unsigned char>> &m, vector<vector<unsigned char>> &a);
+  bool EsAccionValidaA(const Action &accion, const EstadoA_N4 &estado);
+  bool DestinoEnConoVision(const Sensores &sensores, int f_destino, int c_destino);
+  vector<pair<int, int>> ObtenerConoVision(const Sensores &sensores);
+
+
+
+  
   
 
   ///////////////////////////////////////////////////////////////////////////////////////////
@@ -204,10 +268,18 @@ private:
   int pasos;
   pair<int,int> objetivo;
 
-  /*NIVELES 2 Y 3*/
+  /*NIVELES 2,3 Y 4*/
   //Variables de estado
   vector<Action> plan;
   bool hayPlan;
+  vector<Action> plan_N4;
+  bool hayPlanEnergia;
+  map<EstadoA_N4, set<Action>> accionesProhibidas;
+
+  EstadoA_N4 current_state;
+  EstadoA_N4 last_state;
+
+  int f_dest, c_dest;
 };
 
 #endif

@@ -168,7 +168,6 @@ public:
     cola = queue<Action>();
     sigo_plan = false;
     plan_N4 = vector<Action>();
-    plan = list<Action>();
     hayPlan = false;
     hayPlanEnergia = false;
     auxiliarAvisado = false;
@@ -264,8 +263,8 @@ public:
   EstadoR_N4 NextCasillaRescatador(const EstadoR_N4 &st);
   EstadoR_N4 applyR(Action accion, const EstadoR_N4 &st, const vector<vector<unsigned char>> &terreno,
     const vector<vector<unsigned char>> &altura);
-  void ModificarMapa(const Sensores &sensores, vector<vector<unsigned char>> &m, vector<vector<unsigned char>> &a);
-  bool EsAccionValida(const Action &accion, const EstadoR_N4 &estado);
+  void ModificarMapaR(const Sensores &sensores, vector<vector<unsigned char>> &m, vector<vector<unsigned char>> &a);
+  bool EsAccionValidaR(const Action &accion, const EstadoR_N4 &estado);
 
 
 
@@ -295,7 +294,7 @@ private:
   vector<vector<int>> frecuencia_visita;
   pair<int,int> objetivo;
   
-  /*NIVELES 2 Y 3*/
+  /*NIVELES 2, 3 Y 4*/
   //Variables de estado
   list<Action> plan;
   vector<Action> plan_N4;

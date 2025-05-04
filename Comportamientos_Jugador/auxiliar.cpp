@@ -22,7 +22,7 @@ Action ComportamientoAuxiliar::think(Sensores sensores)
 		//accion = ComportamientoAuxiliarNivel_E(sensores);
 		break;
 	case 4:
-		// accion = ComportamientoAuxiliarNivel_4 (sensores);
+		accion = ComportamientoAuxiliarNivel_4 (sensores);
 		break;
 	}
 
@@ -1320,60 +1320,952 @@ vector<Action> ComportamientoAuxiliar::AlgoritmoAE(const EstadoA_N3 &inicio, con
 		return path;
 }
 
+
+
+
 /*NIVEL 4*/
-// Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_4(Sensores sensores) {
-// 	Action accion = IDLE;
 
-// 	// Si el auxiliar no conoce la posición del accidentado, espera a recibir la llamada
-// 	if (sensores.destinoF == -1 && sensores.destinoC == -1) {
-// 		return IDLE;
-// 	}
+Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_4(Sensores sensores){
+	Action accion = IDLE;
 
-// 	// Si el auxiliar conoce la posición del accidentado, planifica el camino hacia él
-// 	if (!hayPlan) {
-// 		EstadoA_N3 inicio, fin;
-// 		inicio.f = sensores.posF;
-// 		inicio.c = sensores.posC;
-// 		inicio.brujula = sensores.rumbo;
-// 		inicio.zapatillas = tiene_zapatillas;
-// 		fin.f = sensores.destinoF;
-// 		fin.c = sensores.destinoC;
+	ModificarMapaA(sensores, mapaResultado, mapaCotas);
 
-// 		// Generar el plan utilizando el algoritmo A*
-// 		plan = AlgoritmoAE(inicio, fin, mapaResultado, mapaCotas);
-// 		VisualizaPlan(inicio, plan);
-// 		hayPlan = !plan.empty();
-// 	}
+	if(mapaResultado[sensores.posF][sensores.posC] == 'D') tiene_zapatillas = true;
 
-// 	// Ejecutar el plan si existe
-// 	if (hayPlan && !plan.empty()) {
-// 		accion = plan.front();
-// 		plan.pop_front();
-// 	}
+	if(f_dest != -1 and c_dest != -1){
+		if(DestinoEnConoVision(sensores, f_dest, c_dest)){
+			hayPlanEnergia = false;
+			hayPlan = false;
+			plan_N4.clear();
+			f_dest = -1;
+			c_dest = -1;
+			return IDLE;
+		}
+	}
+	
+	
+	if(sensores.energia < 500){
+		if(mapaResultado[sensores.posF][sensores.posC] == 'X'){
+			return IDLE;
+		}else{
+			if(!hayPlanEnergia){
+				int distancia = 5000;
+				int f;
+				int c;
+				for(int i = 0; i < mapaResultado.size(); i++){
+					for(int j = 0; j < mapaResultado[0].size(); j++){
+						if(mapaResultado[i][j] == 'X' and abs(i - sensores.posF) + abs(j - sensores.posC) < distancia){
+							distancia = abs(i - sensores.posF) + abs(j - sensores.posC);
+							f = i;
+							c = j;
+						}
+					}
+				}
+				EstadoA_N4 inicio, fin;
+				inicio.f = sensores.posF;
+				inicio.c = sensores.posC;
+				inicio.brujula = sensores.rumbo;
+				inicio.zapatillas = tiene_zapatillas;
+				fin.f = f;
+				fin.c = c;
+				f_dest = f;
+				c_dest = c;
+				current_state = inicio;
+				plan_N4  = AlgoritmoAE_N4(inicio, fin, mapaResultado, mapaCotas);
+				VisualizaPlan(inicio, plan_N4);
+				hayPlanEnergia = plan_N4.size() != 0;
 
-// 	// Si el plan se ha completado, reiniciar el estado
-// 	if (plan.empty()) {
-// 		hayPlan = false;
-// 	}
+			}
+			if(hayPlanEnergia and plan_N4.size()>0){
+				accion = plan_N4.front();
 
-// 	return accion;
-// }
+				last_state = current_state;
+				current_state = applyA(accion, current_state, mapaResultado, mapaCotas);
+				if(current_state == last_state){
+					accionesProhibidas[last_state].insert(accion);
+					hayPlanEnergia = false;
+					plan_N4.clear();
+					return IDLE;
+				}else{
+					accion = plan_N4.front();
+					auto it = plan_N4.begin();
+					it = plan_N4.erase(it);
+				}
+			}
+			if(plan_N4.size()==0 and hayPlanEnergia){
+				hayPlanEnergia=false;
+			}
+			return accion;
+		}
+	}
 
-// void ComportamientoAuxiliar::ActualizarMapaConAccidentado(Sensores sensores) {
-// 	// Actualiza el mapa con la posición del accidentado si es conocida
-// 	if (sensores.destinoF != -1 && sensores.destinoC != -1) {
-// 		mapaResultado[sensores.destinoF][sensores.destinoC] = 'X'; // Marca la posición del accidentado
-// 	}
-// }
 
-// bool ComportamientoAuxiliar::EsAccionValida(Action accion, const EstadoA_N3 &estado, const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura) {
-// 	// Comprueba si una acción es válida en función del terreno y la altura
-// 	EstadoA_N3 siguiente = applyA(accion, estado, terreno, altura);
-// 	return CasillaAccesibleAuxiliar(siguiente, terreno, altura);
-// }
+	if (sensores.venpaca) {
+		cout << "Venpaca: " << sensores.venpaca << endl;
+		if(!hayPlan){
+			//cout << "Planeo de Inicio\n";
+			EstadoA_N4 inicio, fin;
+			inicio.f = sensores.posF;
+			inicio.c = sensores.posC;
+			inicio.brujula = sensores.rumbo;
+			inicio.zapatillas = tiene_zapatillas;
+			fin.f = sensores.destinoF;
+			fin.c = sensores.destinoC;
+			f_dest = sensores.destinoF;
+			c_dest = sensores.destinoC;
+			//cout << "A" << endl;
+			current_state = inicio;
+			//cout << "B"	<< endl;
+			plan_N4  = AlgoritmoAE_N4(inicio, fin, mapaResultado, mapaCotas);
+			//cout << "C" << endl;
+			VisualizaPlan(inicio, plan_N4);
+			//cout << "D" << endl;
+			hayPlan = plan_N4.size() != 0;
+			//cout << "E" << endl;
+		}
+		if(hayPlan and plan_N4.size()>0){
 
-// void ComportamientoAuxiliar::PriorizarAccionesParaRescate() {
-// 	// Implementa una lógica para priorizar acciones en función de la cercanía al accidentado
-// 	// o de la urgencia del rescate
-// 	// Este método puede ser utilizado para ajustar el comportamiento del auxiliar en el nivel 4
-// }
+			accion = plan_N4.front();
+	
+			last_state = current_state;
+			current_state = applyA(accion, current_state, mapaResultado, mapaCotas);
+			//cout << ((current_state == last_state) ? "No me muevo\n" : "Me muevo\n");
+			//cout << current_state.f << " " << current_state.c << " " << current_state.brujula << endl;
+			//cout << last_state.f << " " << last_state.c << " " << last_state.brujula << endl;
+			if(current_state == last_state){
+				//cout << "Cambio de planes\n";
+				accionesProhibidas[last_state].insert(accion);
+				hayPlan = false;
+				plan_N4.clear();
+				return IDLE;
+			}else{
+				accion = plan_N4.front();
+				auto it = plan_N4.begin();
+				it = plan_N4.erase(it);
+			}
+		}
+		if(plan_N4.size()==0 and hayPlan){
+			hayPlan=false;
+		}
+	}
+
+	
+	return accion;
+}
+
+vector<Action> ComportamientoAuxiliar::AlgoritmoAE_N4(const EstadoA_N4 &inicio, const EstadoA_N4 &final,
+	const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura){
+		NodoA_N4 current_node;
+		priority_queue<NodoA_N4> frontier;
+		set<EstadoA_N4> explored;
+		vector<Action> path;
+		int iteraciones = 0;
+		//cout << "B_1" << endl;
+
+		current_node.estado = inicio;
+		current_node.energia = 0;
+		current_node.energia_heuristica = 0;
+		if(terreno[current_node.estado.f][current_node.estado.c] == 'D'){
+			current_node.estado.zapatillas = true;
+		}
+		//cout << "B_2" << endl;
+
+		frontier.push(current_node);
+		bool SolutionFound = (current_node.estado.f == final.f
+			and current_node.estado.c == final.c);
+		//cout << "B_3" << endl;
+
+		while(!SolutionFound and !frontier.empty()){
+
+			iteraciones++;
+			frontier.pop();
+			explored.insert(current_node.estado);
+
+			// if(iteraciones){
+			// 	cout << "B_4" << endl;
+			// }
+			
+
+			if(current_node.estado.f == final.f and current_node.estado.c == final.c){
+				SolutionFound = true;
+			}
+			// if(iteraciones){
+			// 	cout << "B_5" << endl;
+			// }
+			// Genero el hijo resultante de aplicar la acción WALK
+			if(EsAccionValidaA(WALK, current_node.estado)){
+				//cout << "B_5.1" << endl;
+				NodoA_N4 child_WALK = current_node;
+				child_WALK.estado = applyA(WALK, current_node.estado, terreno, altura);
+				child_WALK.secuencia.push_back(WALK);
+				child_WALK.energia += FuncionCoste_A(WALK, current_node.estado, terreno, altura);
+				child_WALK.energia_heuristica = Heuristica(child_WALK.estado, final);
+
+				if(explored.find(child_WALK.estado) == explored.end()){
+					// Se mete en la lista frontier después de añadir a secuencia la acción
+					frontier.push(child_WALK);
+				}
+			}
+			// if(iteraciones){
+			// 	cout << "B_6" << endl;
+			// }
+			
+			// if(iteraciones){
+			// 	cout << "B_7" << endl;
+			// }
+
+			// Genero el hijo resultante de aplicar la acción TURN_SR
+			if(!SolutionFound){
+				if(EsAccionValidaA(TURN_SR, current_node.estado)){
+					//cout << "B_7.1" << endl;
+					// Genero el hijo resultante de aplicar la acción TURN_SR
+					NodoA_N4 child_TURN_SR = current_node;
+					child_TURN_SR.estado = applyA(TURN_SR, current_node.estado, terreno, altura);
+					child_TURN_SR.secuencia.push_back(TURN_SR);
+					child_TURN_SR.energia += FuncionCoste_A(TURN_SR, current_node.estado, terreno, altura);
+					child_TURN_SR.energia_heuristica = Heuristica(child_TURN_SR.estado, final);
+					 
+					if(explored.find(child_TURN_SR.estado) == explored.end()){
+						frontier.push(child_TURN_SR);
+					}
+				}
+				// if(iteraciones){
+				// 	cout << "B_8" << endl;
+				// }
+			}
+			// if(iteraciones){
+			// 	cout << "B_9" << endl;
+			// }
+
+			// Paso a evaluar el siguiente nodo en la lista "frontier"
+			if(!SolutionFound and !frontier.empty()){
+				// if(iteraciones){
+				// 	cout << "B_10" << endl;
+				// }
+				current_node = frontier.top();
+				// if(iteraciones == 1){
+				// 	cout << "B_11" << endl;
+				// }
+				while(explored.find(current_node.estado) != explored.end() and !frontier.empty()){
+					// if(iteraciones){
+					// 	cout << "B_12" << endl;
+					// }
+					frontier.pop();
+					// if(iteraciones == 1){
+					// 	cout << "B_13" << endl;
+					// }
+
+					if(!frontier.empty())
+						current_node = frontier.top();
+
+					// if(iteraciones){
+					// 	cout << "B_14" << endl;
+					// }
+				}
+				// if(iteraciones){
+				// 	cout << "B_15" << endl;
+				// }
+			}
+			// if(iteraciones){
+			// 	cout << "B_16" << endl;
+			// }
+		}
+		
+		//cout << "B_17" << endl;
+		
+		
+		if(SolutionFound) path = current_node.secuencia;
+		// cout << "En abierto hay " << frontier.size() << " nodos\n";
+		// cout << "En cerrado hay " << explored.size() << " nodos\n";
+		// cout << "Se han realizado " << iteraciones << " iteraciones\n";
+		return path;
+}
+
+int ComportamientoAuxiliar::Heuristica(const EstadoA_N4 &a, const EstadoA_N4 &b){
+	int dx = std::abs(a.f - b.f);   
+	int dy = std::abs(a.c - b.c); 
+
+	//return 0;
+	if(dx < dy) return dy;
+	else return dx;
+}
+
+void ComportamientoAuxiliar::VisualizaPlan(const EstadoA_N4 &st, const vector<Action> &plan){
+	AnularMatrizA(mapaConPlan);
+	EstadoA_N4 cst = st;
+
+	auto it = plan.begin();
+	while(it != plan.end()){
+		switch(*it){
+			
+			case WALK:
+				switch(cst.brujula){
+					case 0:
+						cst.f--;
+						break;
+					case 1:
+						cst.f--;
+						cst.c++;
+						break;
+					case 2:
+						cst.c++;
+						break;
+					case 3:
+						cst.f++;
+						cst.c++;
+						break;
+					case 4:
+						cst.f++;
+						break;
+					case 5:
+						cst.f++;
+						cst.c--;
+						break;
+					case 6:
+						cst.c--;
+						break;
+					case 7:
+						cst.f--;
+						cst.c--;
+						break;
+				}
+				mapaConPlan[cst.f][cst.c] = 2;
+				break;
+
+			case TURN_SR:
+				cst.brujula = (Orientacion)((cst.brujula + 1) % 8);
+				break;
+		}
+		it++;
+	}
+}
+
+int ComportamientoAuxiliar::FuncionCoste_A(const Action &accion, const EstadoA_N4 &st, const vector<vector<unsigned char>> &terreno,
+	const vector<vector<unsigned char>> &altura){
+		int coste = 0;
+
+		switch(accion){
+			case WALK: {
+				EstadoA_N4 siguiente = NextCasillaAuxiliar(st);
+				if(siguiente.f < 3 or siguiente.f >= terreno.size()-3 or siguiente.c < 3 or siguiente.c >= terreno[0].size()-3){
+					return 100000;
+				}
+
+				int dif_altura = (altura[siguiente.f][siguiente.c] - altura[st.f][st.c]);
+				int signo;
+				if(dif_altura < 0) signo = -1;
+				else if(dif_altura > 0) signo = 1;
+				else signo = 0;
+	
+				
+				switch(terreno[st.f][st.c]){
+					case 'A':
+						coste = 100 + signo * 10;
+						break;
+					case 'T':
+						coste = 20 + signo * 5;
+						break;
+					case 'S':
+						coste = 2 + signo;
+						break;
+					default:
+						coste = 1;
+						break;
+					}
+				
+				break;
+			}
+		
+			case TURN_SR: {
+				if(st.f < 3 or st.f >= terreno.size()-3 or st.c < 3 or st.c >= terreno[0].size()-3){
+					return 100000;
+				}
+
+				switch(terreno[st.f][st.c]){
+					case 'A':
+						coste = 16;
+						break;
+					case 'T':
+						coste = 3;
+						break;
+					default:
+						coste = 1;
+						break;
+				}
+				break;
+			}
+		}
+		
+		return coste;
+}
+
+EstadoA_N4 ComportamientoAuxiliar::NextCasillaAuxiliar(const EstadoA_N4 &st){
+	EstadoA_N4 siguiente = st;
+	
+	switch(st.brujula){
+		case norte:
+			siguiente.f = st.f - 1;
+			break;
+		case noreste:
+			siguiente.f = st.f - 1;
+			siguiente.c = st.c + 1;
+			break;
+		case este:
+			siguiente.c = st.c + 1;
+			break;
+		case sureste:
+			siguiente.f = st.f + 1;
+			siguiente.c = st.c + 1;
+			break;
+		case sur:
+			siguiente.f = st.f + 1;
+			break;
+		case suroeste:
+			siguiente.f = st.f + 1;
+			siguiente.c = st.c - 1;
+			break;
+		case oeste:
+			siguiente.c = st.c - 1;
+			break;
+		case noroeste:
+			siguiente.f = st.f - 1;
+			siguiente.c = st.c - 1;
+			break;
+	}
+	return siguiente;
+}
+
+EstadoA_N4 ComportamientoAuxiliar::applyA(Action accion, const EstadoA_N4 &st, const vector<vector<unsigned char>> &terreno,
+	const vector<vector<unsigned char>> &altura){
+		EstadoA_N4 next = st;
+
+		switch(accion){
+			case WALK: {
+				EstadoA_N4 auxiliar = NextCasillaAuxiliar(st);
+				if(auxiliar.f < 3 or auxiliar.f >= terreno.size()-3 or auxiliar.c < 3 or auxiliar.c >= terreno[0].size()-3){
+					return st;
+				}
+
+				if(terreno[auxiliar.f][auxiliar.c] == '?'){
+					next = auxiliar;
+				}else{
+					bool check2 = abs(altura[auxiliar.f][auxiliar.c] - altura[st.f][st.c]) <= 1;
+					bool check3 = ((terreno[auxiliar.f][auxiliar.c] == 'B') and st.zapatillas == true);
+					bool check1 = terreno[auxiliar.f][auxiliar.c] != 'P' and terreno[auxiliar.f][auxiliar.c] != 'M' and terreno[auxiliar.f][auxiliar.c] != 'B';
+
+					if((check1 or check3) and check2){
+						next = auxiliar;
+					}
+				}
+				
+				break;
+			}
+		
+		
+			case TURN_SR: {
+				next.brujula = (Orientacion)((next.brujula + 1) % 8);
+				break;
+			}
+		}
+		
+
+		if(terreno[next.f][next.c] == 'D'){
+			next.zapatillas = true;
+		}
+	
+		return next;
+}
+
+void ComportamientoAuxiliar::ModificarMapaA(const Sensores &sensores, vector<vector<unsigned char>> &m, vector<vector<unsigned char>> &a){
+	switch(sensores.rumbo){
+		case norte:
+			m[sensores.posF][sensores.posC] = sensores.superficie[0];
+			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[1];
+			m[sensores.posF-1][sensores.posC] = sensores.superficie[2];
+			m[sensores.posF-1][sensores.posC+1] = sensores.superficie[3];
+			m[sensores.posF-2][sensores.posC-2] = sensores.superficie[4];
+			m[sensores.posF-2][sensores.posC-1] = sensores.superficie[5];
+			m[sensores.posF-2][sensores.posC] = sensores.superficie[6];
+			m[sensores.posF-2][sensores.posC+1] = sensores.superficie[7];
+			m[sensores.posF-2][sensores.posC+2] = sensores.superficie[8];
+			m[sensores.posF-3][sensores.posC-3] = sensores.superficie[9];
+			m[sensores.posF-3][sensores.posC-2] = sensores.superficie[10];
+			m[sensores.posF-3][sensores.posC-1] = sensores.superficie[11];
+			m[sensores.posF-3][sensores.posC] = sensores.superficie[12];
+			m[sensores.posF-3][sensores.posC+1] = sensores.superficie[13];
+			m[sensores.posF-3][sensores.posC+2] = sensores.superficie[14];
+			m[sensores.posF-3][sensores.posC+3] = sensores.superficie[15];
+	
+			a[sensores.posF][sensores.posC] = sensores.cota[0];
+			a[sensores.posF-1][sensores.posC-1] = sensores.cota[1];
+			a[sensores.posF-1][sensores.posC] = sensores.cota[2];
+			a[sensores.posF-1][sensores.posC+1] = sensores.cota[3];
+			a[sensores.posF-2][sensores.posC-2] = sensores.cota[4];
+			a[sensores.posF-2][sensores.posC-1] = sensores.cota[5];
+			a[sensores.posF-2][sensores.posC] = sensores.cota[6];
+			a[sensores.posF-2][sensores.posC+1] = sensores.cota[7];
+			a[sensores.posF-2][sensores.posC+2] = sensores.cota[8];
+			a[sensores.posF-3][sensores.posC-3] = sensores.cota[9];
+			a[sensores.posF-3][sensores.posC-2] = sensores.cota[10];
+			a[sensores.posF-3][sensores.posC-1] = sensores.cota[11];
+			a[sensores.posF-3][sensores.posC] = sensores.cota[12];
+			a[sensores.posF-3][sensores.posC+1] = sensores.cota[13];
+			a[sensores.posF-3][sensores.posC+2] = sensores.cota[14];
+			a[sensores.posF-3][sensores.posC+3] = sensores.cota[15];
+	
+			break;
+	
+		case noroeste:
+			m[sensores.posF][sensores.posC] = sensores.superficie[0];
+			m[sensores.posF][sensores.posC-1] = sensores.superficie[1];
+			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[2];
+			m[sensores.posF-1][sensores.posC] = sensores.superficie[3];
+			m[sensores.posF][sensores.posC-2] = sensores.superficie[4];
+			m[sensores.posF-1][sensores.posC-2] = sensores.superficie[5];
+			m[sensores.posF-2][sensores.posC-2] = sensores.superficie[6];
+			m[sensores.posF-2][sensores.posC-1] = sensores.superficie[7];
+			m[sensores.posF-2][sensores.posC] = sensores.superficie[8];
+			m[sensores.posF][sensores.posC-3] = sensores.superficie[9];
+			m[sensores.posF-1][sensores.posC-3] = sensores.superficie[10];
+			m[sensores.posF-2][sensores.posC-3] = sensores.superficie[11];
+			m[sensores.posF-3][sensores.posC-3] = sensores.superficie[12];
+			m[sensores.posF-3][sensores.posC-2] = sensores.superficie[13];
+			m[sensores.posF-3][sensores.posC-1] = sensores.superficie[14];
+			m[sensores.posF-3][sensores.posC] = sensores.superficie[15];
+	
+			a[sensores.posF][sensores.posC] = sensores.cota[0];
+			a[sensores.posF][sensores.posC-1] = sensores.cota[1];
+			a[sensores.posF-1][sensores.posC-1] = sensores.cota[2];
+			a[sensores.posF-1][sensores.posC] = sensores.cota[3];
+			a[sensores.posF][sensores.posC-2] = sensores.cota[4];
+			a[sensores.posF-1][sensores.posC-2] = sensores.cota[5];
+			a[sensores.posF-2][sensores.posC-2] = sensores.cota[6];
+			a[sensores.posF-2][sensores.posC-1] = sensores.cota[7];
+			a[sensores.posF-2][sensores.posC] = sensores.cota[8];
+			a[sensores.posF][sensores.posC-3] = sensores.cota[9];
+			a[sensores.posF-1][sensores.posC-3] = sensores.cota[10];
+			a[sensores.posF-2][sensores.posC-3] = sensores.cota[11];
+			a[sensores.posF-3][sensores.posC-3] = sensores.cota[12];
+			a[sensores.posF-3][sensores.posC-2] = sensores.cota[13];
+			a[sensores.posF-3][sensores.posC-1] = sensores.cota[14];
+			a[sensores.posF-3][sensores.posC] = sensores.cota[15];
+	
+			break;
+	
+		case oeste:
+			m[sensores.posF][sensores.posC] = sensores.superficie[0];
+			m[sensores.posF+1][sensores.posC-1] = sensores.superficie[1];
+			m[sensores.posF][sensores.posC-1] = sensores.superficie[2];
+			m[sensores.posF-1][sensores.posC-1] = sensores.superficie[3];
+			m[sensores.posF+2][sensores.posC-2] = sensores.superficie[4];
+			m[sensores.posF+1][sensores.posC-2] = sensores.superficie[5];
+			m[sensores.posF][sensores.posC-2] = sensores.superficie[6];
+			m[sensores.posF-1][sensores.posC-2] = sensores.superficie[7];
+			m[sensores.posF-2][sensores.posC-2] = sensores.superficie[8];
+			m[sensores.posF+3][sensores.posC-3] = sensores.superficie[9];
+			m[sensores.posF+2][sensores.posC-3] = sensores.superficie[10];
+			m[sensores.posF+1][sensores.posC-3] = sensores.superficie[11];
+			m[sensores.posF][sensores.posC-3] = sensores.superficie[12];
+			m[sensores.posF-1][sensores.posC-3] = sensores.superficie[13];
+			m[sensores.posF-2][sensores.posC-3] = sensores.superficie[14];
+			m[sensores.posF-3][sensores.posC-3] = sensores.superficie[15];
+	
+			a[sensores.posF][sensores.posC] = sensores.cota[0];
+			a[sensores.posF+1][sensores.posC-1] = sensores.cota[1];
+			a[sensores.posF][sensores.posC-1] = sensores.cota[2];
+			a[sensores.posF-1][sensores.posC-1] = sensores.cota[3];
+			a[sensores.posF+2][sensores.posC-2] = sensores.cota[4];
+			a[sensores.posF+1][sensores.posC-2] = sensores.cota[5];
+			a[sensores.posF][sensores.posC-2] = sensores.cota[6];
+			a[sensores.posF-1][sensores.posC-2] = sensores.cota[7];
+			a[sensores.posF-2][sensores.posC-2] = sensores.cota[8];
+			a[sensores.posF+3][sensores.posC-3] = sensores.cota[9];
+			a[sensores.posF+2][sensores.posC-3] = sensores.cota[10];
+			a[sensores.posF+1][sensores.posC-3] = sensores.cota[11];
+			a[sensores.posF][sensores.posC-3] = sensores.cota[12];
+			a[sensores.posF-1][sensores.posC-3] = sensores.cota[13];
+			a[sensores.posF-2][sensores.posC-3] = sensores.cota[14];
+			a[sensores.posF-3][sensores.posC-3] = sensores.cota[15];
+	
+			break;
+	
+		case sureste:
+			m[sensores.posF][sensores.posC] = sensores.superficie[0];
+			m[sensores.posF][sensores.posC+1] = sensores.superficie[1];
+			m[sensores.posF+1][sensores.posC+1] = sensores.superficie[2];
+			m[sensores.posF+1][sensores.posC] = sensores.superficie[3];
+			m[sensores.posF][sensores.posC+2] = sensores.superficie[4];
+			m[sensores.posF+1][sensores.posC+2] = sensores.superficie[5];
+			m[sensores.posF+2][sensores.posC+2] = sensores.superficie[6];
+			m[sensores.posF+2][sensores.posC+1] = sensores.superficie[7];
+			m[sensores.posF+2][sensores.posC] = sensores.superficie[8];
+			m[sensores.posF][sensores.posC+3] = sensores.superficie[9];
+			m[sensores.posF+1][sensores.posC+3] = sensores.superficie[10];
+			m[sensores.posF+2][sensores.posC+3] = sensores.superficie[11];
+			m[sensores.posF+3][sensores.posC+3] = sensores.superficie[12];
+			m[sensores.posF+3][sensores.posC+2] = sensores.superficie[13];
+			m[sensores.posF+3][sensores.posC+1] = sensores.superficie[14];
+			m[sensores.posF+3][sensores.posC] = sensores.superficie[15];
+	
+			a[sensores.posF][sensores.posC] = sensores.cota[0];
+			a[sensores.posF][sensores.posC+1] = sensores.cota[1];
+			a[sensores.posF+1][sensores.posC+1] = sensores.cota[2];
+			a[sensores.posF+1][sensores.posC] = sensores.cota[3];
+			a[sensores.posF][sensores.posC+2] = sensores.cota[4];
+			a[sensores.posF+1][sensores.posC+2] = sensores.cota[5];
+			a[sensores.posF+2][sensores.posC+2] = sensores.cota[6];
+			a[sensores.posF+2][sensores.posC+1] = sensores.cota[7];
+			a[sensores.posF+2][sensores.posC] = sensores.cota[8];
+			a[sensores.posF][sensores.posC+3] = sensores.cota[9];
+			a[sensores.posF+1][sensores.posC+3] = sensores.cota[10];
+			a[sensores.posF+2][sensores.posC+3] = sensores.cota[11];
+			a[sensores.posF+3][sensores.posC+3] = sensores.cota[12];
+			a[sensores.posF+3][sensores.posC+2] = sensores.cota[13];
+			a[sensores.posF+3][sensores.posC+1] = sensores.cota[14];
+			a[sensores.posF+3][sensores.posC] = sensores.cota[15];
+	
+			break;
+	
+		case sur:
+			m[sensores.posF][sensores.posC] = sensores.superficie[0];
+			m[sensores.posF+1][sensores.posC+1] = sensores.superficie[1];
+			m[sensores.posF+1][sensores.posC] = sensores.superficie[2];
+			m[sensores.posF+1][sensores.posC-1] = sensores.superficie[3];
+			m[sensores.posF+2][sensores.posC+2] = sensores.superficie[4];
+			m[sensores.posF+2][sensores.posC+1] = sensores.superficie[5];
+			m[sensores.posF+2][sensores.posC] = sensores.superficie[6];
+			m[sensores.posF+2][sensores.posC-1] = sensores.superficie[7];
+			m[sensores.posF+2][sensores.posC-2] = sensores.superficie[8];
+			m[sensores.posF+3][sensores.posC+3] = sensores.superficie[9];
+			m[sensores.posF+3][sensores.posC+2] = sensores.superficie[10];
+			m[sensores.posF+3][sensores.posC+1] = sensores.superficie[11];
+			m[sensores.posF+3][sensores.posC] = sensores.superficie[12];
+			m[sensores.posF+3][sensores.posC-1] = sensores.superficie[13];
+			m[sensores.posF+3][sensores.posC-2] = sensores.superficie[14];
+			m[sensores.posF+3][sensores.posC-3] = sensores.superficie[15];
+	
+			a[sensores.posF][sensores.posC] = sensores.cota[0];
+			a[sensores.posF+1][sensores.posC+1] = sensores.cota[1];
+			a[sensores.posF+1][sensores.posC] = sensores.cota[2];
+			a[sensores.posF+1][sensores.posC-1] = sensores.cota[3];
+			a[sensores.posF+2][sensores.posC+2] = sensores.cota[4];
+			a[sensores.posF+2][sensores.posC+1] = sensores.cota[5];
+			a[sensores.posF+2][sensores.posC] = sensores.cota[6];
+			a[sensores.posF+2][sensores.posC-1] = sensores.cota[7];
+			a[sensores.posF+2][sensores.posC-2] = sensores.cota[8];
+			a[sensores.posF+3][sensores.posC+3] = sensores.cota[9];
+			a[sensores.posF+3][sensores.posC+2] = sensores.cota[10];
+			a[sensores.posF+3][sensores.posC+1] = sensores.cota[11];
+			a[sensores.posF+3][sensores.posC] = sensores.cota[12];
+			a[sensores.posF+3][sensores.posC-1] = sensores.cota[13];
+			a[sensores.posF+3][sensores.posC-2] = sensores.cota[14];
+			a[sensores.posF+3][sensores.posC-3] = sensores.cota[15];
+	
+			break;
+	
+		case suroeste:
+			m[sensores.posF][sensores.posC] = sensores.superficie[0];
+			m[sensores.posF+1][sensores.posC] = sensores.superficie[1];
+			m[sensores.posF+1][sensores.posC-1] = sensores.superficie[2];
+			m[sensores.posF][sensores.posC-1] = sensores.superficie[3];
+			m[sensores.posF+2][sensores.posC] = sensores.superficie[4];
+			m[sensores.posF+2][sensores.posC-1] = sensores.superficie[5];
+			m[sensores.posF+2][sensores.posC-2] = sensores.superficie[6];
+			m[sensores.posF+1][sensores.posC-2] = sensores.superficie[7];
+			m[sensores.posF][sensores.posC-2] = sensores.superficie[8];
+			m[sensores.posF+3][sensores.posC] = sensores.superficie[9];
+			m[sensores.posF+3][sensores.posC-1] = sensores.superficie[10];
+			m[sensores.posF+3][sensores.posC-2] = sensores.superficie[11];
+			m[sensores.posF+3][sensores.posC-3] = sensores.superficie[12];
+			m[sensores.posF+2][sensores.posC-3] = sensores.superficie[13];
+			m[sensores.posF+1][sensores.posC-3] = sensores.superficie[14];
+			m[sensores.posF][sensores.posC-3] = sensores.superficie[15];
+	
+			a[sensores.posF][sensores.posC] = sensores.cota[0];
+			a[sensores.posF+1][sensores.posC] = sensores.cota[1];
+			a[sensores.posF+1][sensores.posC-1] = sensores.cota[2];
+			a[sensores.posF][sensores.posC-1] = sensores.cota[3];
+			a[sensores.posF+2][sensores.posC] = sensores.cota[4];
+			a[sensores.posF+2][sensores.posC-1] = sensores.cota[5];
+			a[sensores.posF+2][sensores.posC-2] = sensores.cota[6];
+			a[sensores.posF+1][sensores.posC-2] = sensores.cota[7];
+			a[sensores.posF][sensores.posC-2] = sensores.cota[8];
+			a[sensores.posF+3][sensores.posC] = sensores.cota[9];
+			a[sensores.posF+3][sensores.posC-1] = sensores.cota[10];
+			a[sensores.posF+3][sensores.posC-2] = sensores.cota[11];
+			a[sensores.posF+3][sensores.posC-3] = sensores.cota[12];
+			a[sensores.posF+2][sensores.posC-3] = sensores.cota[13];
+			a[sensores.posF+1][sensores.posC-3] = sensores.cota[14];
+			a[sensores.posF][sensores.posC-3] = sensores.cota[15];
+	
+			break;
+	
+		case este:
+			m[sensores.posF][sensores.posC] = sensores.superficie[0];
+			m[sensores.posF-1][sensores.posC+1] = sensores.superficie[1];
+			m[sensores.posF][sensores.posC+1] = sensores.superficie[2];
+			m[sensores.posF+1][sensores.posC+1] = sensores.superficie[3];
+			m[sensores.posF-2][sensores.posC+2] = sensores.superficie[4];
+			m[sensores.posF-1][sensores.posC+2] = sensores.superficie[5];
+			m[sensores.posF][sensores.posC+2] = sensores.superficie[6];
+			m[sensores.posF+1][sensores.posC+2] = sensores.superficie[7];
+			m[sensores.posF+2][sensores.posC+2] = sensores.superficie[8];
+			m[sensores.posF-3][sensores.posC+3] = sensores.superficie[9];
+			m[sensores.posF-2][sensores.posC+3] = sensores.superficie[10];
+			m[sensores.posF-1][sensores.posC+3] = sensores.superficie[11];
+			m[sensores.posF][sensores.posC+3] = sensores.superficie[12];
+			m[sensores.posF+1][sensores.posC+3] = sensores.superficie[13];
+			m[sensores.posF+2][sensores.posC+3] = sensores.superficie[14];
+			m[sensores.posF+3][sensores.posC+3] = sensores.superficie[15];
+	
+			a[sensores.posF][sensores.posC] = sensores.cota[0];
+			a[sensores.posF-1][sensores.posC+1] = sensores.cota[1];
+			a[sensores.posF][sensores.posC+1] = sensores.cota[2];
+			a[sensores.posF+1][sensores.posC+1] = sensores.cota[3];
+			a[sensores.posF-2][sensores.posC+2] = sensores.cota[4];
+			a[sensores.posF-1][sensores.posC+2] = sensores.cota[5];
+			a[sensores.posF][sensores.posC+2] = sensores.cota[6];
+			a[sensores.posF+1][sensores.posC+2] = sensores.cota[7];
+			a[sensores.posF+2][sensores.posC+2] = sensores.cota[8];
+			a[sensores.posF-3][sensores.posC+3] = sensores.cota[9];
+			a[sensores.posF-2][sensores.posC+3] = sensores.cota[10];
+			a[sensores.posF-1][sensores.posC+3] = sensores.cota[11];
+			a[sensores.posF][sensores.posC+3] = sensores.cota[12];
+			a[sensores.posF+1][sensores.posC+3] = sensores.cota[13];
+			a[sensores.posF+2][sensores.posC+3] = sensores.cota[14];
+			a[sensores.posF+3][sensores.posC+3] = sensores.cota[15];
+	
+			break;
+	
+		case noreste:
+			m[sensores.posF][sensores.posC] = sensores.superficie[0];
+			m[sensores.posF-1][sensores.posC] = sensores.superficie[1];
+			m[sensores.posF-1][sensores.posC+1] = sensores.superficie[2];
+			m[sensores.posF][sensores.posC+1] = sensores.superficie[3];
+			m[sensores.posF-2][sensores.posC] = sensores.superficie[4];
+			m[sensores.posF-2][sensores.posC+1] = sensores.superficie[5];
+			m[sensores.posF-2][sensores.posC+2] = sensores.superficie[6];
+			m[sensores.posF-1][sensores.posC+2] = sensores.superficie[7];
+			m[sensores.posF][sensores.posC+2] = sensores.superficie[8];
+			m[sensores.posF-3][sensores.posC] = sensores.superficie[9];
+			m[sensores.posF-3][sensores.posC+1] = sensores.superficie[10];
+			m[sensores.posF-3][sensores.posC+2] = sensores.superficie[11];
+			m[sensores.posF-3][sensores.posC+3] = sensores.superficie[12];
+			m[sensores.posF-2][sensores.posC+3] = sensores.superficie[13];
+			m[sensores.posF-1][sensores.posC+3] = sensores.superficie[14];
+			m[sensores.posF][sensores.posC+3] = sensores.superficie[15];
+	
+			a[sensores.posF][sensores.posC] = sensores.cota[0];
+			a[sensores.posF-1][sensores.posC] = sensores.cota[1];
+			a[sensores.posF-1][sensores.posC+1] = sensores.cota[2];
+			a[sensores.posF][sensores.posC+1] = sensores.cota[3];
+			a[sensores.posF-2][sensores.posC] = sensores.cota[4];
+			a[sensores.posF-2][sensores.posC+1] = sensores.cota[5];
+			a[sensores.posF-2][sensores.posC+2] = sensores.cota[6];
+			a[sensores.posF-1][sensores.posC+2] = sensores.cota[7];
+			a[sensores.posF][sensores.posC+2] = sensores.cota[8];
+			a[sensores.posF-3][sensores.posC] = sensores.cota[9];
+			a[sensores.posF-3][sensores.posC+1] = sensores.cota[10];
+			a[sensores.posF-3][sensores.posC+2] = sensores.cota[11];
+			a[sensores.posF-3][sensores.posC+3] = sensores.cota[12];
+			a[sensores.posF-2][sensores.posC+3] = sensores.cota[13];
+			a[sensores.posF-1][sensores.posC+3] = sensores.cota[14];
+			a[sensores.posF][sensores.posC+3] = sensores.cota[15];
+	
+			break;
+	}
+}
+
+bool ComportamientoAuxiliar::EsAccionValidaA(const Action &accion, const EstadoA_N4 &estado) {
+	if (accionesProhibidas[estado].count(accion) > 0) {
+        return false; // La acción está prohibida
+    }
+	return true; // La acción es válida
+}
+
+bool ComportamientoAuxiliar::DestinoEnConoVision(const Sensores &sensores, int f_destino, int c_destino) {
+    // Obtener las coordenadas del cono de visión
+    vector<pair<int, int>> conoVision = ObtenerConoVision(sensores);
+    // Coordenadas del destino
+    int destinoF = f_destino;
+    int destinoC = c_destino;
+
+	//cout << "Destino: " << destinoF << " " << destinoC << endl;
+
+    // Buscar si el destino está en el vector
+    for (const auto &coordenada : conoVision) {
+		//cout << coordenada.first << " " << coordenada.second << endl;
+        if (coordenada.first == destinoF && coordenada.second == destinoC) {
+			//cout << "True" << endl;
+            return true; // El destino está en el cono de visión
+        }
+    }
+
+	//cout << "False" << endl;
+    return false; // El destino no está en el cono de visión
+}
+
+vector<pair<int, int>> ComportamientoAuxiliar::ObtenerConoVision(const Sensores &sensores) {
+    vector<pair<int, int>> coordenadasCono;
+
+    // Coordenadas del auxiliar
+    int f = sensores.posF;
+    int c = sensores.posC;
+
+    // Dependiendo de la orientación (rumbo), calcula las casillas visibles
+	switch (sensores.rumbo) {
+		case norte:
+			coordenadasCono.push_back({f, c});
+			coordenadasCono.push_back({f - 1, c - 1});
+			coordenadasCono.push_back({f - 1, c});
+			coordenadasCono.push_back({f - 1, c + 1});
+			coordenadasCono.push_back({f - 2, c - 2});
+			coordenadasCono.push_back({f - 2, c - 1});
+			coordenadasCono.push_back({f - 2, c});
+			coordenadasCono.push_back({f - 2, c + 1});
+			coordenadasCono.push_back({f - 2, c + 2});
+			coordenadasCono.push_back({f - 3, c - 3});
+			coordenadasCono.push_back({f - 3, c - 2});
+			coordenadasCono.push_back({f - 3, c - 1});
+			coordenadasCono.push_back({f - 3, c});
+			coordenadasCono.push_back({f - 3, c + 1});
+			coordenadasCono.push_back({f - 3, c + 2});
+			coordenadasCono.push_back({f - 3, c + 3});
+			break;
+
+		case este:
+			coordenadasCono.push_back({f, c});
+			coordenadasCono.push_back({f - 1, c + 1});
+			coordenadasCono.push_back({f, c + 1});
+			coordenadasCono.push_back({f + 1, c + 1});
+			coordenadasCono.push_back({f - 2, c + 2});
+			coordenadasCono.push_back({f - 1, c + 2});
+			coordenadasCono.push_back({f, c + 2});
+			coordenadasCono.push_back({f + 1, c + 2});
+			coordenadasCono.push_back({f + 2, c + 2});
+			coordenadasCono.push_back({f - 3, c + 3});
+			coordenadasCono.push_back({f - 2, c + 3});
+			coordenadasCono.push_back({f - 1, c + 3});
+			coordenadasCono.push_back({f, c + 3});
+			coordenadasCono.push_back({f + 1, c + 3});
+			coordenadasCono.push_back({f + 2, c + 3});
+			coordenadasCono.push_back({f + 3, c + 3});
+			break;
+
+		case sur:
+			coordenadasCono.push_back({f, c});
+			coordenadasCono.push_back({f + 1, c + 1});
+			coordenadasCono.push_back({f + 1, c});
+			coordenadasCono.push_back({f + 1, c - 1});
+			coordenadasCono.push_back({f + 2, c + 2});
+			coordenadasCono.push_back({f + 2, c + 1});
+			coordenadasCono.push_back({f + 2, c});
+			coordenadasCono.push_back({f + 2, c - 1});
+			coordenadasCono.push_back({f + 2, c - 2});
+			coordenadasCono.push_back({f + 3, c + 3});
+			coordenadasCono.push_back({f + 3, c + 2});
+			coordenadasCono.push_back({f + 3, c + 1});
+			coordenadasCono.push_back({f + 3, c});
+			coordenadasCono.push_back({f + 3, c - 1});
+			coordenadasCono.push_back({f + 3, c - 2});
+			coordenadasCono.push_back({f + 3, c - 3});
+			break;
+
+		case oeste:
+			coordenadasCono.push_back({f, c});
+			coordenadasCono.push_back({f + 1, c - 1});
+			coordenadasCono.push_back({f, c - 1});
+			coordenadasCono.push_back({f - 1, c - 1});
+			coordenadasCono.push_back({f + 2, c - 2});
+			coordenadasCono.push_back({f + 1, c - 2});
+			coordenadasCono.push_back({f, c - 2});
+			coordenadasCono.push_back({f - 1, c - 2});
+			coordenadasCono.push_back({f - 2, c - 2});
+			coordenadasCono.push_back({f + 3, c - 3});
+			coordenadasCono.push_back({f + 2, c - 3});
+			coordenadasCono.push_back({f + 1, c - 3});
+			coordenadasCono.push_back({f, c - 3});
+			coordenadasCono.push_back({f - 1, c - 3});
+			coordenadasCono.push_back({f - 2, c - 3});
+			coordenadasCono.push_back({f - 3, c - 3});
+			break;
+
+		case noreste:
+			coordenadasCono.push_back({f, c});
+			coordenadasCono.push_back({f - 1, c});
+			coordenadasCono.push_back({f - 1, c + 1});
+			coordenadasCono.push_back({f, c + 1});
+			coordenadasCono.push_back({f - 2, c});
+			coordenadasCono.push_back({f - 2, c + 1});
+			coordenadasCono.push_back({f - 2, c + 2});
+			coordenadasCono.push_back({f - 1, c + 2});
+			coordenadasCono.push_back({f, c + 2});
+			coordenadasCono.push_back({f - 3, c});
+			coordenadasCono.push_back({f - 3, c + 1});
+			coordenadasCono.push_back({f - 3, c + 2});
+			coordenadasCono.push_back({f - 3, c + 3});
+			coordenadasCono.push_back({f - 2, c + 3});
+			coordenadasCono.push_back({f - 1, c + 3});
+			coordenadasCono.push_back({f, c + 3});
+			break;
+
+		case sureste:
+			coordenadasCono.push_back({f, c});
+			coordenadasCono.push_back({f, c + 1});
+			coordenadasCono.push_back({f + 1, c + 1});
+			coordenadasCono.push_back({f + 1, c});
+			coordenadasCono.push_back({f, c + 2});
+			coordenadasCono.push_back({f + 1, c + 2});
+			coordenadasCono.push_back({f + 2, c + 2});
+			coordenadasCono.push_back({f + 2, c + 1});
+			coordenadasCono.push_back({f + 2, c});
+			coordenadasCono.push_back({f, c + 3});
+			coordenadasCono.push_back({f + 1, c + 3});
+			coordenadasCono.push_back({f + 2, c + 3});
+			coordenadasCono.push_back({f + 3, c + 3});
+			coordenadasCono.push_back({f + 3, c + 2});
+			coordenadasCono.push_back({f + 3, c + 1});
+			coordenadasCono.push_back({f + 3, c});
+			break;
+
+		case suroeste:
+			coordenadasCono.push_back({f, c});
+			coordenadasCono.push_back({f + 1, c});
+			coordenadasCono.push_back({f + 1, c - 1});
+			coordenadasCono.push_back({f, c - 1});
+			coordenadasCono.push_back({f + 2, c});
+			coordenadasCono.push_back({f + 2, c - 1});
+			coordenadasCono.push_back({f + 2, c - 2});
+			coordenadasCono.push_back({f + 1, c - 2});
+			coordenadasCono.push_back({f, c - 2});
+			coordenadasCono.push_back({f + 3, c});
+			coordenadasCono.push_back({f + 3, c - 1});
+			coordenadasCono.push_back({f + 3, c - 2});
+			coordenadasCono.push_back({f + 3, c - 3});
+			coordenadasCono.push_back({f + 2, c - 3});
+			coordenadasCono.push_back({f + 1, c - 3});
+			coordenadasCono.push_back({f, c - 3});
+			break;
+
+		case noroeste:
+			coordenadasCono.push_back({f, c});
+			coordenadasCono.push_back({f, c - 1});
+			coordenadasCono.push_back({f - 1, c - 1});
+			coordenadasCono.push_back({f - 1, c});
+			coordenadasCono.push_back({f, c - 2});
+			coordenadasCono.push_back({f - 1, c - 2});
+			coordenadasCono.push_back({f - 2, c - 2});
+			coordenadasCono.push_back({f - 2, c - 1});
+			coordenadasCono.push_back({f - 2, c});
+			coordenadasCono.push_back({f, c - 3});
+			coordenadasCono.push_back({f - 1, c - 3});
+			coordenadasCono.push_back({f - 2, c - 3});
+			coordenadasCono.push_back({f - 3, c - 3});
+			coordenadasCono.push_back({f - 3, c - 2});
+			coordenadasCono.push_back({f - 3, c - 1});
+			coordenadasCono.push_back({f - 3, c});
+			break;
+	}
+
+    return coordenadasCono;
+}

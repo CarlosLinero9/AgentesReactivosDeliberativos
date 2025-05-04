@@ -2029,7 +2029,7 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_3(Sensores sensor
 Action ComportamientoRescatador::ComportamientoRescatadorNivel_4(Sensores sensores){
 	Action accion = IDLE;
 
-	ModificarMapa(sensores, mapaResultado, mapaCotas);
+	ModificarMapaR(sensores, mapaResultado, mapaCotas);
 
 	if(mapaResultado[sensores.posF][sensores.posC] == 'D') tiene_zapatillas = true;
 
@@ -2041,6 +2041,8 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_4(Sensores sensor
 			if (!auxiliarAvisado) {
 				auxiliarAvisado = true;
 				return CALL_ON; // Avisar al auxiliar
+			} else if (sensores.energia < 500) {
+				return CALL_OFF; // Renunciar a la misión si la energía es baja
 			} else {
 				return IDLE; // Esperar al auxiliar
 			}
@@ -2088,6 +2090,7 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_4(Sensores sensor
 					plan_N4.clear();
 					return IDLE;
 				}else{
+					accion = plan_N4.front();
 					auto it = plan_N4.begin();
 					it = plan_N4.erase(it);
 				}
@@ -2100,7 +2103,7 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_4(Sensores sensor
 	}
 
 	if(!hayPlan){
-		cout << "Planeo de Inicio\n";
+		//cout << "Planeo de Inicio\n";
 		EstadoR_N4 inicio, fin;
 		inicio.f = sensores.posF;
 		inicio.c = sensores.posC;
@@ -2108,31 +2111,32 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_4(Sensores sensor
 		inicio.zapatillas = tiene_zapatillas;
 		fin.f = sensores.destinoF;
 		fin.c = sensores.destinoC;
-		cout << "A" << endl;
+		//cout << "A" << endl;
 		current_state = inicio;
-		cout << "B"	<< endl;
+		//cout << "B"	<< endl;
 		plan_N4  = AlgoritmoAE(inicio, fin, mapaResultado, mapaCotas);
-		cout << "C" << endl;
+		//cout << "C" << endl;
 		VisualizaPlan(inicio, plan_N4);
-		cout << "D" << endl;
+		//cout << "D" << endl;
 		hayPlan = plan_N4.size() != 0;
-		cout << "E" << endl;
+		//cout << "E" << endl;
 	}
 	if(hayPlan and plan_N4.size()>0){
 		accion = plan_N4.front();
 
 		last_state = current_state;
 		current_state = applyR(accion, current_state, mapaResultado, mapaCotas);
-		cout << ((current_state == last_state) ? "No me muevo\n" : "Me muevo\n");
-		cout << current_state.f << " " << current_state.c << " " << current_state.brujula << endl;
-		cout << last_state.f << " " << last_state.c << " " << last_state.brujula << endl;
+		// cout << ((current_state == last_state) ? "No me muevo\n" : "Me muevo\n");
+		// cout << current_state.f << " " << current_state.c << " " << current_state.brujula << endl;
+		// cout << last_state.f << " " << last_state.c << " " << last_state.brujula << endl;
 		if(current_state == last_state){
-			cout << "Cambio de planes\n";
+			//cout << "Cambio de planes\n";
 			accionesProhibidas[last_state].insert(accion);
 			hayPlan = false;
 			plan_N4.clear();
 			return IDLE;
 		}else{
+			accion = plan_N4.front();
 			auto it = plan_N4.begin();
 			it = plan_N4.erase(it);
 		}
@@ -2150,7 +2154,7 @@ vector<Action> ComportamientoRescatador::AlgoritmoAE(const EstadoR_N4 &inicio, c
 		set<EstadoR_N4> explored;
 		vector<Action> path;
 		int iteraciones = 0;
-		cout << "B_1" << endl;
+		//cout << "B_1" << endl;
 
 		current_node.estado = inicio;
 		current_node.energia = 0;
@@ -2158,12 +2162,12 @@ vector<Action> ComportamientoRescatador::AlgoritmoAE(const EstadoR_N4 &inicio, c
 		if(terreno[current_node.estado.f][current_node.estado.c] == 'D'){
 			current_node.estado.zapatillas = true;
 		}
-		cout << "B_2" << endl;
+		//cout << "B_2" << endl;
 
 		frontier.push(current_node);
 		bool SolutionFound = (current_node.estado.f == final.f
 			and current_node.estado.c == final.c);
-		cout << "B_3" << endl;
+		//cout << "B_3" << endl;
 
 		while(!SolutionFound and !frontier.empty()){
 
@@ -2171,20 +2175,20 @@ vector<Action> ComportamientoRescatador::AlgoritmoAE(const EstadoR_N4 &inicio, c
 			frontier.pop();
 			explored.insert(current_node.estado);
 
-			if(iteraciones){
-				cout << "B_4" << endl;
-			}
+			// if(iteraciones){
+			// 	cout << "B_4" << endl;
+			// }
 			
 
 			if(current_node.estado.f == final.f and current_node.estado.c == final.c){
 				SolutionFound = true;
 			}
-			if(iteraciones){
-				cout << "B_5" << endl;
-			}
+			// if(iteraciones){
+			// 	cout << "B_5" << endl;
+			// }
 			// Genero el hijo resultante de aplicar la acción WALK
-			if(EsAccionValida(WALK, current_node.estado)){
-				cout << "B_5.1" << endl;
+			if(EsAccionValidaR(WALK, current_node.estado)){
+				//cout << "B_5.1" << endl;
 				NodoR_N4 child_WALK = current_node;
 				child_WALK.estado = applyR(WALK, current_node.estado, terreno, altura);
 				child_WALK.secuencia.push_back(WALK);
@@ -2196,40 +2200,40 @@ vector<Action> ComportamientoRescatador::AlgoritmoAE(const EstadoR_N4 &inicio, c
 					frontier.push(child_WALK);
 				}
 			}
-			if(iteraciones){
-				cout << "B_6" << endl;
-			}
+			// if(iteraciones){
+			// 	cout << "B_6" << endl;
+			// }
 			
 
 			if(!SolutionFound){
-				if(EsAccionValida(RUN, current_node.estado)){
-					cout << "B_6.1" << endl;
+				if(EsAccionValidaR(RUN, current_node.estado)){
+					//cout << "B_6.1" << endl;
 					// Genero el hijo resultante de aplicar la acción RUN
 					NodoR_N4 child_RUN = current_node;
-					cout << "B_6.2" << endl;
+					//cout << "B_6.2" << endl;
 					child_RUN.estado = applyR(RUN, current_node.estado, terreno, altura);
-					cout << "B_6.3" << endl;
+					//cout << "B_6.3" << endl;
 					child_RUN.secuencia.push_back(RUN);
-					cout << "B_6.4" << endl;
+					//cout << "B_6.4" << endl;
 					child_RUN.energia += FuncionCoste_R(RUN, current_node.estado, terreno, altura);
-					cout << "B_6.5" << endl;
+					//cout << "B_6.5" << endl;
 					child_RUN.energia_heuristica = Heuristica(child_RUN.estado, final);
-					cout << "B_6.6" << endl;
+					//cout << "B_6.6" << endl;
 					 
 					if(explored.find(child_RUN.estado) == explored.end()){
 						frontier.push(child_RUN);
 					}
-					cout << "B_6.7" << endl;
+					//cout << "B_6.7" << endl;
 				}
 			}
-			if(iteraciones){
-				cout << "B_7" << endl;
-			}
+			// if(iteraciones){
+			// 	cout << "B_7" << endl;
+			// }
 
 			// Genero el hijo resultante de aplicar la acción TURN_SR
 			if(!SolutionFound){
-				if(EsAccionValida(TURN_SR, current_node.estado)){
-					cout << "B_7.1" << endl;
+				if(EsAccionValidaR(TURN_SR, current_node.estado)){
+					//cout << "B_7.1" << endl;
 					// Genero el hijo resultante de aplicar la acción TURN_SR
 					NodoR_N4 child_TURN_SR = current_node;
 					child_TURN_SR.estado = applyR(TURN_SR, current_node.estado, terreno, altura);
@@ -2241,12 +2245,12 @@ vector<Action> ComportamientoRescatador::AlgoritmoAE(const EstadoR_N4 &inicio, c
 						frontier.push(child_TURN_SR);
 					}
 				}
-				if(iteraciones){
-					cout << "B_8" << endl;
-				}
+				// if(iteraciones){
+				// 	cout << "B_8" << endl;
+				// }
 				
-				if(EsAccionValida(TURN_L, current_node.estado)){
-					cout << "B_8.1" << endl;
+				if(EsAccionValidaR(TURN_L, current_node.estado)){
+					//cout << "B_8.1" << endl;
 					NodoR_N4 child_TURN_L = current_node;
 					child_TURN_L.estado = applyR(TURN_L, current_node.estado, terreno, altura);
 					child_TURN_L.secuencia.push_back(TURN_L);
@@ -2258,51 +2262,51 @@ vector<Action> ComportamientoRescatador::AlgoritmoAE(const EstadoR_N4 &inicio, c
 					}
 				}
 			}
-			if(iteraciones){
-				cout << "B_9" << endl;
-			}
+			// if(iteraciones){
+			// 	cout << "B_9" << endl;
+			// }
 
 			// Paso a evaluar el siguiente nodo en la lista "frontier"
 			if(!SolutionFound and !frontier.empty()){
-				if(iteraciones){
-					cout << "B_10" << endl;
-				}
+				// if(iteraciones){
+				// 	cout << "B_10" << endl;
+				// }
 				current_node = frontier.top();
-				if(iteraciones == 1){
-					cout << "B_11" << endl;
-				}
+				// if(iteraciones){
+				// 	cout << "B_11" << endl;
+				// }
 				while(explored.find(current_node.estado) != explored.end() and !frontier.empty()){
-					if(iteraciones){
-						cout << "B_12" << endl;
-					}
+					// if(iteraciones){
+					// 	cout << "B_12" << endl;
+					// }
 					frontier.pop();
-					if(iteraciones == 1){
-						cout << "B_13" << endl;
-					}
+					// if(iteraciones == 1){
+					// 	cout << "B_13" << endl;
+					// }
 
 					if(!frontier.empty())
 						current_node = frontier.top();
 
-					if(iteraciones){
-						cout << "B_14" << endl;
-					}
+					// if(iteraciones){
+					// 	cout << "B_14" << endl;
+					// }
 				}
-				if(iteraciones){
-					cout << "B_15" << endl;
-				}
+				// if(iteraciones){
+				// 	cout << "B_15" << endl;
+				// }
 			}
-			if(iteraciones){
-				cout << "B_16" << endl;
-			}
+			// if(iteraciones){
+			// 	cout << "B_16" << endl;
+			// }
 		}
 		
-		cout << "B_17" << endl;
+		//cout << "B_17" << endl;
 		
 		
 		if(SolutionFound) path = current_node.secuencia;
-		cout << "En abierto hay " << frontier.size() << " nodos\n";
-		cout << "En cerrado hay " << explored.size() << " nodos\n";
-		cout << "Se han realizado " << iteraciones << " iteraciones\n";
+		// cout << "En abierto hay " << frontier.size() << " nodos\n";
+		// cout << "En cerrado hay " << explored.size() << " nodos\n";
+		// cout << "Se han realizado " << iteraciones << " iteraciones\n";
 		return path;
 }
 
@@ -2581,14 +2585,14 @@ EstadoR_N4 ComportamientoRescatador::applyR(Action accion, const EstadoR_N4 &st,
 			}
 		
 			case RUN: {
-				cout << "1" << endl;
+				//cout << "1" << endl;
 				EstadoR_N4 intermedia = NextCasillaRescatador(st);
-				cout << "2" << endl;
+				//cout << "2" << endl;
 				EstadoR_N4 fin = NextCasillaRescatador(intermedia);
-				cout << "3" << endl;
-				cout << "st: " << st.f << " " << st.c << endl;
-				cout << fin.f << " " << fin.c << endl;
-				cout << intermedia.f << " " << intermedia.c << endl;
+				//cout << "3" << endl;
+				//cout << "st: " << st.f << " " << st.c << endl;
+				//cout << fin.f << " " << fin.c << endl;
+				//cout << intermedia.f << " " << intermedia.c << endl;
 				if(fin.f < 3 or fin.f >= terreno.size()-3 or fin.c < 3 or fin.c >= terreno[0].size()-3){
 					return st;
 				}
@@ -2597,19 +2601,19 @@ EstadoR_N4 ComportamientoRescatador::applyR(Action accion, const EstadoR_N4 &st,
 				}
 
 				if(terreno[fin.f][fin.c] == '?' or terreno[intermedia.f][intermedia.c] == '?'){
-					cout << "4" << endl;
+				//	cout << "4" << endl;
 					next = fin;
-					cout << "5" << endl;
+				//	cout << "5" << endl;
 				}else{
-					cout << "6" << endl;
+				//	cout << "6" << endl;
 					bool check1 = terreno[fin.f][fin.c] != 'P' and terreno[fin.f][fin.c] != 'M' and terreno[fin.f][fin.c] != 'B';
-					cout << "7" << endl;
+				//	cout << "7" << endl;
 					bool check2 = abs(altura[fin.f][fin.c] - altura[st.f][st.c]) <= 1;
-					cout << "8" << endl;
+				//	cout << "8" << endl;
 					bool check3 = ((abs(altura[fin.f][fin.c] - altura[st.f][st.c]) <= 2) and st.zapatillas == true);
-					cout << "9" << endl;
+				//	cout << "9" << endl;
 					bool check4 = terreno[intermedia.f][intermedia.c] != 'P' and terreno[intermedia.f][intermedia.c] != 'M' and terreno[intermedia.f][intermedia.c] != 'B';
-					cout << "10" << endl;
+				//	cout << "10" << endl;
 					if(check1 and check4 and (check2 or check3)){
 						next = fin;
 					}
@@ -2637,7 +2641,7 @@ EstadoR_N4 ComportamientoRescatador::applyR(Action accion, const EstadoR_N4 &st,
 		return next;
 }
 
-void ComportamientoRescatador::ModificarMapa(const Sensores &sensores, vector<vector<unsigned char>> &m, vector<vector<unsigned char>> &a){
+void ComportamientoRescatador::ModificarMapaR(const Sensores &sensores, vector<vector<unsigned char>> &m, vector<vector<unsigned char>> &a){
 	switch(sensores.rumbo){
 		case norte:
 			m[sensores.posF][sensores.posC] = sensores.superficie[0];
@@ -2937,7 +2941,7 @@ void ComportamientoRescatador::ModificarMapa(const Sensores &sensores, vector<ve
 	}
 }
 
-bool ComportamientoRescatador::EsAccionValida(const Action &accion, const EstadoR_N4 &estado) {
+bool ComportamientoRescatador::EsAccionValidaR(const Action &accion, const EstadoR_N4 &estado) {
 	if (accionesProhibidas[estado].count(accion) > 0) {
         return false; // La acción está prohibida
     }
