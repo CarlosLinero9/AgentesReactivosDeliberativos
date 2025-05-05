@@ -2035,7 +2035,16 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_3(Sensores sensor
 Action ComportamientoRescatador::ComportamientoRescatadorNivel_4(Sensores sensores){
 	Action accion = IDLE;
 
-	ModificarMapaR(sensores, mapaResultado, mapaCotas);
+	ModificarMapaR(sensores, mapaResultado, mapaCotas, mapaEntidades);
+
+	// for (int i = 0; i < mapaEntidades.size(); ++i) {
+	// 	for (int j = 0; j < mapaEntidades[i].size(); ++j) {
+	// 		std::cout << mapaEntidades[i][j] << " ";
+	// 	}
+	// 	std::cout << std::endl;
+	// }
+	// std::cout << std::endl;
+
 
 	if(mapaResultado[sensores.posF][sensores.posC] == 'D') tiene_zapatillas = true;
 
@@ -2097,7 +2106,7 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_4(Sensores sensor
 			fin.f = f;
 			fin.c = c;
 			current_state = inicio;
-			plan_N4  = AlgoritmoAE(inicio, fin, mapaResultado, mapaCotas);
+			plan_N4  = AlgoritmoAE(inicio, fin, mapaResultado, mapaCotas, mapaEntidades);
 			VisualizaPlan(inicio, plan_N4);
 			hayPlanEnergia = plan_N4.size() != 0;
 
@@ -2105,7 +2114,7 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_4(Sensores sensor
 		if(hayPlanEnergia and plan_N4.size()>0){
 			accion = plan_N4.front();
 			last_state = current_state;
-			current_state = applyR(accion, current_state, mapaResultado, mapaCotas);
+			current_state = applyR(accion, current_state, mapaResultado, mapaCotas, mapaEntidades);
 			if(current_state == last_state){
 				accionesProhibidas[last_state].insert(accion);
 				hayPlanEnergia = false;
@@ -2140,7 +2149,7 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_4(Sensores sensor
 		//cout << "A" << endl;
 		current_state = inicio;
 		//cout << "B"	<< endl;
-		plan_N4  = AlgoritmoAE(inicio, fin, mapaResultado, mapaCotas);
+		plan_N4  = AlgoritmoAE(inicio, fin, mapaResultado, mapaCotas, mapaEntidades);
 		//cout << "C" << endl;
 		VisualizaPlan(inicio, plan_N4);
 		//cout << "D" << endl;
@@ -2151,7 +2160,7 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_4(Sensores sensor
 		accion = plan_N4.front();
 
 		last_state = current_state;
-		current_state = applyR(accion, current_state, mapaResultado, mapaCotas);
+		current_state = applyR(accion, current_state, mapaResultado, mapaCotas, mapaEntidades);
 		// cout << ((current_state == last_state) ? "No me muevo\n" : "Me muevo\n");
 		// cout << current_state.f << " " << current_state.c << " " << current_state.brujula << endl;
 		// cout << last_state.f << " " << last_state.c << " " << last_state.brujula << endl;
@@ -2178,7 +2187,8 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_4(Sensores sensor
 }
 
 vector<Action> ComportamientoRescatador::AlgoritmoAE(const EstadoR_N4 &inicio, const EstadoR_N4 &final,
-	const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura){
+	const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura,
+	 const vector<vector<unsigned char>> &entidades){
 		NodoR_N4 current_node;
 		priority_queue<NodoR_N4> frontier;
 		set<EstadoR_N4> explored;
@@ -2220,7 +2230,7 @@ vector<Action> ComportamientoRescatador::AlgoritmoAE(const EstadoR_N4 &inicio, c
 			if(EsAccionValidaR(WALK, current_node.estado)){
 				//cout << "B_5.1" << endl;
 				NodoR_N4 child_WALK = current_node;
-				child_WALK.estado = applyR(WALK, current_node.estado, terreno, altura);
+				child_WALK.estado = applyR(WALK, current_node.estado, terreno, altura, entidades);
 				child_WALK.secuencia.push_back(WALK);
 				child_WALK.energia += FuncionCoste_R(WALK, current_node.estado, terreno, altura);
 				child_WALK.energia_heuristica = Heuristica(child_WALK.estado, final);
@@ -2241,7 +2251,7 @@ vector<Action> ComportamientoRescatador::AlgoritmoAE(const EstadoR_N4 &inicio, c
 					// Genero el hijo resultante de aplicar la acción RUN
 					NodoR_N4 child_RUN = current_node;
 					//cout << "B_6.2" << endl;
-					child_RUN.estado = applyR(RUN, current_node.estado, terreno, altura);
+					child_RUN.estado = applyR(RUN, current_node.estado, terreno, altura, entidades);
 					//cout << "B_6.3" << endl;
 					child_RUN.secuencia.push_back(RUN);
 					//cout << "B_6.4" << endl;
@@ -2266,7 +2276,7 @@ vector<Action> ComportamientoRescatador::AlgoritmoAE(const EstadoR_N4 &inicio, c
 					//cout << "B_7.1" << endl;
 					// Genero el hijo resultante de aplicar la acción TURN_SR
 					NodoR_N4 child_TURN_SR = current_node;
-					child_TURN_SR.estado = applyR(TURN_SR, current_node.estado, terreno, altura);
+					child_TURN_SR.estado = applyR(TURN_SR, current_node.estado, terreno, altura, entidades);
 					child_TURN_SR.secuencia.push_back(TURN_SR);
 					child_TURN_SR.energia += FuncionCoste_R(TURN_SR, current_node.estado, terreno, altura);
 					child_TURN_SR.energia_heuristica = Heuristica(child_TURN_SR.estado, final);
@@ -2282,7 +2292,7 @@ vector<Action> ComportamientoRescatador::AlgoritmoAE(const EstadoR_N4 &inicio, c
 				if(EsAccionValidaR(TURN_L, current_node.estado)){
 					//cout << "B_8.1" << endl;
 					NodoR_N4 child_TURN_L = current_node;
-					child_TURN_L.estado = applyR(TURN_L, current_node.estado, terreno, altura);
+					child_TURN_L.estado = applyR(TURN_L, current_node.estado, terreno, altura, entidades);
 					child_TURN_L.secuencia.push_back(TURN_L);
 					child_TURN_L.energia += FuncionCoste_R(TURN_L, current_node.estado, terreno, altura);
 					child_TURN_L.energia_heuristica = Heuristica(child_TURN_L.estado, final);
@@ -2589,7 +2599,7 @@ EstadoR_N4 ComportamientoRescatador::NextCasillaRescatador(const EstadoR_N4 &st)
 }
 
 EstadoR_N4 ComportamientoRescatador::applyR(Action accion, const EstadoR_N4 &st, const vector<vector<unsigned char>> &terreno,
-	const vector<vector<unsigned char>> &altura){
+	const vector<vector<unsigned char>> &altura, const vector<vector<unsigned char>> &entidades){
 		EstadoR_N4 next = st;
 
 		switch(accion){
@@ -2605,8 +2615,9 @@ EstadoR_N4 ComportamientoRescatador::applyR(Action accion, const EstadoR_N4 &st,
 					bool check2 = abs(altura[auxiliar.f][auxiliar.c] - altura[st.f][st.c]) <= 1;
 					bool check3 = ((abs(altura[auxiliar.f][auxiliar.c] - altura[st.f][st.c]) <= 2) and st.zapatillas == true);
 					bool check1 = terreno[auxiliar.f][auxiliar.c] != 'P' and terreno[auxiliar.f][auxiliar.c] != 'M' and terreno[auxiliar.f][auxiliar.c] != 'B';
+					bool check4 = entidades[auxiliar.f][auxiliar.c] != 'a';
 
-					if(check1 and (check2 or check3)){
+					if(check1 and (check2 or check3) and check4){
 						next = auxiliar;
 					}
 				}
@@ -2644,7 +2655,9 @@ EstadoR_N4 ComportamientoRescatador::applyR(Action accion, const EstadoR_N4 &st,
 				//	cout << "9" << endl;
 					bool check4 = terreno[intermedia.f][intermedia.c] != 'P' and terreno[intermedia.f][intermedia.c] != 'M' and terreno[intermedia.f][intermedia.c] != 'B';
 				//	cout << "10" << endl;
-					if(check1 and check4 and (check2 or check3)){
+				bool check5 = entidades[intermedia.f][intermedia.c] != 'a';
+				bool check6 = entidades[fin.f][fin.c] != 'a';
+					if(check1 and check4 and (check2 or check3) and check5 and check6){
 						next = fin;
 					}
 				}
@@ -2671,7 +2684,8 @@ EstadoR_N4 ComportamientoRescatador::applyR(Action accion, const EstadoR_N4 &st,
 		return next;
 }
 
-void ComportamientoRescatador::ModificarMapaR(const Sensores &sensores, vector<vector<unsigned char>> &m, vector<vector<unsigned char>> &a){
+void ComportamientoRescatador::ModificarMapaR(const Sensores &sensores, vector<vector<unsigned char>> &m, vector<vector<unsigned char>> &a,
+	vector<vector<unsigned char>> &e){
 	switch(sensores.rumbo){
 		case norte:
 			m[sensores.posF][sensores.posC] = sensores.superficie[0];
@@ -2690,7 +2704,7 @@ void ComportamientoRescatador::ModificarMapaR(const Sensores &sensores, vector<v
 			m[sensores.posF-3][sensores.posC+1] = sensores.superficie[13];
 			m[sensores.posF-3][sensores.posC+2] = sensores.superficie[14];
 			m[sensores.posF-3][sensores.posC+3] = sensores.superficie[15];
-	
+
 			a[sensores.posF][sensores.posC] = sensores.cota[0];
 			a[sensores.posF-1][sensores.posC-1] = sensores.cota[1];
 			a[sensores.posF-1][sensores.posC] = sensores.cota[2];
@@ -2707,9 +2721,26 @@ void ComportamientoRescatador::ModificarMapaR(const Sensores &sensores, vector<v
 			a[sensores.posF-3][sensores.posC+1] = sensores.cota[13];
 			a[sensores.posF-3][sensores.posC+2] = sensores.cota[14];
 			a[sensores.posF-3][sensores.posC+3] = sensores.cota[15];
-	
+
+			e[sensores.posF][sensores.posC] = sensores.agentes[0];
+			e[sensores.posF-1][sensores.posC-1] = sensores.agentes[1];
+			e[sensores.posF-1][sensores.posC] = sensores.agentes[2];
+			e[sensores.posF-1][sensores.posC+1] = sensores.agentes[3];
+			e[sensores.posF-2][sensores.posC-2] = sensores.agentes[4];
+			e[sensores.posF-2][sensores.posC-1] = sensores.agentes[5];
+			e[sensores.posF-2][sensores.posC] = sensores.agentes[6];
+			e[sensores.posF-2][sensores.posC+1] = sensores.agentes[7];
+			e[sensores.posF-2][sensores.posC+2] = sensores.agentes[8];
+			e[sensores.posF-3][sensores.posC-3] = sensores.agentes[9];
+			e[sensores.posF-3][sensores.posC-2] = sensores.agentes[10];
+			e[sensores.posF-3][sensores.posC-1] = sensores.agentes[11];
+			e[sensores.posF-3][sensores.posC] = sensores.agentes[12];
+			e[sensores.posF-3][sensores.posC+1] = sensores.agentes[13];
+			e[sensores.posF-3][sensores.posC+2] = sensores.agentes[14];
+			e[sensores.posF-3][sensores.posC+3] = sensores.agentes[15];
+
 			break;
-	
+
 		case noroeste:
 			m[sensores.posF][sensores.posC] = sensores.superficie[0];
 			m[sensores.posF][sensores.posC-1] = sensores.superficie[1];
@@ -2727,7 +2758,7 @@ void ComportamientoRescatador::ModificarMapaR(const Sensores &sensores, vector<v
 			m[sensores.posF-3][sensores.posC-2] = sensores.superficie[13];
 			m[sensores.posF-3][sensores.posC-1] = sensores.superficie[14];
 			m[sensores.posF-3][sensores.posC] = sensores.superficie[15];
-	
+
 			a[sensores.posF][sensores.posC] = sensores.cota[0];
 			a[sensores.posF][sensores.posC-1] = sensores.cota[1];
 			a[sensores.posF-1][sensores.posC-1] = sensores.cota[2];
@@ -2744,7 +2775,24 @@ void ComportamientoRescatador::ModificarMapaR(const Sensores &sensores, vector<v
 			a[sensores.posF-3][sensores.posC-2] = sensores.cota[13];
 			a[sensores.posF-3][sensores.posC-1] = sensores.cota[14];
 			a[sensores.posF-3][sensores.posC] = sensores.cota[15];
-	
+
+			e[sensores.posF][sensores.posC] = sensores.agentes[0];
+			e[sensores.posF][sensores.posC-1] = sensores.agentes[1];
+			e[sensores.posF-1][sensores.posC-1] = sensores.agentes[2];
+			e[sensores.posF-1][sensores.posC] = sensores.agentes[3];
+			e[sensores.posF][sensores.posC-2] = sensores.agentes[4];
+			e[sensores.posF-1][sensores.posC-2] = sensores.agentes[5];
+			e[sensores.posF-2][sensores.posC-2] = sensores.agentes[6];
+			e[sensores.posF-2][sensores.posC-1] = sensores.agentes[7];
+			e[sensores.posF-2][sensores.posC] = sensores.agentes[8];
+			e[sensores.posF][sensores.posC-3] = sensores.agentes[9];
+			e[sensores.posF-1][sensores.posC-3] = sensores.agentes[10];
+			e[sensores.posF-2][sensores.posC-3] = sensores.agentes[11];
+			e[sensores.posF-3][sensores.posC-3] = sensores.agentes[12];
+			e[sensores.posF-3][sensores.posC-2] = sensores.agentes[13];
+			e[sensores.posF-3][sensores.posC-1] = sensores.agentes[14];
+			e[sensores.posF-3][sensores.posC] = sensores.agentes[15];
+
 			break;
 	
 		case oeste:
@@ -2764,7 +2812,7 @@ void ComportamientoRescatador::ModificarMapaR(const Sensores &sensores, vector<v
 			m[sensores.posF-1][sensores.posC-3] = sensores.superficie[13];
 			m[sensores.posF-2][sensores.posC-3] = sensores.superficie[14];
 			m[sensores.posF-3][sensores.posC-3] = sensores.superficie[15];
-	
+
 			a[sensores.posF][sensores.posC] = sensores.cota[0];
 			a[sensores.posF+1][sensores.posC-1] = sensores.cota[1];
 			a[sensores.posF][sensores.posC-1] = sensores.cota[2];
@@ -2781,6 +2829,23 @@ void ComportamientoRescatador::ModificarMapaR(const Sensores &sensores, vector<v
 			a[sensores.posF-1][sensores.posC-3] = sensores.cota[13];
 			a[sensores.posF-2][sensores.posC-3] = sensores.cota[14];
 			a[sensores.posF-3][sensores.posC-3] = sensores.cota[15];
+
+			e[sensores.posF][sensores.posC] = sensores.agentes[0];
+			e[sensores.posF+1][sensores.posC-1] = sensores.agentes[1];
+			e[sensores.posF][sensores.posC-1] = sensores.agentes[2];
+			e[sensores.posF-1][sensores.posC-1] = sensores.agentes[3];
+			e[sensores.posF+2][sensores.posC-2] = sensores.agentes[4];
+			e[sensores.posF+1][sensores.posC-2] = sensores.agentes[5];
+			e[sensores.posF][sensores.posC-2] = sensores.agentes[6];
+			e[sensores.posF-1][sensores.posC-2] = sensores.agentes[7];
+			e[sensores.posF-2][sensores.posC-2] = sensores.agentes[8];
+			e[sensores.posF+3][sensores.posC-3] = sensores.agentes[9];
+			e[sensores.posF+2][sensores.posC-3] = sensores.agentes[10];
+			e[sensores.posF+1][sensores.posC-3] = sensores.agentes[11];
+			e[sensores.posF][sensores.posC-3] = sensores.agentes[12];
+			e[sensores.posF-1][sensores.posC-3] = sensores.agentes[13];
+			e[sensores.posF-2][sensores.posC-3] = sensores.agentes[14];
+			e[sensores.posF-3][sensores.posC-3] = sensores.agentes[15];
 	
 			break;
 	
@@ -2801,7 +2866,7 @@ void ComportamientoRescatador::ModificarMapaR(const Sensores &sensores, vector<v
 			m[sensores.posF+3][sensores.posC+2] = sensores.superficie[13];
 			m[sensores.posF+3][sensores.posC+1] = sensores.superficie[14];
 			m[sensores.posF+3][sensores.posC] = sensores.superficie[15];
-	
+
 			a[sensores.posF][sensores.posC] = sensores.cota[0];
 			a[sensores.posF][sensores.posC+1] = sensores.cota[1];
 			a[sensores.posF+1][sensores.posC+1] = sensores.cota[2];
@@ -2818,7 +2883,24 @@ void ComportamientoRescatador::ModificarMapaR(const Sensores &sensores, vector<v
 			a[sensores.posF+3][sensores.posC+2] = sensores.cota[13];
 			a[sensores.posF+3][sensores.posC+1] = sensores.cota[14];
 			a[sensores.posF+3][sensores.posC] = sensores.cota[15];
-	
+
+			e[sensores.posF][sensores.posC] = sensores.agentes[0];
+			e[sensores.posF][sensores.posC+1] = sensores.agentes[1];
+			e[sensores.posF+1][sensores.posC+1] = sensores.agentes[2];
+			e[sensores.posF+1][sensores.posC] = sensores.agentes[3];
+			e[sensores.posF][sensores.posC+2] = sensores.agentes[4];
+			e[sensores.posF+1][sensores.posC+2] = sensores.agentes[5];
+			e[sensores.posF+2][sensores.posC+2] = sensores.agentes[6];
+			e[sensores.posF+2][sensores.posC+1] = sensores.agentes[7];
+			e[sensores.posF+2][sensores.posC] = sensores.agentes[8];
+			e[sensores.posF][sensores.posC+3] = sensores.agentes[9];
+			e[sensores.posF+1][sensores.posC+3] = sensores.agentes[10];
+			e[sensores.posF+2][sensores.posC+3] = sensores.agentes[11];
+			e[sensores.posF+3][sensores.posC+3] = sensores.agentes[12];
+			e[sensores.posF+3][sensores.posC+2] = sensores.agentes[13];
+			e[sensores.posF+3][sensores.posC+1] = sensores.agentes[14];
+			e[sensores.posF+3][sensores.posC] = sensores.agentes[15];
+
 			break;
 	
 		case sur:
@@ -2838,7 +2920,7 @@ void ComportamientoRescatador::ModificarMapaR(const Sensores &sensores, vector<v
 			m[sensores.posF+3][sensores.posC-1] = sensores.superficie[13];
 			m[sensores.posF+3][sensores.posC-2] = sensores.superficie[14];
 			m[sensores.posF+3][sensores.posC-3] = sensores.superficie[15];
-	
+
 			a[sensores.posF][sensores.posC] = sensores.cota[0];
 			a[sensores.posF+1][sensores.posC+1] = sensores.cota[1];
 			a[sensores.posF+1][sensores.posC] = sensores.cota[2];
@@ -2855,7 +2937,24 @@ void ComportamientoRescatador::ModificarMapaR(const Sensores &sensores, vector<v
 			a[sensores.posF+3][sensores.posC-1] = sensores.cota[13];
 			a[sensores.posF+3][sensores.posC-2] = sensores.cota[14];
 			a[sensores.posF+3][sensores.posC-3] = sensores.cota[15];
-	
+
+			e[sensores.posF][sensores.posC] = sensores.agentes[0];
+			e[sensores.posF+1][sensores.posC+1] = sensores.agentes[1];
+			e[sensores.posF+1][sensores.posC] = sensores.agentes[2];
+			e[sensores.posF+1][sensores.posC-1] = sensores.agentes[3];
+			e[sensores.posF+2][sensores.posC+2] = sensores.agentes[4];
+			e[sensores.posF+2][sensores.posC+1] = sensores.agentes[5];
+			e[sensores.posF+2][sensores.posC] = sensores.agentes[6];
+			e[sensores.posF+2][sensores.posC-1] = sensores.agentes[7];
+			e[sensores.posF+2][sensores.posC-2] = sensores.agentes[8];
+			e[sensores.posF+3][sensores.posC+3] = sensores.agentes[9];
+			e[sensores.posF+3][sensores.posC+2] = sensores.agentes[10];
+			e[sensores.posF+3][sensores.posC+1] = sensores.agentes[11];
+			e[sensores.posF+3][sensores.posC] = sensores.agentes[12];
+			e[sensores.posF+3][sensores.posC-1] = sensores.agentes[13];
+			e[sensores.posF+3][sensores.posC-2] = sensores.agentes[14];
+			e[sensores.posF+3][sensores.posC-3] = sensores.agentes[15];
+
 			break;
 	
 		case suroeste:
@@ -2875,7 +2974,7 @@ void ComportamientoRescatador::ModificarMapaR(const Sensores &sensores, vector<v
 			m[sensores.posF+2][sensores.posC-3] = sensores.superficie[13];
 			m[sensores.posF+1][sensores.posC-3] = sensores.superficie[14];
 			m[sensores.posF][sensores.posC-3] = sensores.superficie[15];
-	
+
 			a[sensores.posF][sensores.posC] = sensores.cota[0];
 			a[sensores.posF+1][sensores.posC] = sensores.cota[1];
 			a[sensores.posF+1][sensores.posC-1] = sensores.cota[2];
@@ -2892,7 +2991,24 @@ void ComportamientoRescatador::ModificarMapaR(const Sensores &sensores, vector<v
 			a[sensores.posF+2][sensores.posC-3] = sensores.cota[13];
 			a[sensores.posF+1][sensores.posC-3] = sensores.cota[14];
 			a[sensores.posF][sensores.posC-3] = sensores.cota[15];
-	
+
+			e[sensores.posF][sensores.posC] = sensores.agentes[0];
+			e[sensores.posF+1][sensores.posC] = sensores.agentes[1];
+			e[sensores.posF+1][sensores.posC-1] = sensores.agentes[2];
+			e[sensores.posF][sensores.posC-1] = sensores.agentes[3];
+			e[sensores.posF+2][sensores.posC] = sensores.agentes[4];
+			e[sensores.posF+2][sensores.posC-1] = sensores.agentes[5];
+			e[sensores.posF+2][sensores.posC-2] = sensores.agentes[6];
+			e[sensores.posF+1][sensores.posC-2] = sensores.agentes[7];
+			e[sensores.posF][sensores.posC-2] = sensores.agentes[8];
+			e[sensores.posF+3][sensores.posC] = sensores.agentes[9];
+			e[sensores.posF+3][sensores.posC-1] = sensores.agentes[10];
+			e[sensores.posF+3][sensores.posC-2] = sensores.agentes[11];
+			e[sensores.posF+3][sensores.posC-3] = sensores.agentes[12];
+			e[sensores.posF+2][sensores.posC-3] = sensores.agentes[13];
+			e[sensores.posF+1][sensores.posC-3] = sensores.agentes[14];
+			e[sensores.posF][sensores.posC-3] = sensores.agentes[15];
+
 			break;
 	
 		case este:
@@ -2912,7 +3028,7 @@ void ComportamientoRescatador::ModificarMapaR(const Sensores &sensores, vector<v
 			m[sensores.posF+1][sensores.posC+3] = sensores.superficie[13];
 			m[sensores.posF+2][sensores.posC+3] = sensores.superficie[14];
 			m[sensores.posF+3][sensores.posC+3] = sensores.superficie[15];
-	
+
 			a[sensores.posF][sensores.posC] = sensores.cota[0];
 			a[sensores.posF-1][sensores.posC+1] = sensores.cota[1];
 			a[sensores.posF][sensores.posC+1] = sensores.cota[2];
@@ -2929,7 +3045,24 @@ void ComportamientoRescatador::ModificarMapaR(const Sensores &sensores, vector<v
 			a[sensores.posF+1][sensores.posC+3] = sensores.cota[13];
 			a[sensores.posF+2][sensores.posC+3] = sensores.cota[14];
 			a[sensores.posF+3][sensores.posC+3] = sensores.cota[15];
-	
+
+			e[sensores.posF][sensores.posC] = sensores.agentes[0];
+			e[sensores.posF-1][sensores.posC+1] = sensores.agentes[1];
+			e[sensores.posF][sensores.posC+1] = sensores.agentes[2];
+			e[sensores.posF+1][sensores.posC+1] = sensores.agentes[3];
+			e[sensores.posF-2][sensores.posC+2] = sensores.agentes[4];
+			e[sensores.posF-1][sensores.posC+2] = sensores.agentes[5];
+			e[sensores.posF][sensores.posC+2] = sensores.agentes[6];
+			e[sensores.posF+1][sensores.posC+2] = sensores.agentes[7];
+			e[sensores.posF+2][sensores.posC+2] = sensores.agentes[8];
+			e[sensores.posF-3][sensores.posC+3] = sensores.agentes[9];
+			e[sensores.posF-2][sensores.posC+3] = sensores.agentes[10];
+			e[sensores.posF-1][sensores.posC+3] = sensores.agentes[11];
+			e[sensores.posF][sensores.posC+3] = sensores.agentes[12];
+			e[sensores.posF+1][sensores.posC+3] = sensores.agentes[13];
+			e[sensores.posF+2][sensores.posC+3] = sensores.agentes[14];
+			e[sensores.posF+3][sensores.posC+3] = sensores.agentes[15];
+
 			break;
 	
 		case noreste:
@@ -2949,7 +3082,7 @@ void ComportamientoRescatador::ModificarMapaR(const Sensores &sensores, vector<v
 			m[sensores.posF-2][sensores.posC+3] = sensores.superficie[13];
 			m[sensores.posF-1][sensores.posC+3] = sensores.superficie[14];
 			m[sensores.posF][sensores.posC+3] = sensores.superficie[15];
-	
+
 			a[sensores.posF][sensores.posC] = sensores.cota[0];
 			a[sensores.posF-1][sensores.posC] = sensores.cota[1];
 			a[sensores.posF-1][sensores.posC+1] = sensores.cota[2];
@@ -2966,7 +3099,24 @@ void ComportamientoRescatador::ModificarMapaR(const Sensores &sensores, vector<v
 			a[sensores.posF-2][sensores.posC+3] = sensores.cota[13];
 			a[sensores.posF-1][sensores.posC+3] = sensores.cota[14];
 			a[sensores.posF][sensores.posC+3] = sensores.cota[15];
-	
+
+			e[sensores.posF][sensores.posC] = sensores.agentes[0];
+			e[sensores.posF-1][sensores.posC] = sensores.agentes[1];
+			e[sensores.posF-1][sensores.posC+1] = sensores.agentes[2];
+			e[sensores.posF][sensores.posC+1] = sensores.agentes[3];
+			e[sensores.posF-2][sensores.posC] = sensores.agentes[4];
+			e[sensores.posF-2][sensores.posC+1] = sensores.agentes[5];
+			e[sensores.posF-2][sensores.posC+2] = sensores.agentes[6];
+			e[sensores.posF-1][sensores.posC+2] = sensores.agentes[7];
+			e[sensores.posF][sensores.posC+2] = sensores.agentes[8];
+			e[sensores.posF-3][sensores.posC] = sensores.agentes[9];
+			e[sensores.posF-3][sensores.posC+1] = sensores.agentes[10];
+			e[sensores.posF-3][sensores.posC+2] = sensores.agentes[11];
+			e[sensores.posF-3][sensores.posC+3] = sensores.agentes[12];
+			e[sensores.posF-2][sensores.posC+3] = sensores.agentes[13];
+			e[sensores.posF-1][sensores.posC+3] = sensores.agentes[14];
+			e[sensores.posF][sensores.posC+3] = sensores.agentes[15];
+
 			break;
 	}
 }

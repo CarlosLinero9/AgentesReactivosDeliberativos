@@ -257,15 +257,16 @@ public:
   /*NIVEL 4*/
   Action ComportamientoRescatadorNivel_4(Sensores sensores);
   vector<Action> AlgoritmoAE(const EstadoR_N4 &inicio, const EstadoR_N4 &final,
-    const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura);
+    const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura, 
+    const vector<vector<unsigned char>> &entidades);
   int Heuristica(const EstadoR_N4 &a, const EstadoR_N4 &b);
   void VisualizaPlan(const EstadoR_N4 &st, const vector<Action> &plan);
   int FuncionCoste_R(const Action &accion, const EstadoR_N4 &st, const vector<vector<unsigned char>> &terreno,
     const vector<vector<unsigned char>> &altura);
   EstadoR_N4 NextCasillaRescatador(const EstadoR_N4 &st);
   EstadoR_N4 applyR(Action accion, const EstadoR_N4 &st, const vector<vector<unsigned char>> &terreno,
-    const vector<vector<unsigned char>> &altura);
-  void ModificarMapaR(const Sensores &sensores, vector<vector<unsigned char>> &m, vector<vector<unsigned char>> &a);
+    const vector<vector<unsigned char>> &altura, const vector<vector<unsigned char>> &entidades);
+  void ModificarMapaR(const Sensores &sensores, vector<vector<unsigned char>> &m, vector<vector<unsigned char>> &a, vector<vector<unsigned char>> &e);
   bool EsAccionValidaR(const Action &accion, const EstadoR_N4 &estado);
 
 
