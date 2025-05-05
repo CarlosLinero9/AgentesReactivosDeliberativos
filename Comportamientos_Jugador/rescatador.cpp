@@ -2051,7 +2051,18 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_4(Sensores sensor
 					auxiliarAvisado = true;
 					return CALL_ON; // Avisar al auxiliar
 				} else {
-					return IDLE; // Esperar al auxiliar
+					if(fallos_auxiliares == MAXIMOS_FALLOS_N4){
+						return CALL_OFF; // Renunciar a la misión si el auxiliar no responde
+					}else{
+						if(esperas == MAXIMAS_ESPERAS_N4){
+							fallos_auxiliares++;
+							esperas = 0;
+							auxiliarAvisado = false; // Reiniciar el estado del aviso al auxiliar
+							return CALL_OFF; // Renunciar a la misión si el auxiliar no responde
+						}
+						esperas++;
+						return IDLE; // Esperar al auxiliar
+					}
 				}
 			}
 		}
@@ -2100,6 +2111,10 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_4(Sensores sensor
 				hayPlanEnergia = false;
 				plan_N4.clear();
 				return IDLE;
+			}else if(accion == WALK and (sensores.agentes[2] == 'v' or sensores.agentes[2] == 'e')){
+				return IDLE;
+			}else if(accion == RUN and ((sensores.agentes[2] == 'v' or sensores.agentes[2] == 'e') or (sensores.agentes[6] == 'v' or sensores.agentes[6] == 'e'))){
+				return IDLE;
 			}else{
 				accion = plan_N4.front();
 				auto it = plan_N4.begin();
@@ -2145,6 +2160,10 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_4(Sensores sensor
 			accionesProhibidas[last_state].insert(accion);
 			hayPlan = false;
 			plan_N4.clear();
+			return IDLE;
+		}else if(accion == WALK and (sensores.agentes[2] == 'v' or sensores.agentes[2] == 'e')){
+			return IDLE;
+		}else if(accion == RUN and ((sensores.agentes[2] == 'v' or sensores.agentes[2] == 'e') or (sensores.agentes[6] == 'v' or sensores.agentes[6] == 'e'))){
 			return IDLE;
 		}else{
 			accion = plan_N4.front();

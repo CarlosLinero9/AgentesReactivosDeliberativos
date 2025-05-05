@@ -171,6 +171,8 @@ public:
     hayPlan = false;
     hayPlanEnergia = false;
     auxiliarAvisado = false;
+    esperas = 0;
+    fallos_auxiliares = 0;
 
   }
 
@@ -283,6 +285,8 @@ private:
   /*NIVEL 0, 1 y 4*/
   const int SUMA_AL_VISITAR = 30; //Suma que se le añade a la casilla que se va a visitar
   const int SUMA_AL_VER = 1; //Suma que se le añade a la casilla que se ve en el cono de vision
+  const int MAXIMAS_ESPERAS_N4 = (mapaResultado.size() * mapaResultado[0].size() )/ 2; //Máximo de esperas que se permiten en el nivel 4
+  const int MAXIMOS_FALLOS_N4 = 3; //Máximo de esperas que se permiten en el nivel 2
 
   // Variables de Estado
   bool accion_defecto;
@@ -306,6 +310,8 @@ private:
   EstadoR_N4 last_state;
 
   bool auxiliarAvisado;
+  int esperas;
+  int fallos_auxiliares;
 };
 
 #endif

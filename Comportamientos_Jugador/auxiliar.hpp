@@ -237,8 +237,8 @@ public:
     const vector<vector<unsigned char>> &altura);
   void ModificarMapaA(const Sensores &sensores, vector<vector<unsigned char>> &m, vector<vector<unsigned char>> &a);
   bool EsAccionValidaA(const Action &accion, const EstadoA_N4 &estado);
-  bool DestinoEnConoVision(const Sensores &sensores, int f_destino, int c_destino);
-  vector<pair<int, int>> ObtenerConoVision(const Sensores &sensores);
+  bool DestinoEnConoVision(const EstadoA_N4 &estado, const EstadoA_N4 &final);
+  vector<pair<int, int>> ObtenerConoVision(const EstadoA_N4 &estado);
 
 
 

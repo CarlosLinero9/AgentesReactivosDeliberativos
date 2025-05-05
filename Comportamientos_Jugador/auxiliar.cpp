@@ -1340,14 +1340,14 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_4(Sensores sensores){
 	if(mapaResultado[sensores.posF][sensores.posC] == 'D') tiene_zapatillas = true;
 
 	if(f_dest != -1 and c_dest != -1){
-		if(DestinoEnConoVision(sensores, f_dest, c_dest)){
+		
 			hayPlanEnergia = false;
 			hayPlan = false;
 			plan_N4.clear();
 			f_dest = -1;
 			c_dest = -1;
 			return IDLE;
-		}
+		
 	}
 	
 	
@@ -1393,6 +1393,8 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_4(Sensores sensores){
 				accionesProhibidas[last_state].insert(accion);
 				hayPlanEnergia = false;
 				plan_N4.clear();
+				return IDLE;
+			}else if(accion == WALK and (sensores.agentes[2] == 'v' or sensores.agentes[2] == 'e')){
 				return IDLE;
 			}else{
 				accion = plan_N4.front();
@@ -1446,6 +1448,8 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_4(Sensores sensores){
 				hayPlan = false;
 				plan_N4.clear();
 				return IDLE;
+			}else if(accion == WALK and (sensores.agentes[2] == 'v' or sensores.agentes[2] == 'e')){
+				return IDLE;
 			}else{
 				accion = plan_N4.front();
 				auto it = plan_N4.begin();
@@ -1479,8 +1483,7 @@ vector<Action> ComportamientoAuxiliar::AlgoritmoAE_N4(const EstadoA_N4 &inicio, 
 		//cout << "B_2" << endl;
 
 		frontier.push(current_node);
-		bool SolutionFound = (current_node.estado.f == final.f
-			and current_node.estado.c == final.c);
+		bool SolutionFound = DestinoEnConoVision(current_node.estado, final);
 		//cout << "B_3" << endl;
 
 		while(!SolutionFound and !frontier.empty()){
@@ -1494,9 +1497,9 @@ vector<Action> ComportamientoAuxiliar::AlgoritmoAE_N4(const EstadoA_N4 &inicio, 
 			// }
 			
 
-			if(current_node.estado.f == final.f and current_node.estado.c == final.c){
+			if(DestinoEnConoVision(current_node.estado, final)){
 				SolutionFound = true;
-			}
+			}			
 			// if(iteraciones){
 			// 	cout << "B_5" << endl;
 			// }
@@ -2091,12 +2094,12 @@ bool ComportamientoAuxiliar::EsAccionValidaA(const Action &accion, const EstadoA
 	return true; // La acción es válida
 }
 
-bool ComportamientoAuxiliar::DestinoEnConoVision(const Sensores &sensores, int f_destino, int c_destino) {
+bool ComportamientoAuxiliar::DestinoEnConoVision(const EstadoA_N4 &estado, const EstadoA_N4 &final) {
     // Obtener las coordenadas del cono de visión
-    vector<pair<int, int>> conoVision = ObtenerConoVision(sensores);
+    vector<pair<int, int>> conoVision = ObtenerConoVision(estado);
     // Coordenadas del destino
-    int destinoF = f_destino;
-    int destinoC = c_destino;
+    int destinoF = final.f;
+    int destinoC = final.c;
 
 	//cout << "Destino: " << destinoF << " " << destinoC << endl;
 
@@ -2113,15 +2116,15 @@ bool ComportamientoAuxiliar::DestinoEnConoVision(const Sensores &sensores, int f
     return false; // El destino no está en el cono de visión
 }
 
-vector<pair<int, int>> ComportamientoAuxiliar::ObtenerConoVision(const Sensores &sensores) {
+vector<pair<int, int>> ComportamientoAuxiliar::ObtenerConoVision(const EstadoA_N4 &estado) {
     vector<pair<int, int>> coordenadasCono;
 
     // Coordenadas del auxiliar
-    int f = sensores.posF;
-    int c = sensores.posC;
+    int f = estado.f;
+    int c = estado.c;
 
     // Dependiendo de la orientación (rumbo), calcula las casillas visibles
-	switch (sensores.rumbo) {
+	switch (estado.brujula) {
 		case norte:
 			coordenadasCono.push_back({f, c});
 			coordenadasCono.push_back({f - 1, c - 1});
