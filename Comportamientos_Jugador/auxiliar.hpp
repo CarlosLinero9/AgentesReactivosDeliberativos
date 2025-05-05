@@ -226,6 +226,8 @@ public:
 
   /*NIVEL 4*/
   Action ComportamientoAuxiliarNivel_4(Sensores sensores);
+  vector<Action> AlgoritmoAE(const EstadoA_N4 &inicio, const EstadoA_N4 &final,
+    const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura);
   vector<Action> AlgoritmoAE_N4(const EstadoA_N4 &inicio, const EstadoA_N4 &final,
     const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura);
   int Heuristica(const EstadoA_N4 &a, const EstadoA_N4 &b);

@@ -2081,6 +2081,21 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_4(Sensores sensor
 
 	
 	if(mapaResultado[sensores.posF][sensores.posC] == 'X'){
+		// int limite_energia = 500;
+		// if(sensores.tiempo < 1000){
+		// 	limite_energia = 500;
+		// }else if(sensores.tiempo < 1500){
+		// 	limite_energia = 750;
+		// }else if(sensores.tiempo < 2000){
+		// 	limite_energia = 1000;
+		// }else if(sensores.tiempo < 2500){
+		// 	limite_energia = 1500;
+		// }else if(sensores.tiempo < 3000){
+		// 	limite_energia = 2000;
+		// }
+		// while(sensores.energia != limite_energia){
+		// 	return IDLE;
+		// }
 		while(sensores.energia != 3000){
 			return IDLE;
 		}
@@ -2098,18 +2113,20 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_4(Sensores sensor
 					}
 				}
 			}
-			EstadoR_N4 inicio, fin;
-			inicio.f = sensores.posF;
-			inicio.c = sensores.posC;
-			inicio.brujula = sensores.rumbo;
-			inicio.zapatillas = tiene_zapatillas;
-			fin.f = f;
-			fin.c = c;
-			current_state = inicio;
-			plan_N4  = AlgoritmoAE(inicio, fin, mapaResultado, mapaCotas, mapaEntidades);
-			VisualizaPlan(inicio, plan_N4);
-			hayPlanEnergia = plan_N4.size() != 0;
 
+			if(f != -1 and c != -1){
+				EstadoR_N4 inicio, fin;
+				inicio.f = sensores.posF;
+				inicio.c = sensores.posC;
+				inicio.brujula = sensores.rumbo;
+				inicio.zapatillas = tiene_zapatillas;
+				fin.f = f;
+				fin.c = c;
+				current_state = inicio;
+				plan_N4  = AlgoritmoAE(inicio, fin, mapaResultado, mapaCotas, mapaEntidades);
+				VisualizaPlan(inicio, plan_N4);
+				hayPlanEnergia = plan_N4.size() != 0;
+			}
 		}
 		if(hayPlanEnergia and plan_N4.size()>0){
 			accion = plan_N4.front();
@@ -2129,11 +2146,11 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_4(Sensores sensor
 				auto it = plan_N4.begin();
 				it = plan_N4.erase(it);
 			}
+			return accion;
 		}
 		if(plan_N4.size()==0 and hayPlanEnergia){
 			hayPlanEnergia=false;
 		}
-		return accion;
 	}
 	
 

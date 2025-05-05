@@ -1370,19 +1370,19 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_4(Sensores sensores){
 					}
 				}
 			}
-			EstadoA_N4 inicio, fin;
-			inicio.f = sensores.posF;
-			inicio.c = sensores.posC;
-			inicio.brujula = sensores.rumbo;
-			inicio.zapatillas = tiene_zapatillas;
-			fin.f = f;
-			fin.c = c;
-			f_dest = f;
-			c_dest = c;
-			current_state = inicio;
-			plan_N4  = AlgoritmoAE_N4(inicio, fin, mapaResultado, mapaCotas);
-			VisualizaPlan(inicio, plan_N4);
-			hayPlanEnergia = plan_N4.size() != 0;
+			if(f != -1 and c != -1){
+				EstadoA_N4 inicio, fin;
+				inicio.f = sensores.posF;
+				inicio.c = sensores.posC;
+				inicio.brujula = sensores.rumbo;
+				inicio.zapatillas = tiene_zapatillas;
+				fin.f = f;
+				fin.c = c;
+				current_state = inicio;
+				plan_N4  = AlgoritmoAE(inicio, fin, mapaResultado, mapaCotas);
+				VisualizaPlan(inicio, plan_N4);
+				hayPlanEnergia = plan_N4.size() != 0;
+			}
 
 		}
 		if(hayPlanEnergia and plan_N4.size()>0){
@@ -1401,11 +1401,11 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_4(Sensores sensores){
 				auto it = plan_N4.begin();
 				it = plan_N4.erase(it);
 			}
+			return accion;
 		}
 		if(plan_N4.size()==0 and hayPlanEnergia){
 			hayPlanEnergia=false;
 		}
-		return accion;
 	}
 	
 
@@ -1589,6 +1589,79 @@ vector<Action> ComportamientoAuxiliar::AlgoritmoAE_N4(const EstadoA_N4 &inicio, 
 		// cout << "En abierto hay " << frontier.size() << " nodos\n";
 		// cout << "En cerrado hay " << explored.size() << " nodos\n";
 		// cout << "Se han realizado " << iteraciones << " iteraciones\n";
+		return path;
+}
+
+vector<Action> ComportamientoAuxiliar::AlgoritmoAE(const EstadoA_N4 &inicio, const EstadoA_N4 &final,
+	const vector<vector<unsigned char>> &terreno, const vector<vector<unsigned char>> &altura){
+	
+		NodoA_N4 current_node;
+		priority_queue<NodoA_N4> frontier;
+		set<EstadoA_N4> explored;
+		vector<Action> path;
+		int iteraciones = 0;
+
+		current_node.estado = inicio;
+		current_node.energia = 0;
+		current_node.energia_heuristica = 0;
+		if(terreno[current_node.estado.f][current_node.estado.c] == 'D'){
+			current_node.estado.zapatillas = true;
+		}
+
+		frontier.push(current_node);
+		bool SolutionFound = (current_node.estado.f == final.f
+			and current_node.estado.c == final.c);
+
+		while(!SolutionFound and !frontier.empty()){
+			iteraciones++;
+			frontier.pop();
+			explored.insert(current_node.estado);
+
+			if(current_node.estado.f == final.f and current_node.estado.c == final.c){
+				SolutionFound = true;
+			}
+
+			// Genero el hijo resultante de aplicar la acción WALK
+			NodoA_N4 child_WALK = current_node;
+			child_WALK.estado = applyA(WALK, current_node.estado, terreno, altura);
+			child_WALK.secuencia.push_back(WALK);
+			child_WALK.energia += FuncionCoste_A(WALK, current_node.estado, terreno, altura);
+			child_WALK.energia_heuristica = Heuristica(child_WALK.estado, final);
+
+			if(explored.find(child_WALK.estado) == explored.end()){
+				// Se mete en la lista frontier después de añadir a secuencia la acción
+				frontier.push(child_WALK);
+			}
+
+			// Genero el hijo resultante de aplicar la acción TURN_SR
+			if(!SolutionFound){
+				NodoA_N4 child_TURN_SR = current_node;
+				child_TURN_SR.estado = applyA(TURN_SR, current_node.estado, terreno, altura);
+				child_TURN_SR.secuencia.push_back(TURN_SR);
+				child_TURN_SR.energia += FuncionCoste_A(TURN_SR, current_node.estado, terreno, altura);
+				child_TURN_SR.energia_heuristica = Heuristica(child_TURN_SR.estado, final);
+				 
+				if(explored.find(child_TURN_SR.estado) == explored.end()){
+					frontier.push(child_TURN_SR);
+				}
+			}
+
+			// Paso a evaluar el siguiente nodo en la lista "frontier"
+			if(!SolutionFound and !frontier.empty()){
+				current_node = frontier.top();
+				while(explored.find(current_node.estado) != explored.end() and !frontier.empty()){
+					frontier.pop();
+
+					if(!frontier.empty())
+						current_node = frontier.top();
+				}
+			}
+		}
+
+		if(SolutionFound) path = current_node.secuencia;
+		cout << "En abierto hay " << frontier.size() << " nodos\n";
+		cout << "En cerrado hay " << explored.size() << " nodos\n";
+		cout << "Se han realizado " << iteraciones << " iteraciones\n";
 		return path;
 }
 
