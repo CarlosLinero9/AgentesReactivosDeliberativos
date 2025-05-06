@@ -2047,6 +2047,11 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_4(Sensores sensor
 
 
 	if(mapaResultado[sensores.posF][sensores.posC] == 'D') tiene_zapatillas = true;
+	if(sensores.choque){
+		// Si el rescatador choca, se reinicia el plan
+		plan_N4.clear();
+		hayPlan = false;
+	}
 
 	if (sensores.posF == sensores.destinoF && sensores.posC == sensores.destinoC) {
 		if (!sensores.gravedad) {

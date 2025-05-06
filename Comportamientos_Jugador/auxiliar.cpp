@@ -1338,6 +1338,11 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_4(Sensores sensores){
 	ModificarMapaA(sensores, mapaResultado, mapaCotas);
 
 	if(mapaResultado[sensores.posF][sensores.posC] == 'D') tiene_zapatillas = true;
+	if(sensores.choque){
+		// Si el rescatador choca, se reinicia el plan
+		plan_N4.clear();
+		hayPlan = false;
+	}
 
 	if(f_dest != -1 and c_dest != -1){
 		
