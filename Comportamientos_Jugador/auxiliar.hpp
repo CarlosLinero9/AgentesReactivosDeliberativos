@@ -160,8 +160,6 @@ public:
     plan_N4 = vector<Action>();
     hayPlan = false;
     hayPlanEnergia = false;
-    f_dest = -1;
-    c_dest = -1;
     iteraciones = 3000;
     iteraciones_busqueda = 0;
   }
@@ -289,7 +287,6 @@ private:
   int iteraciones;
   int iteraciones_busqueda;
 
-  int f_dest, c_dest;
 };
 
 #endif

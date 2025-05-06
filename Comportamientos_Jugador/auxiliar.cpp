@@ -1344,17 +1344,6 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_4(Sensores sensores){
 		plan_N4.clear();
 		hayPlan = false;
 	}
-
-	if(f_dest != -1 and c_dest != -1){
-		
-			hayPlanEnergia = false;
-			hayPlan = false;
-			plan_N4.clear();
-			f_dest = -1;
-			c_dest = -1;
-			return IDLE;
-		
-	}
 	
 	
 	
@@ -1428,8 +1417,6 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_4(Sensores sensores){
 			inicio.zapatillas = tiene_zapatillas;
 			fin.f = sensores.destinoF;
 			fin.c = sensores.destinoC;
-			f_dest = sensores.destinoF;
-			c_dest = sensores.destinoC;
 			//cout << "A" << endl;
 			current_state = inicio;
 			//cout << "B"	<< endl;
