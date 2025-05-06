@@ -173,6 +173,7 @@ public:
     auxiliarAvisado = false;
     esperas = 0;
     fallos_auxiliares = 0;
+    iteraciones = 3000;
 
   }
 
@@ -313,6 +314,7 @@ private:
   bool auxiliarAvisado;
   int esperas;
   int fallos_auxiliares;
+  int iteraciones;
 };
 
 #endif

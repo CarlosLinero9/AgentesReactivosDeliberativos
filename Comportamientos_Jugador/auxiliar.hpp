@@ -162,6 +162,7 @@ public:
     hayPlanEnergia = false;
     f_dest = -1;
     c_dest = -1;
+    iteraciones = 3000;
   }
   ComportamientoAuxiliar(std::vector<std::vector<unsigned char>> mapaR, std::vector<std::vector<unsigned char>> mapaC) : Comportamiento(mapaR,mapaC)
   {
@@ -280,6 +281,7 @@ private:
 
   EstadoA_N4 current_state;
   EstadoA_N4 last_state;
+  int iteraciones;
 
   int f_dest, c_dest;
 };

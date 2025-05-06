@@ -2053,7 +2053,7 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_4(Sensores sensor
 			// El accidentado no requiere ayuda urgente, misión completada
 			return IDLE; // Esperar nueva misión
 		} else {
-			if(sensores.energia < 500 or sensores.tiempo > 200){
+			if(sensores.energia < 500){
 				return CALL_OFF; // Renunciar a la misión si la energía es baja o el tiempo es alto
 			}else{
 				if (!auxiliarAvisado) {
@@ -2138,8 +2138,10 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_4(Sensores sensor
 				plan_N4.clear();
 				return IDLE;
 			}else if(accion == WALK and (sensores.agentes[2] == 'v' or sensores.agentes[2] == 'e')){
+				plan_N4.clear();
 				return IDLE;
 			}else if(accion == RUN and ((sensores.agentes[2] == 'v' or sensores.agentes[2] == 'e') or (sensores.agentes[6] == 'v' or sensores.agentes[6] == 'e'))){
+				plan_N4.clear();
 				return IDLE;
 			}else{
 				accion = plan_N4.front();
@@ -2188,8 +2190,10 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_4(Sensores sensor
 			plan_N4.clear();
 			return IDLE;
 		}else if(accion == WALK and (sensores.agentes[2] == 'v' or sensores.agentes[2] == 'e')){
+			plan_N4.clear();
 			return IDLE;
 		}else if(accion == RUN and ((sensores.agentes[2] == 'v' or sensores.agentes[2] == 'e') or (sensores.agentes[6] == 'v' or sensores.agentes[6] == 'e'))){
+			plan_N4.clear();
 			return IDLE;
 		}else{
 			accion = plan_N4.front();

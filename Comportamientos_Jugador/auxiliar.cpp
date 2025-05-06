@@ -1395,6 +1395,7 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_4(Sensores sensores){
 				plan_N4.clear();
 				return IDLE;
 			}else if(accion == WALK and (sensores.agentes[2] == 'v' or sensores.agentes[2] == 'e')){
+				plan_N4.clear();
 				return IDLE;
 			}else{
 				accion = plan_N4.front();
@@ -1449,6 +1450,7 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_4(Sensores sensores){
 				plan_N4.clear();
 				return IDLE;
 			}else if(accion == WALK and (sensores.agentes[2] == 'v' or sensores.agentes[2] == 'e')){
+				plan_N4.clear();
 				return IDLE;
 			}else{
 				accion = plan_N4.front();
