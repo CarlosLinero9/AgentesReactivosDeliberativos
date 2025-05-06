@@ -163,6 +163,7 @@ public:
     f_dest = -1;
     c_dest = -1;
     iteraciones = 3000;
+    iteraciones_busqueda = 0;
   }
   ComportamientoAuxiliar(std::vector<std::vector<unsigned char>> mapaR, std::vector<std::vector<unsigned char>> mapaC) : Comportamiento(mapaR,mapaC)
   {
@@ -242,6 +243,8 @@ public:
   bool EsAccionValidaA(const Action &accion, const EstadoA_N4 &estado);
   bool DestinoEnConoVision(const EstadoA_N4 &estado, const EstadoA_N4 &final);
   vector<pair<int, int>> ObtenerConoVision(const EstadoA_N4 &estado);
+  Action BuscaZapatillas(Sensores &sensores);
+
 
 
 
@@ -258,6 +261,8 @@ private:
   //Constantes
   const int SUMA_AL_VISITAR = 30; //Suma que se le añade a la casilla que se va a visitar
   const int SUMA_AL_VER = 1; //Suma que se le añade a la casilla que se ve en el cono de vision
+  const int ITERACIONES_BUSQUEDA_ZAP = 500;
+
 
   // Variables de Estado
   bool accion_defecto;
@@ -282,6 +287,7 @@ private:
   EstadoA_N4 current_state;
   EstadoA_N4 last_state;
   int iteraciones;
+  int iteraciones_busqueda;
 
   int f_dest, c_dest;
 };

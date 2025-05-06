@@ -1338,6 +1338,7 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_4(Sensores sensores){
 	ModificarMapaA(sensores, mapaResultado, mapaCotas);
 
 	if(mapaResultado[sensores.posF][sensores.posC] == 'D') tiene_zapatillas = true;
+	
 	if(sensores.choque){
 		// Si el rescatador choca, se reinicia el plan
 		plan_N4.clear();
@@ -1466,6 +1467,10 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_4(Sensores sensores){
 		if(plan_N4.size()==0 and hayPlan){
 			hayPlan=false;
 		}
+	}
+	if(!tiene_zapatillas and iteraciones_busqueda <= ITERACIONES_BUSQUEDA_ZAP and accion == IDLE){
+		iteraciones_busqueda++;
+		return BuscaZapatillas(sensores);
 	}
 
 	
@@ -2359,4 +2364,55 @@ vector<pair<int, int>> ComportamientoAuxiliar::ObtenerConoVision(const EstadoA_N
 	}
 
     return coordenadasCono;
+}
+
+
+Action ComportamientoAuxiliar::BuscaZapatillas(Sensores &sensores)
+{
+	Action accion;
+	SituarSensorenMapaA(mapaResultado, mapaCotas, sensores);
+	if(sensores.superficie[0] == 'D') tiene_zapatillas = true;
+
+	if(mapaResultado[sensores.posF][sensores.posC] == 'X'){
+		while(sensores.energia <= 2000){
+			return IDLE;
+		}
+	}
+
+
+	if(giro45izq != 0){
+		accion = TURN_SR;
+		giro45izq--;
+	}
+	else {
+		
+		int pos = VeoCasillaInteresanteA_N1(sensores, tiene_zapatillas);
+		switch (pos){
+			case 2:
+				accion = WALK;
+				break;
+			case 1:
+				giro45izq = 6;
+				accion = TURN_SR;
+				break;
+			case 3:
+				accion = TURN_SR;
+				break;
+			case 0:
+				if(accion_defecto){
+					accion = TURN_SR;
+				}else{
+					accion_defecto = true;
+					giro45izq = 6;
+					accion = TURN_SR;
+				}
+				
+				break;
+		}
+	}
+
+	
+	pasos++;
+	last_action = accion;
+	return accion;
 }

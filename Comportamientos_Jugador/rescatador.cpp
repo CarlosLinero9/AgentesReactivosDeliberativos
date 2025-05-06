@@ -2035,6 +2035,7 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_3(Sensores sensor
 Action ComportamientoRescatador::ComportamientoRescatadorNivel_4(Sensores sensores){
 	Action accion = IDLE;
 
+	
 	ModificarMapaR(sensores, mapaResultado, mapaCotas, mapaEntidades);
 
 	// for (int i = 0; i < mapaEntidades.size(); ++i) {
@@ -2045,8 +2046,10 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_4(Sensores sensor
 	// }
 	// std::cout << std::endl;
 
+	
 
 	if(mapaResultado[sensores.posF][sensores.posC] == 'D') tiene_zapatillas = true;
+	
 	if(sensores.choque){
 		// Si el rescatador choca, se reinicia el plan
 		plan_N4.clear();
@@ -2209,6 +2212,13 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_4(Sensores sensor
 	if(plan_N4.size()==0 and hayPlan){
 		hayPlan=false;
 	}
+
+	if(!tiene_zapatillas and iteraciones_busqueda <= ITERACIONES_BUSQUEDA_ZAP and accion == IDLE){
+		iteraciones_busqueda++;
+		return BuscaZapatillas(sensores);
+	}
+
+
 	return accion;
 }
 
@@ -3154,4 +3164,72 @@ bool ComportamientoRescatador::EsAccionValidaR(const Action &accion, const Estad
         return false; // La acción está prohibida
     }
 	return true; // La acción es válida
+}
+
+Action ComportamientoRescatador::BuscaZapatillas(Sensores &sensores) {
+	Action accion;
+	SituarSensorenMapaR(mapaResultado, mapaCotas, sensores);
+	if(sensores.superficie[0] == 'D') tiene_zapatillas = true;
+
+	if(mapaResultado[sensores.posF][sensores.posC] == 'X'){
+		while(sensores.energia <= 2000){
+			return IDLE;
+		}
+	}
+
+	if(!cola.empty()){
+		accion = cola.front();
+		cola.pop();
+	}
+	else {
+		int pos = VeoCasillaInteresanteR_N1(sensores, tiene_zapatillas);
+		switch (pos){
+			case 2:
+				accion = WALK;
+				//cout << "Avanzo" << endl;
+				break;
+			case 1:
+				cola.push(TURN_L);
+				cola.push(TURN_SR);
+				//cout << "Izqda" << endl;
+				break;
+			case 3:
+				accion = TURN_SR;
+				//cout << "Dcha" << endl;
+				break;
+			case 0:
+				if(accion_defecto){
+					accion = TURN_SR;
+				}else{
+					accion_defecto = true;
+					cola.push(TURN_L);
+					cola.push(TURN_SR);
+				}
+				//cout << "Defecto" << endl;
+				break;
+			case 4:
+				accion = RUN;
+				break;
+			case 5:
+				cola.push(TURN_SR);
+				cola.push(RUN);
+				break;
+			case 6:
+				cola.push(TURN_L);
+				cola.push(TURN_SR);
+				cola.push(RUN);
+				
+				break;
+
+			case 7:
+				cola.push(TURN_L);
+				cola.push(TURN_L);
+				
+				break;
+		}
+	}
+
+	
+	last_action = accion;
+	return accion;
 }

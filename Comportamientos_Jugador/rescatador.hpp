@@ -174,6 +174,7 @@ public:
     esperas = 0;
     fallos_auxiliares = 0;
     iteraciones = 3000;
+    iteraciones_busqueda = 0;
 
   }
 
@@ -269,6 +270,7 @@ public:
     const vector<vector<unsigned char>> &altura, const vector<vector<unsigned char>> &entidades);
   void ModificarMapaR(const Sensores &sensores, vector<vector<unsigned char>> &m, vector<vector<unsigned char>> &a, vector<vector<unsigned char>> &e);
   bool EsAccionValidaR(const Action &accion, const EstadoR_N4 &estado);
+  Action BuscaZapatillas(Sensores &sensores);
 
 
 
@@ -288,7 +290,8 @@ private:
   const int SUMA_AL_VISITAR = 30; //Suma que se le añade a la casilla que se va a visitar
   const int SUMA_AL_VER = 1; //Suma que se le añade a la casilla que se ve en el cono de vision
   const int MAXIMAS_ESPERAS_N4 = (mapaResultado.size() * mapaResultado[0].size() )/ 2; //Máximo de esperas que se permiten en el nivel 4
-  const int MAXIMOS_FALLOS_N4 = 3; //Máximo de esperas que se permiten en el nivel 2
+  const int MAXIMOS_FALLOS_N4 = 3; //Máximo de esperas que se permiten en el nivel 4
+  const int ITERACIONES_BUSQUEDA_ZAP = 500;
 
   // Variables de Estado
   bool accion_defecto;
@@ -315,6 +318,7 @@ private:
   int esperas;
   int fallos_auxiliares;
   int iteraciones;
+  int iteraciones_busqueda;
 };
 
 #endif
