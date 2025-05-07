@@ -2107,7 +2107,7 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_4(Sensores sensor
 		while(sensores.energia != 3000){
 			return IDLE;
 		}
-	}else if(sensores.energia < 500){
+	}else if(sensores.energia < 700){
 		if(!hayPlanEnergia){
 			int distancia = 5000;
 			int f = -1;

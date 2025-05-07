@@ -858,10 +858,10 @@ int ComportamientoAuxiliar::DetectarCasillaZapatillasA(Sensores &sensores, bool 
     return -1; // No se encontró ninguna casilla interesante
 }
 
-bool ComportamientoAuxiliar::EsTransitableA(char casilla){
+bool ComportamientoAuxiliar::EsTransitableA(int nivel, char casilla){
 	
 	if(casilla == 'X' or casilla == 'C' or casilla == 'D'
-		or casilla == 'S') return true;
+		or casilla == 'S' or (nivel == 4 and (casilla == 'T' or (casilla == 'B' and tiene_zapatillas)))) return true;
 	else return false;
 	
 }
@@ -892,13 +892,13 @@ int ComportamientoAuxiliar::VeoCasillaInteresanteA_N1(Sensores &sensores, bool z
 				case 4:
 				case 9:
 					//Aquí debería de meter algo de si es transitable o no
-					if(EsTransitableA(sensores.superficie[1]) and i_libre and i != 'P') return 1;
+					if(EsTransitableA(sensores.nivel, sensores.superficie[1]) and i_libre and i != 'P') return 1;
 					break;
 
 				case 3:
 				case 8:
 				case 15:
-					if(EsTransitableA(sensores.superficie[3]) and d_libre and d != 'P') return 3;
+					if(EsTransitableA(sensores.nivel, sensores.superficie[3]) and d_libre and d != 'P') return 3;
 					break;
 
 				case 2:
@@ -910,7 +910,7 @@ int ComportamientoAuxiliar::VeoCasillaInteresanteA_N1(Sensores &sensores, bool z
 				case 12:
 				case 13:	
 				case 14:
-					if(EsTransitableA(sensores.superficie[2]) and c_libre and c != 'P') return 2;
+					if(EsTransitableA(sensores.nivel, sensores.superficie[2]) and c_libre and c != 'P') return 2;
 					break;
 			}
 		}
@@ -997,9 +997,9 @@ int ComportamientoAuxiliar::VeoCasillaInteresanteA_N1(Sensores &sensores, bool z
 	std::sort(frecuencia_casillas.begin(), frecuencia_casillas.end());  // Ordena de menor a mayor
 
 	for (int freq : frecuencia_casillas) {
-		if (freq == frecuencia_c && c_libre and EsTransitableA(sensores.superficie[2]) and c!='P') return 2;
-		else if (freq == frecuencia_i && i_libre and EsTransitableA(sensores.superficie[1]) and i!='P') return 1;
-		else if (freq == frecuencia_d && d_libre and EsTransitableA(sensores.superficie[3]) and d!='P') return 3;
+		if (freq == frecuencia_c && c_libre and EsTransitableA(sensores.nivel, sensores.superficie[2]) and c!='P') return 2;
+		else if (freq == frecuencia_i && i_libre and EsTransitableA(sensores.nivel, sensores.superficie[1]) and i!='P') return 1;
+		else if (freq == frecuencia_d && d_libre and EsTransitableA(sensores.nivel, sensores.superficie[3]) and d!='P') return 3;
 	}
 
 	return 0;
@@ -1347,11 +1347,11 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_4(Sensores sensores){
 	
 	
 	
-	if(mapaResultado[sensores.posF][sensores.posC] == 'X'){
+	if(mapaResultado[sensores.posF][sensores.posC] == 'X' and !sensores.venpaca){
 		while(sensores.energia != 3000){
 			return IDLE;
 		}
-	}else if(sensores.energia < 500){
+	}else if(sensores.energia < 700){
 		if(!hayPlanEnergia){
 			//cout << "Planeo de Energia\n";
 			int distancia = 5000;
@@ -1394,7 +1394,7 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_4(Sensores sensores){
 				hayPlanEnergia = false;
 				plan_N4.clear();
 				return IDLE;
-			}else if(accion == WALK and (sensores.agentes[2] == 'v' or sensores.agentes[2] == 'e')){
+			}else if(accion == WALK and (sensores.agentes[2] != '_')){
 				plan_N4.clear();
 				return IDLE;
 			}else{
@@ -1447,7 +1447,7 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_4(Sensores sensores){
 				hayPlan = false;
 				plan_N4.clear();
 				return IDLE;
-			}else if(accion == WALK and (sensores.agentes[2] == 'v' or sensores.agentes[2] == 'e')){
+			}else if(accion == WALK and (sensores.agentes[2] != '_')){
 				plan_N4.clear();
 				return IDLE;
 			}else{
@@ -1460,10 +1460,70 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_4(Sensores sensores){
 			hayPlan=false;
 		}
 	}
-	if(!tiene_zapatillas and iteraciones_busqueda <= ITERACIONES_BUSQUEDA_ZAP and accion == IDLE){
-		iteraciones_busqueda++;
-		return BuscaZapatillas(sensores);
+
+	if(accion == IDLE){
+		if(!tiene_zapatillas and iteraciones_busqueda <= ITERACIONES_BUSQUEDA_ZAP){
+			iteraciones_busqueda++;
+			return BuscaZapatillas(sensores);
+		}else{
+			if(!hayPlanEnergia){
+				//cout << "Planeo de Energia\n";
+				int distancia = 5000;
+				int f = -1;
+				int c = -1;
+				for(int i = 0; i < mapaResultado.size(); i++){
+					for(int j = 0; j < mapaResultado[0].size(); j++){
+						// cout << "i: " << i << " j: " << j << endl;
+						// cout << mapaResultado[i][j] << endl;
+						if(mapaResultado[i][j] == 'X' and abs(i - sensores.posF) + abs(j - sensores.posC) < distancia){
+							distancia = abs(i - sensores.posF) + abs(j - sensores.posC);
+							f = i;
+							c = j;
+						}
+					}
+				//	cout << endl;
+				}
+				//cout << "f: " << f << " c: " << c << endl;
+				if(f != -1 and c != -1){
+					EstadoA_N4 inicio, fin;
+					inicio.f = sensores.posF;
+					inicio.c = sensores.posC;
+					inicio.brujula = sensores.rumbo;
+					inicio.zapatillas = tiene_zapatillas;
+					fin.f = f;
+					fin.c = c;
+					current_state = inicio;
+					plan_N4  = AlgoritmoAE(inicio, fin, mapaResultado, mapaCotas);
+					VisualizaPlan(inicio, plan_N4);
+					hayPlanEnergia = plan_N4.size() != 0;
+				}
+	
+			}
+			if(hayPlanEnergia and plan_N4.size()>0){
+				accion = plan_N4.front();
+				last_state = current_state;
+				current_state = applyA(accion, current_state, mapaResultado, mapaCotas);
+				if(current_state == last_state){
+					accionesProhibidas[last_state].insert(accion);
+					hayPlanEnergia = false;
+					plan_N4.clear();
+					return IDLE;
+				}else if(accion == WALK and (sensores.agentes[2] == 'v' or sensores.agentes[2] == 'e')){
+					plan_N4.clear();
+					return IDLE;
+				}else{
+					accion = plan_N4.front();
+					auto it = plan_N4.begin();
+					it = plan_N4.erase(it);
+				}
+				return accion;
+			}
+			if(plan_N4.size()==0 and hayPlanEnergia){
+				hayPlanEnergia=false;
+			}
+		}
 	}
+	
 
 	
 	return accion;

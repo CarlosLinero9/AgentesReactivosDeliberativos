@@ -195,7 +195,7 @@ public:
   Action ComportamientoAuxiliarNivel_1(Sensores sensores);
   int DetectarCasillaZapatillasA(Sensores &sensores, bool zap);
   int VeoCasillaInteresanteA_N1(Sensores & sensores, bool zap);
-  bool EsTransitableA(char casilla);
+  bool EsTransitableA(int nivel, char casilla);
   
 
   ///////////////////////////////////////////////////////////////////////////////////////////
