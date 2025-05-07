@@ -1353,18 +1353,23 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_4(Sensores sensores){
 		}
 	}else if(sensores.energia < 500){
 		if(!hayPlanEnergia){
+			//cout << "Planeo de Energia\n";
 			int distancia = 5000;
-			int f;
-			int c;
+			int f = -1;
+			int c = -1;
 			for(int i = 0; i < mapaResultado.size(); i++){
 				for(int j = 0; j < mapaResultado[0].size(); j++){
+					// cout << "i: " << i << " j: " << j << endl;
+					// cout << mapaResultado[i][j] << endl;
 					if(mapaResultado[i][j] == 'X' and abs(i - sensores.posF) + abs(j - sensores.posC) < distancia){
 						distancia = abs(i - sensores.posF) + abs(j - sensores.posC);
 						f = i;
 						c = j;
 					}
 				}
+			//	cout << endl;
 			}
+			//cout << "f: " << f << " c: " << c << endl;
 			if(f != -1 and c != -1){
 				EstadoA_N4 inicio, fin;
 				inicio.f = sensores.posF;
@@ -2386,13 +2391,7 @@ Action ComportamientoAuxiliar::BuscaZapatillas(Sensores &sensores)
 				accion = TURN_SR;
 				break;
 			case 0:
-				if(accion_defecto){
-					accion = TURN_SR;
-				}else{
-					accion_defecto = true;
-					giro45izq = 6;
-					accion = TURN_SR;
-				}
+				accion = IDLE; 
 				
 				break;
 		}

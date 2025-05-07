@@ -2110,8 +2110,8 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_4(Sensores sensor
 	}else if(sensores.energia < 500){
 		if(!hayPlanEnergia){
 			int distancia = 5000;
-			int f;
-			int c;
+			int f = -1;
+			int c = -1;
 			for(int i = 0; i < mapaResultado.size(); i++){
 				for(int j = 0; j < mapaResultado[0].size(); j++){
 					if(mapaResultado[i][j] == 'X' and abs(i - sensores.posF) + abs(j - sensores.posC) < distancia){
@@ -3198,13 +3198,7 @@ Action ComportamientoRescatador::BuscaZapatillas(Sensores &sensores) {
 				//cout << "Dcha" << endl;
 				break;
 			case 0:
-				if(accion_defecto){
-					accion = TURN_SR;
-				}else{
-					accion_defecto = true;
-					cola.push(TURN_L);
-					cola.push(TURN_SR);
-				}
+				accion = IDLE;
 				//cout << "Defecto" << endl;
 				break;
 			case 4:
