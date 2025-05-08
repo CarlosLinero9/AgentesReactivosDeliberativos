@@ -162,6 +162,8 @@ public:
     hayPlanEnergia = false;
     iteraciones = 3000;
     iteraciones_busqueda = 0;
+    hayPlanZapatillas = false;
+    zapatillas_vistas = false;
   }
   ComportamientoAuxiliar(std::vector<std::vector<unsigned char>> mapaR, std::vector<std::vector<unsigned char>> mapaC) : Comportamiento(mapaR,mapaC)
   {
@@ -259,7 +261,6 @@ private:
   //Constantes
   const int SUMA_AL_VISITAR = 30; //Suma que se le añade a la casilla que se va a visitar
   const int SUMA_AL_VER = 1; //Suma que se le añade a la casilla que se ve en el cono de vision
-  const int ITERACIONES_BUSQUEDA_ZAP = 500;
 
 
   // Variables de Estado
@@ -280,6 +281,9 @@ private:
   bool hayPlan;
   vector<Action> plan_N4;
   bool hayPlanEnergia;
+  bool hayPlanZapatillas;
+  bool zapatillas_vistas;
+
   map<EstadoA_N4, set<Action>> accionesProhibidas;
 
   EstadoA_N4 current_state;

@@ -175,6 +175,8 @@ public:
     fallos_auxiliares = 0;
     iteraciones = 3000;
     iteraciones_busqueda = 0;
+    zapatillas_vistas = false;
+    hayPlanZapatillas = false;
 
   }
 
@@ -309,6 +311,7 @@ private:
   vector<Action> plan_N4;
   bool hayPlan;
   bool hayPlanEnergia;
+  bool hayPlanZapatillas;
   map<EstadoR_N4, set<Action>> accionesProhibidas;
 
   EstadoR_N4 current_state;
@@ -319,6 +322,7 @@ private:
   int fallos_auxiliares;
   int iteraciones;
   int iteraciones_busqueda;
+  bool zapatillas_vistas;
 };
 
 #endif

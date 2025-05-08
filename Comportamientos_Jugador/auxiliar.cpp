@@ -1321,9 +1321,9 @@ vector<Action> ComportamientoAuxiliar::AlgoritmoAE(const EstadoA_N3 &inicio, con
 		}
 
 		if(SolutionFound) path = current_node.secuencia;
-		cout << "En abierto hay " << frontier.size() << " nodos\n";
-		cout << "En cerrado hay " << explored.size() << " nodos\n";
-		cout << "Se han realizado " << iteraciones << " iteraciones\n";
+		// cout << "En abierto hay " << frontier.size() << " nodos\n";
+		// cout << "En cerrado hay " << explored.size() << " nodos\n";
+		// cout << "Se han realizado " << iteraciones << " iteraciones\n";
 		return path;
 }
 
@@ -1343,15 +1343,20 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_4(Sensores sensores){
 		// Si el rescatador choca, se reinicia el plan
 		plan_N4.clear();
 		hayPlan = false;
+		hayPlanEnergia = false;
+		hayPlanZapatillas = false;
 	}
 	
 	
 	
-	if(mapaResultado[sensores.posF][sensores.posC] == 'X' and !sensores.venpaca){
-		while(sensores.energia != 3000){
+	if(mapaResultado[sensores.posF][sensores.posC] == 'X'){
+		if(sensores.energia == 3000) hayPlanEnergia = false;
+		while(sensores.energia < 3000){
+			//cout << "Recarga" << endl;
 			return IDLE;
 		}
-	}else if(sensores.energia < 700){
+	}
+	if(sensores.energia < 1000){
 		if(!hayPlanEnergia){
 			//cout << "Planeo de Energia\n";
 			int distancia = 5000;
@@ -1408,11 +1413,11 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_4(Sensores sensores){
 			hayPlanEnergia=false;
 		}
 	}
-	
+	//cout << "Plan Energia" << hayPlanEnergia << endl;
 
 
-	if (sensores.venpaca) {
-		//cout << "Venpaca: " << sensores.venpaca << endl;
+	if (sensores.venpaca and !hayPlanEnergia) {
+		cout << "Venpaca: " << sensores.venpaca << endl;
 		if(!hayPlan){
 			//cout << "Planeo de Inicio\n";
 			EstadoA_N4 inicio, fin;
@@ -1462,65 +1467,10 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_4(Sensores sensores){
 	}
 
 	if(accion == IDLE){
-		if(!tiene_zapatillas and iteraciones_busqueda <= ITERACIONES_BUSQUEDA_ZAP){
-			iteraciones_busqueda++;
+		// cout << "IDLE\n";
+		if(!tiene_zapatillas and sensores.energia > 1000){
+			//cout << "Buscando zapatillas\n";
 			return BuscaZapatillas(sensores);
-		}else{
-			if(!hayPlanEnergia){
-				//cout << "Planeo de Energia\n";
-				int distancia = 5000;
-				int f = -1;
-				int c = -1;
-				for(int i = 0; i < mapaResultado.size(); i++){
-					for(int j = 0; j < mapaResultado[0].size(); j++){
-						// cout << "i: " << i << " j: " << j << endl;
-						// cout << mapaResultado[i][j] << endl;
-						if(mapaResultado[i][j] == 'X' and abs(i - sensores.posF) + abs(j - sensores.posC) < distancia){
-							distancia = abs(i - sensores.posF) + abs(j - sensores.posC);
-							f = i;
-							c = j;
-						}
-					}
-				//	cout << endl;
-				}
-				//cout << "f: " << f << " c: " << c << endl;
-				if(f != -1 and c != -1){
-					EstadoA_N4 inicio, fin;
-					inicio.f = sensores.posF;
-					inicio.c = sensores.posC;
-					inicio.brujula = sensores.rumbo;
-					inicio.zapatillas = tiene_zapatillas;
-					fin.f = f;
-					fin.c = c;
-					current_state = inicio;
-					plan_N4  = AlgoritmoAE(inicio, fin, mapaResultado, mapaCotas);
-					VisualizaPlan(inicio, plan_N4);
-					hayPlanEnergia = plan_N4.size() != 0;
-				}
-	
-			}
-			if(hayPlanEnergia and plan_N4.size()>0){
-				accion = plan_N4.front();
-				last_state = current_state;
-				current_state = applyA(accion, current_state, mapaResultado, mapaCotas);
-				if(current_state == last_state){
-					accionesProhibidas[last_state].insert(accion);
-					hayPlanEnergia = false;
-					plan_N4.clear();
-					return IDLE;
-				}else if(accion == WALK and (sensores.agentes[2] == 'v' or sensores.agentes[2] == 'e')){
-					plan_N4.clear();
-					return IDLE;
-				}else{
-					accion = plan_N4.front();
-					auto it = plan_N4.begin();
-					it = plan_N4.erase(it);
-				}
-				return accion;
-			}
-			if(plan_N4.size()==0 and hayPlanEnergia){
-				hayPlanEnergia=false;
-			}
 		}
 	}
 	
@@ -1723,9 +1673,9 @@ vector<Action> ComportamientoAuxiliar::AlgoritmoAE(const EstadoA_N4 &inicio, con
 		}
 
 		if(SolutionFound) path = current_node.secuencia;
-		cout << "En abierto hay " << frontier.size() << " nodos\n";
-		cout << "En cerrado hay " << explored.size() << " nodos\n";
-		cout << "Se han realizado " << iteraciones << " iteraciones\n";
+		// cout << "En abierto hay " << frontier.size() << " nodos\n";
+		// cout << "En cerrado hay " << explored.size() << " nodos\n";
+		// cout << "Se han realizado " << iteraciones << " iteraciones\n";
 		return path;
 }
 
@@ -1925,6 +1875,11 @@ EstadoA_N4 ComportamientoAuxiliar::applyA(Action accion, const EstadoA_N4 &st, c
 }
 
 void ComportamientoAuxiliar::ModificarMapaA(const Sensores &sensores, vector<vector<unsigned char>> &m, vector<vector<unsigned char>> &a){
+	for(int i = 0; i < sensores.superficie.size(); i++){
+		if(sensores.superficie[i] == 'D'){
+			zapatillas_vistas = true;
+		}
+	}
 	switch(sensores.rumbo){
 		case norte:
 			m[sensores.posF][sensores.posC] = sensores.superficie[0];
@@ -2421,44 +2376,99 @@ vector<pair<int, int>> ComportamientoAuxiliar::ObtenerConoVision(const EstadoA_N
 
 Action ComportamientoAuxiliar::BuscaZapatillas(Sensores &sensores)
 {
-	Action accion;
-	SituarSensorenMapaA(mapaResultado, mapaCotas, sensores);
+	Action accion = IDLE;
+	ModificarMapaA(sensores, mapaResultado, mapaCotas);
 	if(sensores.superficie[0] == 'D') tiene_zapatillas = true;
 
-	if(mapaResultado[sensores.posF][sensores.posC] == 'X'){
-		while(sensores.energia <= 2000){
+	if(!hayPlanZapatillas and zapatillas_vistas){
+		int distancia = 5000;
+		int f = -1;
+		int c = -1;
+		for(int i = 0; i < mapaResultado.size(); i++){
+			for(int j = 0; j < mapaResultado[0].size(); j++){
+				// cout << "i: " << i << " j: " << j << endl;
+				// cout << mapaResultado[i][j] << endl;
+				if(mapaResultado[i][j] == 'D' and abs(i - sensores.posF) + abs(j - sensores.posC) < distancia){
+					distancia = abs(i - sensores.posF) + abs(j - sensores.posC);
+					f = i;
+					c = j;
+				}
+			}
+		//	cout << endl;
+		}
+		//cout << "f: " << f << " c: " << c << endl;
+		if(f != -1 and c != -1){
+			EstadoA_N4 inicio, fin;
+			inicio.f = sensores.posF;
+			inicio.c = sensores.posC;
+			inicio.brujula = sensores.rumbo;
+			inicio.zapatillas = tiene_zapatillas;
+			fin.f = f;
+			fin.c = c;
+			current_state = inicio;
+			plan_N4  = AlgoritmoAE(inicio, fin, mapaResultado, mapaCotas);
+			VisualizaPlan(inicio, plan_N4);
+			hayPlanZapatillas = plan_N4.size() != 0;
+		}
+	}
+	if(hayPlanZapatillas and plan_N4.size()>0){
+
+		accion = plan_N4.front();
+
+		last_state = current_state;
+		current_state = applyA(accion, current_state, mapaResultado, mapaCotas);
+		//cout << ((current_state == last_state) ? "No me muevo\n" : "Me muevo\n");
+		//cout << current_state.f << " " << current_state.c << " " << current_state.brujula << endl;
+		//cout << last_state.f << " " << last_state.c << " " << last_state.brujula << endl;
+		if(current_state == last_state){
+			//cout << "Cambio de planes\n";
+			accionesProhibidas[last_state].insert(accion);
+			hayPlanZapatillas = false;
+			plan_N4.clear();
 			return IDLE;
+		}else if(accion == WALK and (sensores.agentes[2] != '_')){
+			plan_N4.clear();
+			return IDLE;
+		}else{
+			accion = plan_N4.front();
+			auto it = plan_N4.begin();
+			it = plan_N4.erase(it);
 		}
 	}
-
-
-	if(giro45izq != 0){
-		accion = TURN_SR;
-		giro45izq--;
+	if(plan_N4.size()==0 and hayPlanZapatillas){
+		hayPlanZapatillas=false;
 	}
-	else {
-		
-		int pos = VeoCasillaInteresanteA_N1(sensores, tiene_zapatillas);
-		switch (pos){
-			case 2:
-				accion = WALK;
-				break;
-			case 1:
-				giro45izq = 6;
-				accion = TURN_SR;
-				break;
-			case 3:
-				accion = TURN_SR;
-				break;
-			case 0:
-				accion = IDLE; 
-				
-				break;
+
+	if(accion == IDLE){
+		if(giro45izq != 0){
+			accion = TURN_SR;
+			giro45izq--;
 		}
-	}
-
+		else {
+			
+			int pos = VeoCasillaInteresanteA_N1(sensores, tiene_zapatillas);
+			switch (pos){
+				case 2:
+					accion = WALK;
+					break;
+				case 1:
+					giro45izq = 6;
+					accion = TURN_SR;
+					break;
+				case 3:
+					accion = TURN_SR;
+					break;
+				case 0:
+					accion = TURN_SR; 
+					
+					break;
+			}
+		}
 	
-	pasos++;
-	last_action = accion;
+		
+		pasos++;
+		last_action = accion;
+	}
 	return accion;
+	
 }

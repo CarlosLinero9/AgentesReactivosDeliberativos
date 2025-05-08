@@ -2089,25 +2089,11 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_4(Sensores sensor
 
 	
 	if(mapaResultado[sensores.posF][sensores.posC] == 'X'){
-		// int limite_energia = 500;
-		// if(sensores.tiempo < 1000){
-		// 	limite_energia = 500;
-		// }else if(sensores.tiempo < 1500){
-		// 	limite_energia = 750;
-		// }else if(sensores.tiempo < 2000){
-		// 	limite_energia = 1000;
-		// }else if(sensores.tiempo < 2500){
-		// 	limite_energia = 1500;
-		// }else if(sensores.tiempo < 3000){
-		// 	limite_energia = 2000;
-		// }
-		// while(sensores.energia != limite_energia){
-		// 	return IDLE;
-		// }
 		while(sensores.energia != 3000){
 			return IDLE;
 		}
-	}else if(sensores.energia < 700){
+	}
+	if(sensores.energia < 700){
 		if(!hayPlanEnergia){
 			int distancia = 5000;
 			int f = -1;
@@ -2213,9 +2199,12 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_4(Sensores sensor
 		hayPlan=false;
 	}
 
-	if(!tiene_zapatillas and iteraciones_busqueda <= ITERACIONES_BUSQUEDA_ZAP and accion == IDLE){
-		iteraciones_busqueda++;
-		return BuscaZapatillas(sensores);
+	if(accion == IDLE){
+		//cout << "IDLE\n";
+		if(!tiene_zapatillas and sensores.energia > 1000){
+			//cout << "Buscando zapatillas\n";
+			return BuscaZapatillas(sensores);
+		}
 	}
 
 
@@ -2722,6 +2711,12 @@ EstadoR_N4 ComportamientoRescatador::applyR(Action accion, const EstadoR_N4 &st,
 
 void ComportamientoRescatador::ModificarMapaR(const Sensores &sensores, vector<vector<unsigned char>> &m, vector<vector<unsigned char>> &a,
 	vector<vector<unsigned char>> &e){
+
+	for(int i = 0; i < sensores.superficie.size(); i++){
+		if(sensores.superficie[i] == 'D'){
+			zapatillas_vistas = true;
+		}
+	}
 	switch(sensores.rumbo){
 		case norte:
 			m[sensores.posF][sensores.posC] = sensores.superficie[0];
@@ -3167,63 +3162,119 @@ bool ComportamientoRescatador::EsAccionValidaR(const Action &accion, const Estad
 }
 
 Action ComportamientoRescatador::BuscaZapatillas(Sensores &sensores) {
-	Action accion;
-	SituarSensorenMapaR(mapaResultado, mapaCotas, sensores);
+
+	Action accion = IDLE;
+	ModificarMapaR(sensores, mapaResultado, mapaCotas, mapaEntidades);
 	if(sensores.superficie[0] == 'D') tiene_zapatillas = true;
 
-	if(mapaResultado[sensores.posF][sensores.posC] == 'X'){
-		while(sensores.energia <= 2000){
+	if(!hayPlanZapatillas and zapatillas_vistas){
+		int distancia = 5000;
+		int f = -1;
+		int c = -1;
+		for(int i = 0; i < mapaResultado.size(); i++){
+			for(int j = 0; j < mapaResultado[0].size(); j++){
+				// cout << "i: " << i << " j: " << j << endl;
+				// cout << mapaResultado[i][j] << endl;
+				if(mapaResultado[i][j] == 'D' and abs(i - sensores.posF) + abs(j - sensores.posC) < distancia){
+					distancia = abs(i - sensores.posF) + abs(j - sensores.posC);
+					f = i;
+					c = j;
+				}
+			}
+		//	cout << endl;
+		}
+		//cout << "f: " << f << " c: " << c << endl;
+		if(f != -1 and c != -1){
+			EstadoR_N4 inicio, fin;
+			inicio.f = sensores.posF;
+			inicio.c = sensores.posC;
+			inicio.brujula = sensores.rumbo;
+			inicio.zapatillas = tiene_zapatillas;
+			fin.f = f;
+			fin.c = c;
+			current_state = inicio;
+			plan_N4  = AlgoritmoAE(inicio, fin, mapaResultado, mapaCotas, mapaEntidades);
+			VisualizaPlan(inicio, plan_N4);
+			hayPlanZapatillas = plan_N4.size() != 0;
+		}
+	}
+	if(hayPlanZapatillas and plan_N4.size()>0){
+
+		accion = plan_N4.front();
+
+		last_state = current_state;
+		current_state = applyR(accion, current_state, mapaResultado, mapaCotas, mapaEntidades);
+		//cout << ((current_state == last_state) ? "No me muevo\n" : "Me muevo\n");
+		//cout << current_state.f << " " << current_state.c << " " << current_state.brujula << endl;
+		//cout << last_state.f << " " << last_state.c << " " << last_state.brujula << endl;
+		if(current_state == last_state){
+			//cout << "Cambio de planes\n";
+			accionesProhibidas[last_state].insert(accion);
+			hayPlanZapatillas = false;
+			plan_N4.clear();
 			return IDLE;
+		}else if(accion == WALK and (sensores.agentes[2] != '_')){
+			plan_N4.clear();
+			return IDLE;
+		}else{
+			accion = plan_N4.front();
+			auto it = plan_N4.begin();
+			it = plan_N4.erase(it);
 		}
 	}
-
-	if(!cola.empty()){
-		accion = cola.front();
-		cola.pop();
+	if(plan_N4.size()==0 and hayPlanZapatillas){
+		hayPlanZapatillas=false;
 	}
-	else {
-		int pos = VeoCasillaInteresanteR_N1(sensores, tiene_zapatillas);
-		switch (pos){
-			case 2:
-				accion = WALK;
-				//cout << "Avanzo" << endl;
-				break;
-			case 1:
-				cola.push(TURN_L);
-				cola.push(TURN_SR);
-				//cout << "Izqda" << endl;
-				break;
-			case 3:
-				accion = TURN_SR;
-				//cout << "Dcha" << endl;
-				break;
-			case 0:
-				accion = IDLE;
-				//cout << "Defecto" << endl;
-				break;
-			case 4:
-				accion = RUN;
-				break;
-			case 5:
-				cola.push(TURN_SR);
-				cola.push(RUN);
-				break;
-			case 6:
-				cola.push(TURN_L);
-				cola.push(TURN_SR);
-				cola.push(RUN);
-				
-				break;
 
-			case 7:
-				cola.push(TURN_L);
-				cola.push(TURN_L);
-				
-				break;
+	if(accion == IDLE){
+		if(!cola.empty()){
+			accion = cola.front();
+			cola.pop();
 		}
-	}
-
+		else {
+			int pos = VeoCasillaInteresanteR_N1(sensores, tiene_zapatillas);
+			switch (pos){
+				case 2:
+					accion = WALK;
+					//cout << "Avanzo" << endl;
+					break;
+				case 1:
+					cola.push(TURN_L);
+					cola.push(TURN_SR);
+					//cout << "Izqda" << endl;
+					break;
+				case 3:
+					accion = TURN_SR;
+					//cout << "Dcha" << endl;
+					break;
+				case 0:
+					accion = TURN_SR;
+					//cout << "Defecto" << endl;
+					break;
+				case 4:
+					accion = RUN;
+					break;
+				case 5:
+					cola.push(TURN_SR);
+					cola.push(RUN);
+					break;
+				case 6:
+					cola.push(TURN_L);
+					cola.push(TURN_SR);
+					cola.push(RUN);
+					
+					break;
 	
-	last_action = accion;
+				case 7:
+					cola.push(TURN_L);
+					cola.push(TURN_L);
+					
+					break;
+			}
+		}
+	
+		
+		last_action = accion;
+	}
 	return accion;
 }
