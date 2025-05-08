@@ -1471,6 +1471,62 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_4(Sensores sensores){
 		if(!tiene_zapatillas and sensores.energia > 1000){
 			//cout << "Buscando zapatillas\n";
 			return BuscaZapatillas(sensores);
+		}else{
+			if(!hayPlanEnergia){
+				//cout << "Planeo de Energia\n";
+				int distancia = 5000;
+				int f = -1;
+				int c = -1;
+				for(int i = 0; i < mapaResultado.size(); i++){
+					for(int j = 0; j < mapaResultado[0].size(); j++){
+						// cout << "i: " << i << " j: " << j << endl;
+						// cout << mapaResultado[i][j] << endl;
+						if(mapaResultado[i][j] == 'X' and abs(i - sensores.posF) + abs(j - sensores.posC) < distancia){
+							distancia = abs(i - sensores.posF) + abs(j - sensores.posC);
+							f = i;
+							c = j;
+						}
+					}
+				//	cout << endl;
+				}
+				//cout << "f: " << f << " c: " << c << endl;
+				if(f != -1 and c != -1){
+					EstadoA_N4 inicio, fin;
+					inicio.f = sensores.posF;
+					inicio.c = sensores.posC;
+					inicio.brujula = sensores.rumbo;
+					inicio.zapatillas = tiene_zapatillas;
+					fin.f = f;
+					fin.c = c;
+					current_state = inicio;
+					plan_N4  = AlgoritmoAE(inicio, fin, mapaResultado, mapaCotas);
+					VisualizaPlan(inicio, plan_N4);
+					hayPlanEnergia = plan_N4.size() != 0;
+				}
+	
+			}
+			if(hayPlanEnergia and plan_N4.size()>0){
+				accion = plan_N4.front();
+				last_state = current_state;
+				current_state = applyA(accion, current_state, mapaResultado, mapaCotas);
+				if(current_state == last_state){
+					accionesProhibidas[last_state].insert(accion);
+					hayPlanEnergia = false;
+					plan_N4.clear();
+					return IDLE;
+				}else if(accion == WALK and (sensores.agentes[2] != '_')){
+					plan_N4.clear();
+					return IDLE;
+				}else{
+					accion = plan_N4.front();
+					auto it = plan_N4.begin();
+					it = plan_N4.erase(it);
+				}
+				return accion;
+			}
+			if(plan_N4.size()==0 and hayPlanEnergia){
+				hayPlanEnergia=false;
+			}
 		}
 	}
 	
