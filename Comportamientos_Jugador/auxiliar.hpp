@@ -257,12 +257,11 @@ public:
 private:
   // Definir Variables de Estado
 
-  /*NIVELES 0, 1 y 4*/
   //Constantes
   const int SUMA_AL_VISITAR = 30; //Suma que se le añade a la casilla que se va a visitar
   const int SUMA_AL_VER = 1; //Suma que se le añade a la casilla que se ve en el cono de vision
 
-
+  /*NIVELES 0, 1*/
   // Variables de Estado
   bool accion_defecto;
   queue<int> cola_acciones;

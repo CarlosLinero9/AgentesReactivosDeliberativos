@@ -200,15 +200,13 @@ public:
 
   /*NIVEL 0*/
   Action ComportamientoRescatadorNivel_0(Sensores sensores);
-  //bool NoVisitaFrecuente(int frecuencia);
   int VeoCasillaInteresanteR_N0(Sensores & sensores, bool zap);
   char ViablePorAlturaR (char casilla, int dif, bool zap);
   bool CasillaLibreR(char casilla);
   void SituarSensorenMapaR(vector<vector<unsigned char>> &m, vector<vector<unsigned char>> &a, Sensores sensores);
   int DetectarCasillaInteresanteR(Sensores &sensores, bool zap);
   bool PuedeCorrer_N0(int i, Sensores &sensores, bool zap);
-  // void RefrescarmatrizR(vector<vector<int>> &m);
-  // int minimo(int a, int b, int c);
+
 
   /*NIVEL 1*/
   Action ComportamientoRescatadorNivel_1(Sensores sensores);
@@ -287,14 +285,14 @@ public:
 private:
 
   //Constantes
-
-  /*NIVEL 0, 1 y 4*/
+ 
   const int SUMA_AL_VISITAR = 30; //Suma que se le añade a la casilla que se va a visitar
   const int SUMA_AL_VER = 1; //Suma que se le añade a la casilla que se ve en el cono de vision
   const int MAXIMAS_ESPERAS_N4 = (mapaResultado.size() * mapaResultado[0].size() )/ 2; //Máximo de esperas que se permiten en el nivel 4
   const int MAXIMOS_FALLOS_N4 = 3; //Máximo de esperas que se permiten en el nivel 4
   const int ITERACIONES_BUSQUEDA_ZAP = 500;
 
+  /*NIVEL 0, 1*/
   // Variables de Estado
   bool accion_defecto;
   queue<int> cola_acciones;

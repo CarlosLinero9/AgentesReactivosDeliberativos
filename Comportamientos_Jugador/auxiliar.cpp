@@ -67,16 +67,13 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_0(Sensores sensores)
 		switch (pos){
 			case 2:
 				accion = WALK;
-				//cout << "Avanzo" << endl;
 				break;
 			case 1:
 				giro45izq = 6;
 				accion = TURN_SR;
-				//cout << "Izqda" << endl;
 				break;
 			case 3:
 				accion = TURN_SR;
-				//cout << "Der" << endl;
 				break;
 			case 0:
 				if(accion_defecto){
@@ -86,7 +83,6 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_0(Sensores sensores)
 					giro45izq = 6;
 					accion = TURN_SR;
 				}
-				//cout << "Defecto" << endl;
 				break;
 		}
 	}
@@ -105,13 +101,7 @@ int ComportamientoAuxiliar::DetectarCasillaInteresanteA(Sensores &sensores, bool
     return -1; // No se encontró ninguna casilla interesante
 }
 
-// bool ComportamientoAuxiliar::NoVisitaFrecuente(int frecuencia){
-// 	// if(frecuencia <= 20) return true;
-// 	// else return false;
-// }
 
-/*Una primera idea para resolver puede ser esta. 
-Tengo que ir perfeccionando cosas.*/
 int ComportamientoAuxiliar::VeoCasillaInteresanteA(Sensores &sensores, bool zap){
 
 	char i = ViablePorAlturaA(sensores.superficie[1], sensores.cota[1]-sensores.cota[0], zap);
@@ -121,7 +111,6 @@ int ComportamientoAuxiliar::VeoCasillaInteresanteA(Sensores &sensores, bool zap)
 	bool i_libre = CasillaLibreA(sensores.agentes[1]);
 	bool c_libre = CasillaLibreA(sensores.agentes[2]);
 	bool d_libre = CasillaLibreA(sensores.agentes[3]);
-	/*Primero me aseguro de que se observa alguna casilla interesante*/
 
 	if (c == 'X' and c_libre) return 2;
 	else if (i == 'X' and i_libre) return 1;
@@ -228,7 +217,7 @@ int ComportamientoAuxiliar::VeoCasillaInteresanteA(Sensores &sensores, bool zap)
 			cola_acciones.pop();
 
 			switch (accion) {
-				case 1: // TURN_SL
+				case 1: // TURN_L
 					if (i_libre and (i == 'C' or i == 'D' or i == 'X')) {
 						return accion;
 					}
@@ -355,8 +344,6 @@ bool ComportamientoAuxiliar::CasillaLibreA(char casilla){
 }
 
 void ComportamientoAuxiliar::SituarSensorenMapaA(vector<vector<unsigned char>> &m, vector<vector<unsigned char>> &a, Sensores sensores){
-	//cout << "estoy en situarsensor en matriz de mapa\n";
-
 	int pos = 1;
 
 	switch(sensores.rumbo){
@@ -875,7 +862,6 @@ int ComportamientoAuxiliar::VeoCasillaInteresanteA_N1(Sensores &sensores, bool z
 	bool i_libre = CasillaLibreA(sensores.agentes[1]);
 	bool c_libre = CasillaLibreA(sensores.agentes[2]);
 	bool d_libre = CasillaLibreA(sensores.agentes[3]);
-	//cout << "i: " << i << " c: " << c << " d: " << d << endl;
 
 	if(!zap) {
 		if(c == 'D' and c_libre) return 2;
@@ -891,7 +877,6 @@ int ComportamientoAuxiliar::VeoCasillaInteresanteA_N1(Sensores &sensores, bool z
 				case 1:
 				case 4:
 				case 9:
-					//Aquí debería de meter algo de si es transitable o no
 					if(EsTransitableA(sensores.nivel, sensores.superficie[1]) and i_libre and i != 'P') return 1;
 					break;
 
@@ -921,10 +906,6 @@ int ComportamientoAuxiliar::VeoCasillaInteresanteA_N1(Sensores &sensores, bool z
 	int frecuencia_d=0;	
 
 	vector<int> frecuencia_casillas;
-
-	//Debería jugar tmb con los consumos para menearme lo maximo posible.
-	//Lo ideal será establecer una jerarquía en funcion del gasto al moverme
-	//y así ir a las que gasten menos.
 
 	switch(sensores.rumbo){
 		case norte:
@@ -1030,8 +1011,7 @@ void ComportamientoAuxiliar::AnularMatrizA(vector<vector<unsigned char>> &m){
 
 /*NIVEL 2*/
 Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_2(Sensores sensores){
-	//Debería de definir algún comportamiento para apartarse y no molestar al rescatador
-	//De todas formas, el rescatador lo evita en su comportamiento
+	
 	Action accion = IDLE;
 	return accion;
 }
@@ -1045,7 +1025,6 @@ int ComportamientoAuxiliar::Heuristica(const EstadoA_N3 &a, const EstadoA_N3 &b)
 	int dx = std::abs(a.f - b.f);   
 	int dy = std::abs(a.c - b.c); 
 
-	//return 0;
 	if(dx < dy) return dy;
 	else return dx;
 }
@@ -1321,9 +1300,7 @@ vector<Action> ComportamientoAuxiliar::AlgoritmoAE(const EstadoA_N3 &inicio, con
 		}
 
 		if(SolutionFound) path = current_node.secuencia;
-		// cout << "En abierto hay " << frontier.size() << " nodos\n";
-		// cout << "En cerrado hay " << explored.size() << " nodos\n";
-		// cout << "Se han realizado " << iteraciones << " iteraciones\n";
+
 		return path;
 }
 
@@ -1334,7 +1311,6 @@ vector<Action> ComportamientoAuxiliar::AlgoritmoAE(const EstadoA_N3 &inicio, con
 
 Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_4(Sensores sensores){
 	Action accion = IDLE;
-
 	ModificarMapaA(sensores, mapaResultado, mapaCotas);
 
 	if(mapaResultado[sensores.posF][sensores.posC] == 'D') tiene_zapatillas = true;
@@ -1347,34 +1323,27 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_4(Sensores sensores){
 		hayPlanZapatillas = false;
 	}
 	
-	
-	
 	if(mapaResultado[sensores.posF][sensores.posC] == 'X'){
-		if(sensores.energia == 3000) hayPlanEnergia = false;
-		while(sensores.energia < 3000){
-			//cout << "Recarga" << endl;
+		if(sensores.energia == 2500) hayPlanEnergia = false;
+		while(sensores.energia < 2500){
 			return IDLE;
 		}
 	}
-	if(sensores.energia < 1000){
+
+	if(sensores.energia < 700){
 		if(!hayPlanEnergia){
-			//cout << "Planeo de Energia\n";
 			int distancia = 5000;
 			int f = -1;
 			int c = -1;
 			for(int i = 0; i < mapaResultado.size(); i++){
 				for(int j = 0; j < mapaResultado[0].size(); j++){
-					// cout << "i: " << i << " j: " << j << endl;
-					// cout << mapaResultado[i][j] << endl;
 					if(mapaResultado[i][j] == 'X' and abs(i - sensores.posF) + abs(j - sensores.posC) < distancia){
 						distancia = abs(i - sensores.posF) + abs(j - sensores.posC);
 						f = i;
 						c = j;
 					}
 				}
-			//	cout << endl;
 			}
-			//cout << "f: " << f << " c: " << c << endl;
 			if(f != -1 and c != -1){
 				EstadoA_N4 inicio, fin;
 				inicio.f = sensores.posF;
@@ -1413,13 +1382,11 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_4(Sensores sensores){
 			hayPlanEnergia=false;
 		}
 	}
-	//cout << "Plan Energia" << hayPlanEnergia << endl;
 
 
 	if (sensores.venpaca and !hayPlanEnergia) {
 		cout << "Venpaca: " << sensores.venpaca << endl;
 		if(!hayPlan){
-			//cout << "Planeo de Inicio\n";
 			EstadoA_N4 inicio, fin;
 			inicio.f = sensores.posF;
 			inicio.c = sensores.posC;
@@ -1427,15 +1394,10 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_4(Sensores sensores){
 			inicio.zapatillas = tiene_zapatillas;
 			fin.f = sensores.destinoF;
 			fin.c = sensores.destinoC;
-			//cout << "A" << endl;
 			current_state = inicio;
-			//cout << "B"	<< endl;
 			plan_N4  = AlgoritmoAE_N4(inicio, fin, mapaResultado, mapaCotas);
-			//cout << "C" << endl;
 			VisualizaPlan(inicio, plan_N4);
-			//cout << "D" << endl;
 			hayPlan = plan_N4.size() != 0;
-			//cout << "E" << endl;
 		}
 		if(hayPlan and plan_N4.size()>0){
 
@@ -1443,11 +1405,8 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_4(Sensores sensores){
 	
 			last_state = current_state;
 			current_state = applyA(accion, current_state, mapaResultado, mapaCotas);
-			//cout << ((current_state == last_state) ? "No me muevo\n" : "Me muevo\n");
-			//cout << current_state.f << " " << current_state.c << " " << current_state.brujula << endl;
-			//cout << last_state.f << " " << last_state.c << " " << last_state.brujula << endl;
+			
 			if(current_state == last_state){
-				//cout << "Cambio de planes\n";
 				accionesProhibidas[last_state].insert(accion);
 				hayPlan = false;
 				plan_N4.clear();
@@ -1467,29 +1426,22 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_4(Sensores sensores){
 	}
 
 	if(accion == IDLE){
-		// cout << "IDLE\n";
 		if(!tiene_zapatillas and sensores.energia > 1000){
-			//cout << "Buscando zapatillas\n";
 			return BuscaZapatillas(sensores);
 		}else{
 			if(!hayPlanEnergia){
-				//cout << "Planeo de Energia\n";
 				int distancia = 5000;
 				int f = -1;
 				int c = -1;
 				for(int i = 0; i < mapaResultado.size(); i++){
 					for(int j = 0; j < mapaResultado[0].size(); j++){
-						// cout << "i: " << i << " j: " << j << endl;
-						// cout << mapaResultado[i][j] << endl;
 						if(mapaResultado[i][j] == 'X' and abs(i - sensores.posF) + abs(j - sensores.posC) < distancia){
 							distancia = abs(i - sensores.posF) + abs(j - sensores.posC);
 							f = i;
 							c = j;
 						}
 					}
-				//	cout << endl;
 				}
-				//cout << "f: " << f << " c: " << c << endl;
 				if(f != -1 and c != -1){
 					EstadoA_N4 inicio, fin;
 					inicio.f = sensores.posF;
@@ -1542,40 +1494,28 @@ vector<Action> ComportamientoAuxiliar::AlgoritmoAE_N4(const EstadoA_N4 &inicio, 
 		set<EstadoA_N4> explored;
 		vector<Action> path;
 		int iteraciones = 0;
-		//cout << "B_1" << endl;
-
 		current_node.estado = inicio;
 		current_node.energia = 0;
 		current_node.energia_heuristica = 0;
 		if(terreno[current_node.estado.f][current_node.estado.c] == 'D'){
 			current_node.estado.zapatillas = true;
 		}
-		//cout << "B_2" << endl;
 
 		frontier.push(current_node);
 		bool SolutionFound = DestinoEnConoVision(current_node.estado, final);
-		//cout << "B_3" << endl;
 
 		while(!SolutionFound and !frontier.empty()){
 
 			iteraciones++;
 			frontier.pop();
 			explored.insert(current_node.estado);
-
-			// if(iteraciones){
-			// 	cout << "B_4" << endl;
-			// }
 			
 
 			if(DestinoEnConoVision(current_node.estado, final)){
 				SolutionFound = true;
 			}			
-			// if(iteraciones){
-			// 	cout << "B_5" << endl;
-			// }
-			// Genero el hijo resultante de aplicar la acción WALK
+			
 			if(EsAccionValidaA(WALK, current_node.estado)){
-				//cout << "B_5.1" << endl;
 				NodoA_N4 child_WALK = current_node;
 				child_WALK.estado = applyA(WALK, current_node.estado, terreno, altura);
 				child_WALK.secuencia.push_back(WALK);
@@ -1587,18 +1527,10 @@ vector<Action> ComportamientoAuxiliar::AlgoritmoAE_N4(const EstadoA_N4 &inicio, 
 					frontier.push(child_WALK);
 				}
 			}
-			// if(iteraciones){
-			// 	cout << "B_6" << endl;
-			// }
-			
-			// if(iteraciones){
-			// 	cout << "B_7" << endl;
-			// }
 
 			// Genero el hijo resultante de aplicar la acción TURN_SR
 			if(!SolutionFound){
 				if(EsAccionValidaA(TURN_SR, current_node.estado)){
-					//cout << "B_7.1" << endl;
 					// Genero el hijo resultante de aplicar la acción TURN_SR
 					NodoA_N4 child_TURN_SR = current_node;
 					child_TURN_SR.estado = applyA(TURN_SR, current_node.estado, terreno, altura);
@@ -1610,55 +1542,24 @@ vector<Action> ComportamientoAuxiliar::AlgoritmoAE_N4(const EstadoA_N4 &inicio, 
 						frontier.push(child_TURN_SR);
 					}
 				}
-				// if(iteraciones){
-				// 	cout << "B_8" << endl;
-				// }
 			}
-			// if(iteraciones){
-			// 	cout << "B_9" << endl;
-			// }
 
 			// Paso a evaluar el siguiente nodo en la lista "frontier"
 			if(!SolutionFound and !frontier.empty()){
-				// if(iteraciones){
-				// 	cout << "B_10" << endl;
-				// }
 				current_node = frontier.top();
-				// if(iteraciones == 1){
-				// 	cout << "B_11" << endl;
-				// }
 				while(explored.find(current_node.estado) != explored.end() and !frontier.empty()){
-					// if(iteraciones){
-					// 	cout << "B_12" << endl;
-					// }
 					frontier.pop();
-					// if(iteraciones == 1){
-					// 	cout << "B_13" << endl;
-					// }
 
 					if(!frontier.empty())
 						current_node = frontier.top();
-
-					// if(iteraciones){
-					// 	cout << "B_14" << endl;
-					// }
 				}
-				// if(iteraciones){
-				// 	cout << "B_15" << endl;
-				// }
 			}
-			// if(iteraciones){
-			// 	cout << "B_16" << endl;
-			// }
 		}
 		
-		//cout << "B_17" << endl;
 		
 		
 		if(SolutionFound) path = current_node.secuencia;
-		// cout << "En abierto hay " << frontier.size() << " nodos\n";
-		// cout << "En cerrado hay " << explored.size() << " nodos\n";
-		// cout << "Se han realizado " << iteraciones << " iteraciones\n";
+		
 		return path;
 }
 
@@ -1729,9 +1630,7 @@ vector<Action> ComportamientoAuxiliar::AlgoritmoAE(const EstadoA_N4 &inicio, con
 		}
 
 		if(SolutionFound) path = current_node.secuencia;
-		// cout << "En abierto hay " << frontier.size() << " nodos\n";
-		// cout << "En cerrado hay " << explored.size() << " nodos\n";
-		// cout << "Se han realizado " << iteraciones << " iteraciones\n";
+		
 		return path;
 }
 
@@ -1739,7 +1638,6 @@ int ComportamientoAuxiliar::Heuristica(const EstadoA_N4 &a, const EstadoA_N4 &b)
 	int dx = std::abs(a.f - b.f);   
 	int dy = std::abs(a.c - b.c); 
 
-	//return 0;
 	if(dx < dy) return dy;
 	else return dx;
 }
@@ -2249,18 +2147,14 @@ bool ComportamientoAuxiliar::DestinoEnConoVision(const EstadoA_N4 &estado, const
     int destinoF = final.f;
     int destinoC = final.c;
 
-	//cout << "Destino: " << destinoF << " " << destinoC << endl;
 
     // Buscar si el destino está en el vector
     for (const auto &coordenada : conoVision) {
-		//cout << coordenada.first << " " << coordenada.second << endl;
         if (coordenada.first == destinoF && coordenada.second == destinoC) {
-			//cout << "True" << endl;
             return true; // El destino está en el cono de visión
         }
     }
 
-	//cout << "False" << endl;
     return false; // El destino no está en el cono de visión
 }
 
@@ -2442,17 +2336,14 @@ Action ComportamientoAuxiliar::BuscaZapatillas(Sensores &sensores)
 		int c = -1;
 		for(int i = 0; i < mapaResultado.size(); i++){
 			for(int j = 0; j < mapaResultado[0].size(); j++){
-				// cout << "i: " << i << " j: " << j << endl;
-				// cout << mapaResultado[i][j] << endl;
+				
 				if(mapaResultado[i][j] == 'D' and abs(i - sensores.posF) + abs(j - sensores.posC) < distancia){
 					distancia = abs(i - sensores.posF) + abs(j - sensores.posC);
 					f = i;
 					c = j;
 				}
 			}
-		//	cout << endl;
 		}
-		//cout << "f: " << f << " c: " << c << endl;
 		if(f != -1 and c != -1){
 			EstadoA_N4 inicio, fin;
 			inicio.f = sensores.posF;
@@ -2473,11 +2364,8 @@ Action ComportamientoAuxiliar::BuscaZapatillas(Sensores &sensores)
 
 		last_state = current_state;
 		current_state = applyA(accion, current_state, mapaResultado, mapaCotas);
-		//cout << ((current_state == last_state) ? "No me muevo\n" : "Me muevo\n");
-		//cout << current_state.f << " " << current_state.c << " " << current_state.brujula << endl;
-		//cout << last_state.f << " " << last_state.c << " " << last_state.brujula << endl;
+		
 		if(current_state == last_state){
-			//cout << "Cambio de planes\n";
 			accionesProhibidas[last_state].insert(accion);
 			hayPlanZapatillas = false;
 			plan_N4.clear();
