@@ -1385,7 +1385,6 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_4(Sensores sensores){
 
 
 	if (sensores.venpaca and !hayPlanEnergia) {
-		cout << "Venpaca: " << sensores.venpaca << endl;
 		if(!hayPlan){
 			EstadoA_N4 inicio, fin;
 			inicio.f = sensores.posF;

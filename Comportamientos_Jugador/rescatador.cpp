@@ -972,7 +972,6 @@ bool ComportamientoRescatador::DetectarAgenteR(Sensores &sensores) {
 	for (int i = 1; i < sensores.agentes.size(); ++i) {
 		
 		if (sensores.agentes[i] == 'a') {
-			cout << i << endl;
 			return true; // Se encontró un agente
 		}    
 	}
@@ -1987,9 +1986,7 @@ list<Action> ComportamientoRescatador::DijsktraR(const EstadoR_N2 &inicio, const
 		}
 		
 		if(SolutionFound) path = current_node.secuencia;
-		cout << "En abierto hay " << frontier.size() << " nodos\n";
-		cout << "En cerrado hay " << explored.size() << " nodos\n";
-		cout << "Se han realizado " << iteraciones << " iteraciones\n";
+		
 		return path;
 	}
 
